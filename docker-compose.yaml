@@ -5,7 +5,7 @@ services:
     restart: always
 
     env_file: 
-      - path: ./database/database.env
+      - path: ./database/.env
         required: true
 
     volumes: 
@@ -22,6 +22,34 @@ services:
 
     networks:
       - app_networks
+
+  backend: 
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+
+    restart: always
+
+    env_file: 
+      - path: ./backend/.env
+        required: true
+
+    develop:
+      watch:
+        - path: ./backend/package.json
+          action: rebuild
+
+        - path: ./backend/
+          target: /app
+          action: sync
+
+    ports:
+      - 3000:3000
+
+    depends_on:
+      db:
+        condition: service_healthy
+
 
 volumes:
   postgresql_data:

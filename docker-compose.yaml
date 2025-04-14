@@ -50,6 +50,41 @@ services:
       db:
         condition: service_healthy
 
+    networks:
+      - app_networks
+
+  frontend: 
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+
+    restart: always
+
+    env_file: 
+      - path: ./frontend/.env
+        required: true
+
+    develop:
+      watch:
+        - path: ./frontend/package.json
+          action: rebuild
+
+        - path: ./frontend/
+          target: /app
+          action: sync
+
+    ports:
+      - 5173:5173
+
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_started
+
+    networks:
+      - app_networks
+
 
 volumes:
   postgresql_data:

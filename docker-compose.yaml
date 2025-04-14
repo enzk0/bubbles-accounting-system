@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:17.4
+
+    restart: always
+
+    env_file: 
+      - path: ./database/database.env
+        required: true
+
+    volumes: 
+      - postgresql_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    ports:
+      - 5432:5432
+
+    networks:
+      - app_networks
+
+volumes:
+  postgresql_data:
+
+networks:
+  app_networks:

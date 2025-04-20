@@ -13,3 +13,112 @@ datasource db {
     provider = "postgresql"
     url      = env("TEST_DATABASE_URL")
 }
+
+model Branch {
+    id Int @id @default(autoincrement())
+
+    code    String @unique
+    address String
+    counter Int
+
+    createdAt DateTime @default(now())
+
+    JobOrder JobOrder[]
+}
+
+model User {
+    id Int @id @default(autoincrement())
+
+    name     String
+    password String
+
+    createdAt DateTime
+
+    role   Role? @relation(fields: [roleId], references: [id])
+    roleId Int?
+
+    JobOrder JobOrder[]
+}
+
+model Role {
+    id Int @id @default(autoincrement())
+
+    name        String
+    description String?
+
+    user        User[]
+    permissions Permission[]
+}
+
+model Permission {
+    id Int @id @default(autoincrement())
+
+    name        String
+    description String?
+
+    roles Role[]
+}
+
+model Customer {
+    id Int @id @default(autoincrement())
+
+    name      String
+    address   String @default("")
+    contactNo String @default("")
+
+    createdAt DateTime @default(now())
+
+    JobOrder JobOrder[]
+}
+
+model Product {
+    id Int @id @default(autoincrement())
+
+    name  String
+    price Float
+
+    JobOrderItem JobOrderItem[]
+}
+
+model JobOrder {
+    idCode   String
+    idNumber Int
+
+    createdAt DateTime  @default(now())
+    paidAt    DateTime?
+    claimedAt DateTime?
+
+    isPaid    Boolean
+    isClaimed Boolean
+
+    employeeInCharge String @default("")
+    remarks          String @default("")
+
+    branch   Branch @relation(fields: [branchId], references: [id])
+    branchId Int
+
+    customer   Customer @relation(fields: [customerId], references: [id])
+    customerId Int
+
+    user   User @relation(fields: [userId], references: [id])
+    userId Int
+
+    jobOrderItems JobOrderItem[]
+
+    @@id([idCode, idNumber])
+}
+
+model JobOrderItem {
+    id Int @id @default(autoincrement())
+
+    productName     String
+    productPrice    Float
+    productQuantity Int
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+
+    JobOrder         JobOrder @relation(fields: [jobOrderIdCode, jobOrderIdNumber], references: [idCode, idNumber])
+    jobOrderIdCode   String
+    jobOrderIdNumber Int
+}

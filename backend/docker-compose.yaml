@@ -1,0 +1,11 @@
+services:
+  db:
+    image: postgres:17.4
+    restart: no
+    container_name: supertask-test-database
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: tests

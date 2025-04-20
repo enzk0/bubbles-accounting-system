@@ -118,7 +118,7 @@ model JobOrderItem {
     product   Product @relation(fields: [productId], references: [id])
     productId Int
 
-    JobOrder         JobOrder? @relation(fields: [jobOrderIdCode, jobOrderIdNumber], references: [idCode, idNumber])
-    jobOrderIdCode   String?
-    jobOrderIdNumber Int?
+    JobOrder         JobOrder @relation(fields: [jobOrderIdCode, jobOrderIdNumber], references: [idCode, idNumber])
+    jobOrderIdCode   String
+    jobOrderIdNumber Int
 }

@@ -13,3 +13,68 @@ datasource db {
     provider = "postgresql"
     url      = env("TEST_DATABASE_URL")
 }
+
+model Branch {
+    id Int @id @default(autoincrement())
+
+    code    String @unique
+    address String
+    counter Int
+
+    createdAt DateTime @default(now())
+}
+
+model User {
+    id Int @id @default(autoincrement())
+
+    name     String
+    password String
+
+    createdAt DateTime
+}
+
+model Role {
+    id Int @id @default(autoincrement())
+
+    name        String
+    description String?
+}
+
+model Permission {
+    id Int @id @default(autoincrement())
+
+    name        String
+    description String?
+}
+
+model Product {
+    id Int @id @default(autoincrement())
+
+    name  String
+    price Float
+}
+
+model JobOrder {
+    idCode   String
+    idNumber Int
+
+    createdAt DateTime  @default(now())
+    paidAt    DateTime?
+    claimedAt DateTime?
+
+    isPaid    Boolean
+    isClaimed Boolean
+
+    employeeInCharge String @default("")
+    remarks          String @default("")
+
+    @@id([idCode, idNumber])
+}
+
+model JobOrderItem {
+    id Int @id @default(autoincrement())
+
+    productName     String
+    productPrice    Float
+    productQuantity Int
+}

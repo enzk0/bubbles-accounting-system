@@ -22,6 +22,8 @@ model Branch {
     counter Int
 
     createdAt DateTime @default(now())
+
+    JobOrder JobOrder[]
 }
 
 model User {
@@ -34,6 +36,8 @@ model User {
 
     role   Role? @relation(fields: [roleId], references: [id])
     roleId Int?
+
+    JobOrder JobOrder[]
 }
 
 model Role {
@@ -63,6 +67,8 @@ model Customer {
     contactNo String @default("")
 
     createdAt DateTime @default(now())
+
+    JobOrder JobOrder[]
 }
 
 model Product {
@@ -88,6 +94,17 @@ model JobOrder {
     employeeInCharge String @default("")
     remarks          String @default("")
 
+    branch   Branch @relation(fields: [branchId], references: [id])
+    branchId Int
+
+    customer   Customer @relation(fields: [customerId], references: [id])
+    customerId Int
+
+    user   User @relation(fields: [userId], references: [id])
+    userId Int
+
+    jobOrderItems JobOrderItem[]
+
     @@id([idCode, idNumber])
 }
 
@@ -100,4 +117,8 @@ model JobOrderItem {
 
     product   Product @relation(fields: [productId], references: [id])
     productId Int
+
+    JobOrder         JobOrder? @relation(fields: [jobOrderIdCode, jobOrderIdNumber], references: [idCode, idNumber])
+    jobOrderIdCode   String?
+    jobOrderIdNumber Int?
 }

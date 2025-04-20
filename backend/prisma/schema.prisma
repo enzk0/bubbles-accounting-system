@@ -29,7 +29,7 @@ model Branch {
 model User {
     id Int @id @default(autoincrement())
 
-    name     String
+    name     String @unique
     password String
 
     createdAt DateTime
@@ -43,7 +43,7 @@ model User {
 model Role {
     id Int @id @default(autoincrement())
 
-    name        String
+    name        String  @unique
     description String?
 
     user        User[]
@@ -53,7 +53,7 @@ model Role {
 model Permission {
     id Int @id @default(autoincrement())
 
-    name        String
+    name        String  @unique
     description String?
 
     roles Role[]
@@ -74,7 +74,7 @@ model Customer {
 model Product {
     id Int @id @default(autoincrement())
 
-    name  String
+    name  String @unique
     price Float
 
     JobOrderItem JobOrderItem[]

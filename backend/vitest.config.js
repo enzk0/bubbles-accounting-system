@@ -16,6 +16,8 @@ if (process.env.TESTING_TYPE === "unit") {
       include: ["**/*.test.js"],
       exclude: [
         "**/*.integration.test.js",
+        "**/*.template.test.js",
+        "**/*.template.integration.test.js",
         "**/node_modules/**",
         "**/dist/**",
         "**/cypress/**",
@@ -39,6 +41,15 @@ if (process.env.TESTING_TYPE === "integration") {
       environment: "node",
       setupFiles: [],
       include: ["**/*.integration.test.js"],
+      exclude: [
+        "**/*.template.test.js",
+        "**/*.template.integration.test.js",
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/cypress/**",
+        "**/.{idea,git,cache,output,temp}/**",
+        "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
+      ],
     },
   });
 }

@@ -7,9 +7,9 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:restart": "npm run docker:down && npm run docker:up",
-    "test": "vitest --reporter=verbose --run",
-    "test:unit": "cross-env TESTING_TYPE=unit ENVIRONMENT=testing npm run test",
-    "test:integration": "prisma migrate deploy && cross-env TESTING_TYPE=integration ENVIRONMENT=testing npm run test",
+    "test": "cross-env ENVIRONMENT=testing vitest --reporter=verbose --run",
+    "test:unit": "cross-env TESTING_TYPE=unit npm run test",
+    "test:integration": "prisma migrate deploy && cross-env TESTING_TYPE=integration npm run test",
     "dev": "nodemon index.js"
   },
   "author": "",

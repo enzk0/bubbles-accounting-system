@@ -55,13 +55,6 @@ model Permission {
     roles Role[]
 }
 
-model Product {
-    id Int @id @default(autoincrement())
-
-    name  String
-    price Float
-}
-
 model Customer {
     id Int @id @default(autoincrement())
 
@@ -70,6 +63,15 @@ model Customer {
     contactNo String @default("")
 
     createdAt DateTime @default(now())
+}
+
+model Product {
+    id Int @id @default(autoincrement())
+
+    name  String
+    price Float
+
+    JobOrderItem JobOrderItem[]
 }
 
 model JobOrder {
@@ -95,4 +97,7 @@ model JobOrderItem {
     productName     String
     productPrice    Float
     productQuantity Int
+
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
 }

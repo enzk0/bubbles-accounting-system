@@ -10,14 +10,11 @@ export async function createUser(req, res) {
         return res.status(422);
     }
 
-    const hashedPassword = bcrypt.hashSync(
-        userInformation.password,
-        saltRounds
-    );
+    const hash = bcrypt.hashSync(userInformation.password, saltRounds);
 
     try {
         const user = await prisma.user.create({
-            data: { ...userInformation, password: hashedPassword },
+            data: { ...userInformation, password: hash },
         });
 
         res.status(201);
@@ -34,6 +31,32 @@ export async function deleteUser(req, res) {
         const user = await prisma.user.delete({
             where: {
                 name: userInformation.name,
+            },
+        });
+
+        res.status(200);
+        return user;
+    } catch (error) {
+        return res.status(500);
+    }
+}
+
+export async function changePassword(req, res) {
+    const { userInformation } = req.body;
+
+    if (!userInformation.name || !userInformation.password) {
+        return res.status(422);
+    }
+
+    const hash = bcrypt.hashSync(userInformation.password, saltRounds);
+
+    try {
+        const user = await prisma.user.update({
+            where: {
+                name: userInformation.name,
+            },
+            data: {
+                password: hash,
             },
         });
 

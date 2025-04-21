@@ -84,3 +84,61 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(422);
     });
 });
+
+describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
+    const mockRequest = (body) => ({
+        body: body,
+    });
+
+    const mockResponse = () => {
+        const res = {};
+
+        res.status = vi.fn().mockReturnValue(res);
+        res.json = vi.fn().mockReturnValue(res);
+
+        return res;
+    };
+
+    test("deleteUser() should send a HTTP response code of 200 when a user is deleted successfully", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            userInformation: { name: "john_doe" },
+        });
+
+        const res = mockResponse();
+
+        const mock = {
+            id: 2,
+            name: "john_doe",
+            password:
+                "$2a$12$j82bxfd6gJTHiYJae7nK2.0hJQ.7zQ9luwED1rSYZn.CLai.5HWaC",
+            createdAt: new Date(),
+            roleId: null,
+        };
+
+        prismaMock.user.delete.mockResolvedValue(mock);
+
+        const user = await deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalled(200);
+        expect(mock).toEqual(user);
+    });
+
+    test("deleteUser() should send a HTTP response code of 500 when an error in deleting a user in the database occurs", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            userInformation: { name: "john_doe" },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.user.delete.mockImplementation(() => {
+            let error = new Error();
+            throw error;
+        });
+
+        await deleteUser(req, res);
+
+        expect(res.status).toHaveBeenCalled(500);
+    });
+});

@@ -22,7 +22,7 @@ const mockResponse = () => {
 };
 
 describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
-    test("createUser() should create a user with a hashed password", async () => {
+    test("createUser() should send a HTTP response code of 201 when a user with a hashed password has been created successfully", async () => {
         const req = mockRequest({
             requester: { id: 1 },
             userInformation: { name: "john_doe", password: "password123" },
@@ -58,7 +58,7 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
         ).toBe(true);
     });
 
-    test("createUser() should send an error code when either of the fields are incomplete", async () => {
+    test("createUser() should send a HTTP response code of 422 when either of the fields are incomplete", async () => {
         let req = mockRequest({
             requester: { id: 1 },
             userInformation: { name: "john_doe", password: "" },

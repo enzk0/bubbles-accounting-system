@@ -25,7 +25,7 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
     test("createUser() should send a HTTP response code of 201 when a user with a hashed password has been created successfully", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "john_doe", password: "password123" },
+            user: { name: "john_doe", password: "password123" },
         });
 
         const res = mockResponse();
@@ -45,23 +45,23 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
             roleId: mock.roleId,
         }));
 
-        const user = await createUser(req, res);
+        const created = await createUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(201);
 
-        expect(mock.id).toEqual(user.id);
-        expect(mock.name).toEqual(user.name);
-        expect(mock.createdAt).toEqual(user.createdAt);
-        expect(mock.roleId).toEqual(user.roleId);
+        expect(mock.id).toEqual(created.id);
+        expect(mock.name).toEqual(created.name);
+        expect(mock.createdAt).toEqual(created.createdAt);
+        expect(mock.roleId).toEqual(created.roleId);
         expect(
-            bcrypt.compareSync(req.body.userInformation.password, user.password)
+            bcrypt.compareSync(req.body.user.password, created.password)
         ).toBe(true);
     });
 
     test("createUser() should send a HTTP response code of 422 when either of the fields are incomplete", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "john_doe", password: "" },
+            user: { name: "john_doe", password: "" },
         });
 
         const res = mockResponse();
@@ -72,7 +72,7 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
 
         req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "", password: "password123" },
+            user: { name: "", password: "password123" },
         });
 
         await createUser(req, res);
@@ -81,7 +81,7 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
 
         req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "", password: "" },
+            user: { name: "", password: "" },
         });
 
         await createUser(req, res);
@@ -94,7 +94,7 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
     test("deleteUser() should send a HTTP response code of 200 when a user is deleted successfully", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "john_doe" },
+            user: { name: "john_doe" },
         });
 
         const res = mockResponse();
@@ -105,7 +105,7 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
             password:
                 "$2a$12$j82bxfd6gJTHiYJae7nK2.0hJQ.7zQ9luwED1rSYZn.CLai.5HWaC",
             createdAt: new Date(),
-            roleId: null,
+            roleId: 1,
         };
 
         prismaMock.user.delete.mockResolvedValue(mock);
@@ -119,7 +119,7 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
     test("deleteUser() should send a HTTP response code of 500 when an error in deleting a user in the database occurs", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "john_doe" },
+            user: { name: "john_doe" },
         });
 
         const res = mockResponse();
@@ -139,7 +139,8 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
     test("changePassword() should send a HTTP response code of 200 when a user password has been changed successfully", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "john_doe", password: "newpassword" },
+            user: { name: "john_doe" },
+            newPassword: "newpassword",
         });
 
         const res = mockResponse();
@@ -148,18 +149,17 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
             password: input.data.password,
         }));
 
-        const user = await changePassword(req, res);
+        const updated = await changePassword(req, res);
 
         expect(res.status).toHaveBeenCalled(200);
-        expect(
-            bcrypt.compareSync(req.body.userInformation.password, user.password)
-        );
+        expect(bcrypt.compareSync(req.body.newPassword, updated.password));
     });
 
     test("changePassword() should send a HTTP response code of 500 when the user to be updated cannot be found", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "jane_doe", password: "newpassword" },
+            user: { name: "jane_doe" },
+            newPassword: "newpassword",
         });
 
         const res = mockResponse();
@@ -177,7 +177,8 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
     test("changePassword() should send a HTTP response code of 422 if any of the fields are empty", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "john_doe", password: "" },
+            user: { name: "john_doe" },
+            newPassword: "",
         });
 
         const res = mockResponse();
@@ -188,7 +189,8 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
 
         req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "", password: "newpassword" },
+            user: { name: "" },
+            newPassword: "newPassword",
         });
 
         await changePassword(req, res);
@@ -197,7 +199,8 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
 
         req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "", password: "" },
+            user: { name: "" },
+            newPassword: "",
         });
 
         await changePassword(req, res);
@@ -210,7 +213,7 @@ describe("UNIT TEST SUITE FOR 'assignRole()' CONTROLLER", async () => {
     test("assignRole() should send a HTTP response code of 200 if the user has been successfully assigned a role", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "" },
+            user: { name: "" },
             role: { id: 0, name: "ADMIN" },
         });
 
@@ -227,16 +230,16 @@ describe("UNIT TEST SUITE FOR 'assignRole()' CONTROLLER", async () => {
 
         prismaMock.user.update.mockResolvedValue(mock);
 
-        const user = await assignRole(req, res);
+        const updated = await assignRole(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(user).toEqual(user);
+        expect(updated).toEqual(mock);
     });
 
     test("assignRole() should send a HTTP response code of 500 if the user cannot be found or updated", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            userInformation: { name: "" },
+            user: { name: "" },
             role: { id: 0, name: "ADMIN" },
         });
 

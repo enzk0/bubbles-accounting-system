@@ -26,3 +26,20 @@ export async function createUser(req, res) {
         return res.status(500);
     }
 }
+
+export async function deleteUser(req, res) {
+    const { userInformation } = req.body;
+
+    try {
+        const user = await prisma.user.delete({
+            where: {
+                name: userInformation.name,
+            },
+        });
+
+        res.status(200);
+        return user;
+    } catch (error) {
+        return res.status(500);
+    }
+}

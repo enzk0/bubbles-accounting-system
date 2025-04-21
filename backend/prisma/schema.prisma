@@ -32,7 +32,7 @@ model User {
     name     String @unique
     password String
 
-    createdAt DateTime
+    createdAt DateTime @default(now())
 
     role   Role? @relation(fields: [roleId], references: [id])
     roleId Int?

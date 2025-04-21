@@ -66,3 +66,27 @@ export async function changePassword(req, res) {
         return res.status(500);
     }
 }
+
+export async function assignRole(req, res) {
+    const { userInformation, role } = req.body;
+
+    try {
+        const updated = await prisma.user.update({
+            where: {
+                id: userInformation.name,
+            },
+            data: {
+                role: {
+                    connect: {
+                        id: role.id,
+                    },
+                },
+            },
+        });
+
+        res.status(200);
+        return updated;
+    } catch (error) {
+        return res.status(500);
+    }
+}

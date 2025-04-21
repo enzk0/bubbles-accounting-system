@@ -4,56 +4,56 @@ import bcrypt from "bcrypt";
 const saltRounds = 10;
 
 export async function createUser(req, res) {
-    const { userInformation } = req.body;
+    const { user } = req.body;
 
-    if (!userInformation.name || !userInformation.password) {
+    if (!user.name || !user.password) {
         return res.status(422);
     }
 
-    const hash = bcrypt.hashSync(userInformation.password, saltRounds);
+    const hash = bcrypt.hashSync(user.password, saltRounds);
 
     try {
-        const user = await prisma.user.create({
-            data: { ...userInformation, password: hash },
+        const created = await prisma.user.create({
+            data: { ...user, password: hash },
         });
 
         res.status(201);
-        return user;
+        return created;
     } catch (error) {
         return res.status(500);
     }
 }
 
 export async function deleteUser(req, res) {
-    const { userInformation } = req.body;
+    const { user } = req.body;
 
     try {
-        const user = await prisma.user.delete({
+        const deleted = await prisma.user.delete({
             where: {
-                name: userInformation.name,
+                name: user.name,
             },
         });
 
         res.status(200);
-        return user;
+        return deleted;
     } catch (error) {
         return res.status(500);
     }
 }
 
 export async function changePassword(req, res) {
-    const { userInformation } = req.body;
+    const { user, newPassword } = req.body;
 
-    if (!userInformation.name || !userInformation.password) {
+    if (!user.name || !newPassword) {
         return res.status(422);
     }
 
-    const hash = bcrypt.hashSync(userInformation.password, saltRounds);
+    const hash = bcrypt.hashSync(newPassword, saltRounds);
 
     try {
-        const user = await prisma.user.update({
+        const updated = await prisma.user.update({
             where: {
-                name: userInformation.name,
+                name: user.name,
             },
             data: {
                 password: hash,
@@ -61,19 +61,19 @@ export async function changePassword(req, res) {
         });
 
         res.status(200);
-        return user;
+        return updated;
     } catch (error) {
         return res.status(500);
     }
 }
 
 export async function assignRole(req, res) {
-    const { userInformation, role } = req.body;
+    const { user, role } = req.body;
 
     try {
         const updated = await prisma.user.update({
             where: {
-                id: userInformation.name,
+                id: user.name,
             },
             data: {
                 role: {

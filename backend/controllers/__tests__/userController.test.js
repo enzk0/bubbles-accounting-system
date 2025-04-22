@@ -4,6 +4,7 @@ import {
     deleteUser,
     changePassword,
     assignRole,
+    getUser,
 } from "../userController";
 import { prismaMock } from "../../singleton";
 import bcrypt from "bcrypt";
@@ -253,5 +254,62 @@ describe("UNIT TEST SUITE FOR 'assignRole()' CONTROLLER", async () => {
         await assignRole(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
+    test("getUser() should send a HTTP response code of 200 and a json response of a user when a user is found from the database", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { name: "john_doe" },
+        });
+
+        const res = mockResponse();
+
+        const mock = {
+            id: 2,
+            name: "john_doe",
+            createdAt: new Date(),
+            roleId: 0,
+            role: {
+                id: 0,
+                name: "ADMIN",
+            },
+        };
+
+        prismaMock.user.findUnique.mockResolvedValue(mock);
+
+        const found = await getUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(mock);
+        expect(found).toEqual(mock);
+    });
+
+    test("getUser() should send a HTTP response code of 404 when a user cannot be found in the database", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { name: "jane_doe" },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue(null);
+
+        const found = await getUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(found).toEqual(null);
+    });
+
+    test("getUser() should send a HTTP response code of 500 when an error occurs with database client", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { name: "jane_doe" },
+        });
+
+        const res = mockResponse();
+
+        expect(res.status).toHaveBeenCalledWith(200);
     });
 });

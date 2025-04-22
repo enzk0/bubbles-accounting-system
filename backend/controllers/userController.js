@@ -90,3 +90,20 @@ export async function assignRole(req, res) {
         return res.status(500);
     }
 }
+
+export async function getUser(req, res) {
+    const { user } = req.body;
+
+    const found = await prisma.user.findUnique({
+        where: user,
+    });
+
+    if (!found || found === null) {
+        res.status(404);
+        return found;
+    }
+
+    res.status(200);
+    res.json(found);
+    return found;
+}

@@ -5,6 +5,7 @@ import {
     changePassword,
     assignRole,
     getUser,
+    getAllUsers,
 } from "../userController";
 import { prismaMock } from "../../singleton";
 import bcrypt from "bcrypt";
@@ -316,6 +317,95 @@ describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
         });
 
         await getUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'getAllUsers()' CONTROLLER", () => {
+    test("getAllUsers() should send a HTTP response of code 200 when it can send a response containing an array of all users", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+        });
+
+        const res = mockResponse();
+
+        const mock = [
+            {
+                user: {
+                    id: 1,
+                    name: "admin",
+                    roleId: 0,
+                },
+            },
+            {
+                user: {
+                    id: 2,
+                    name: "employee",
+                    roleId: 1,
+                },
+            },
+        ];
+
+        prismaMock.user.findMany.mockResolvedValue(mock);
+
+        const found = await getAllUsers(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({
+            users: [
+                {
+                    user: {
+                        id: 1,
+                        name: "admin",
+                        roleId: 0,
+                    },
+                },
+                {
+                    user: {
+                        id: 2,
+                        name: "employee",
+                        roleId: 1,
+                    },
+                },
+            ],
+        });
+        expect(found).toEqual(mock);
+    });
+
+    test("getAllUsers() should send a HTTP response code of 404 when no users can be found and should also send a json where users is an empty array", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+        });
+
+        let res = mockResponse();
+
+        const mock = [];
+
+        prismaMock.user.findMany.mockResolvedValue(mock);
+
+        const found = await getAllUsers(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(res.json).toHaveBeenCalledWith({
+            users: [],
+        });
+        expect(found).toEqual(mock);
+    });
+
+    test("getAllUsers() should send a HTTP response code of 500 when an error occurs with the database client", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+        });
+
+        let res = mockResponse();
+
+        prismaMock.user.findMany.mockImplementation(() => {
+            let error = new Error();
+            throw error;
+        });
+
+        const found = getAllUsers(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
     });

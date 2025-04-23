@@ -310,6 +310,13 @@ describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
 
         const res = mockResponse();
 
-        expect(res.status).toHaveBeenCalledWith(200);
+        prismaMock.user.findUnique.mockImplementation(() => {
+            let error = new Error();
+            throw error;
+        });
+
+        await getUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 });

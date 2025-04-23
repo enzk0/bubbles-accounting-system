@@ -111,3 +111,25 @@ export async function getUser(req, res) {
         return res.status(500);
     }
 }
+
+export async function getAllUsers(req, res) {
+    try {
+        const found = await prisma.user.findMany();
+
+        if (found.length === 0) {
+            res.status(404);
+            res.json({
+                users: found,
+            });
+            return found;
+        }
+
+        res.status(200);
+        res.json({
+            users: found,
+        });
+        return found;
+    } catch (error) {
+        return res.status(500);
+    }
+}

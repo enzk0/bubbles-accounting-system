@@ -1,7 +1,58 @@
 # Group G
 This is the official repo for CSCC22 Group G.
 
+## Testing Guide
+
+### Testing Templates
+
+There are templates for test files that can be found in `./backend/templates`. `*.test.js` files should only be used for unit tests and `*.integration.test.js` should only be used for integration tests.
+
+### Running Unit Tests
+
+To run Unit Tests, run the custom `npm` script to execute all test files that contain unit tests:
+```
+npm run test:unit
+```
+
+**NOTE:** Unit Tests should not rely on any external dependencies. If you need the behavior or output of a dependency while unit testing, simulate the behavior of the dependency through mocking.
+
+#### Useful References
+- https://vitest.dev/api/
+- https://vitest.dev/guide/why
+- https://vitest.dev/guide/mocking.html
+- https://vitest.dev/guide/
+
+### Running Integration Tests
+
+To run Integration Tests, start all dependencies first such as the docker container for the entire project or the docker container for the testing database. Afterwards, run the custom `npm` script to execute all tests files that contain integration tests:
+```
+npm run test:integration
+```
+
+**NOTE:** Integration Tests test the interaction between the different systems of your application. Be sure to start any dependency that the application or component needs before performing integration testing.
+
+#### Useful References
+- https://github.com/ladjs/supertest/blob/master/README.md
+- https://www.theodinproject.com/lessons/nodejs-testing-routes-and-controllers
+- https://www.theodinproject.com/lessons/node-path-nodejs-testing-database-operations
+
+
 ## Prisma Guide
+
+### Useful Referemces
+- https://www.prisma.io/docs/orm/prisma-client/queries/crud
+- https://www.prisma.io/docs/orm/prisma-client/queries/relation-queries
+- https://www.prisma.io/docs/orm/prisma-client/queries/aggregation-grouping-summarizing
+- https://www.prisma.io/docs/orm/prisma-client/queries/filtering-and-sorting
+- https://www.prisma.io/docs/orm/prisma-client/queries/computed-fields
+- https://www.prisma.io/docs/orm/prisma-client/queries/query-optimization-performance
+- https://www.prisma.io/docs/orm/prisma-client/queries/custom-models
+- https://www.prisma.io/docs/orm/prisma-client/queries/transactions
+- https://www.prisma.io/docs/orm/prisma-client/queries/select-fields
+- https://www.prisma.io/docs/orm/prisma-client/queries/excluding-fields
+- https://www.prisma.io/docs/orm/prisma-client/queries
+- https://www.prisma.io/docs/orm/prisma-client
+- https://www.prisma.io/docs
 
 ### Prerequisites
 

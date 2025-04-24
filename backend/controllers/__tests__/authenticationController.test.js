@@ -1,0 +1,91 @@
+import { test, expect, describe, vi, beforeEach } from "vitest";
+import { login } from "../authenticationController";
+import { prismaMock } from "../../singleton";
+import bcrypt from "bcrypt";
+
+const mockRequest = (body) => ({
+  body: body,
+});
+
+const mockResponse = () => {
+  const res = {};
+
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
+
+  return res;
+};
+
+describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
+  test("login() should send an HTTP response of 200 and a jwt access token when the user has been successfully authenticated", async () => {
+    const req = mockRequest({
+      user: { name: "user123", password: "password456" },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 2,
+      name: "user123",
+      password: "$2a$10$9IZROxxaSXKpNE7ZYZxfReWVvRZlk2mi4R4xMeUAt/.V73vDeVmPG",
+      createdAt: new Date(),
+      roleId: 2,
+    });
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ accessToken: expect.any(String) });
+  });
+
+  test("login() should send an HTTP response of 401 when the incorrect password is used to authenticate the user", async () => {
+    const req = mockRequest({
+      user: { name: "user123", password: "pass123" },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 2,
+      name: "user123",
+      password: "$2a$10$9IZROxxaSXKpNE7ZYZxfReWVvRZlk2mi4R4xMeUAt/.V73vDeVmPG",
+      createdAt: new Date(),
+      roleId: 2,
+    });
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  test("login() should send an HTTP response of 404 when a user with the specified user name cannot be found", async () => {
+    const req = mockRequest({
+      user: { name: "use27", password: "password456" },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.user.findUnique.mockResolvedValue(null);
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+  });
+
+  test("login() should send an HTTP response of 500 when an error in the database client has occurred", async () => {
+    const req = mockRequest({
+      user: { name: "use27", password: "password456" },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.user.findUnique.mockImplementation(() => {
+      let error = new Error();
+      throw error;
+    });
+
+    await login(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+  });
+});

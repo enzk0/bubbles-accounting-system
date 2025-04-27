@@ -26,15 +26,30 @@ app.post("/", async (req, res) => {
   }
 });
 
-app.put("/", async (req, res) => {
-  try {
-    res.status(200).send({
-      type: "PUT",
-      message: "Successfully received PUT request.",
-    });
+// Define your routes
+app.put("/sales-data/:id", (req, res) => {
+ try {
+    // Example logic for updating sales data
+    const { id } = req.params;
+    const { isPaid } = req.body;
+
+    // Replace this with actual database/service logic
+    const updatedData = {
+      id,
+      isPaid,
+      isClaimed: false, // Ensure all required fields are included
+    };
+
+    res.status(200).send(updatedData);
   } catch (error) {
-    res.status(500).send({ message: error });
+    console.error(`Error in PUT /sales-data/${req.params.id}:`, error);
+    res.status(500).send({ message: "Internal Server Error" });
   }
+});
+
+app.put("/admin/sales-data/:id", (req, res) => {
+  // Example admin route logic
+  res.status(200).send({ id: req.params.id, ...req.body });
 });
 
 app.delete("/", async (req, res) => {
@@ -49,3 +64,5 @@ app.delete("/", async (req, res) => {
 });
 
 app.listen(port, () => console.log(`Server is listening on port ${port}`));
+
+export default app;

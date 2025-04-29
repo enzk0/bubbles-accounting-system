@@ -18,8 +18,9 @@ model Branch {
     id Int @id @default(autoincrement())
 
     code    String @unique
+    name    String
     address String
-    counter Int
+    counter Int    @default(0)
 
     createdAt DateTime @default(now())
 
@@ -46,17 +47,7 @@ model Role {
     name        String  @unique
     description String?
 
-    user        User[]
-    permissions Permission[]
-}
-
-model Permission {
-    id Int @id @default(autoincrement())
-
-    name        String  @unique
-    description String?
-
-    roles Role[]
+    user User[]
 }
 
 model Customer {
@@ -88,8 +79,9 @@ model JobOrder {
     paidAt    DateTime?
     claimedAt DateTime?
 
-    isPaid    Boolean
-    isClaimed Boolean
+    isPaid    Boolean @default(false)
+    isClaimed Boolean @default(false)
+    isHidden  Boolean @default(false)
 
     employeeInCharge String @default("")
     remarks          String @default("")

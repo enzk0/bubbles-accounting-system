@@ -49,16 +49,28 @@ export async function countJobOrder(req, res) {
     const jobOrderCount = await custom.jobOrder.groupByDate(interval);
     console.log(jobOrderCount);
   
-    const { total, total_paid, total_unpaid, no_of_unpaid, no_of_unclaimed } = jobOrderCount[0];
+    const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
     
+    console.log("Interval Start: ", interval_start);
     console.log("Total: ", total);
     console.log("Total Paid: ", total_paid);
     console.log("Total Unpaid: ", total_unpaid);
+    console.log("No of Job Orders: ", no_of_job_orders);
+    console.log("No of Paid: ", no_of_paid);
     console.log("No of Unpaid: ", no_of_unpaid);
+    console.log("No of Claimed: ", no_of_claimed);
     console.log("No of Unclaimed: ", no_of_unclaimed);
 
     const result = {
-      total: total, total_paid: total_paid, total_unpaid: total_unpaid, no_of_unpaid: no_of_unpaid, no_of_unclaimed: no_of_unclaimed
+      interval_start: interval_start,
+      total: total,
+      total_paid: total_paid,
+      total_unpaid: total_unpaid,
+      no_of_job_orders: no_of_job_orders,
+      no_of_paid: no_of_paid,
+      no_of_unpaid: no_of_unpaid,
+      no_of_claimed: no_of_claimed,
+      no_of_unclaimed: no_of_unclaimed
     }
     res.status(200).json(result);
     console.log(result)

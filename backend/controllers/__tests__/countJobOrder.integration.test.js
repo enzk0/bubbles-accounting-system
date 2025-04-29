@@ -1,28 +1,40 @@
+import { test, expect, describe, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import { countJobOrder } from "../controllers/countJobOrder"; 
+import { countJobOrder } from "../countJobOrder.js"; 
 
 const prisma = new PrismaClient();
 
 // Mock Express req/res objects
-const mockRequest = (data) => ({
-  query: data,
-  body: data,
+const mockRequest = (body) => ({
+  body: body,
 });
-
+const mockResponse = () => { 
+  const res = {};
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
+  return res;
+};
 
 describe("INTEGRATION TESTS FOR 'countJobOrder()' CONTROLLER", () => {
   // We're using the seeded database, so no need for beforeEach/afterEach setup
 
   test("countJobOrder() should return the count of job orders for today", async () => {
+    const req = mockRequest({
+      interval: "day",
+    });
+    const res = mockResponse();
 
-
-    await countJobOrder(req, res);
+    const result = await countJobOrder(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
-    const responseData = res.json.mock.calls[0][0];
-    expect(responseData).toHaveProperty("count");
-    expect(responseData.count).toBeDefined();
-    expect(responseData.count).toBeGreaterThanOrEqual(0); // Assuming there are job orders  
+
+    expect(result).toHaveProperty("total");
+    expect(result).toHaveProperty("total_paid");
+    expect(result).toHaveProperty("total_unpaid");
+    expect(result).toHaveProperty("no_of_unpaid");
+    expect(result).toHaveProperty("no_of_unclaimed");
+    
+    expect(result).toBeTypeOf("object");
   });
 });

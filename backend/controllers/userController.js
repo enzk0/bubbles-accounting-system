@@ -44,13 +44,24 @@ export async function deleteUser(req, res) {
 export async function changePassword(req, res) {
     const { user, newPassword } = req.body;
 
-    if (!user.name || !newPassword) {
+    if (!user.name || !user.password || !newPassword) {
         return res.status(422);
     }
 
-    const hash = bcrypt.hashSync(newPassword, saltRounds);
-
     try {
+        const found = await prisma.user.findUnique({
+            where: {
+                name: user.name,
+            },
+        });
+
+        const isVerified = bcrypt.compareSync(user.password, found.password);
+
+        if (!isVerified) {
+            return res.status(401);
+        }
+
+        const hash = bcrypt.hashSync(newPassword, saltRounds);
         const updated = await prisma.user.update({
             where: {
                 name: user.name,
@@ -63,6 +74,7 @@ export async function changePassword(req, res) {
         res.status(200);
         return updated;
     } catch (error) {
+        console.log(error);
         return res.status(500);
     }
 }
@@ -73,7 +85,7 @@ export async function assignRole(req, res) {
     try {
         const updated = await prisma.user.update({
             where: {
-                id: user.name,
+                name: user.name,
             },
             data: {
                 role: {
@@ -87,6 +99,7 @@ export async function assignRole(req, res) {
         res.status(200);
         return updated;
     } catch (error) {
+        console.log("assignRole() error: ", error);
         return res.status(500);
     }
 }

@@ -114,7 +114,7 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
 
         const user = await deleteUser(req, res);
 
-        expect(res.status).toHaveBeenCalled(200);
+        expect(res.status).toHaveBeenCalledWith(200);
         expect(mock).toEqual(user);
     });
 
@@ -133,7 +133,7 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
 
         await deleteUser(req, res);
 
-        expect(res.status).toHaveBeenCalled(500);
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 });
 
@@ -141,11 +141,16 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
     test("changePassword() should send a HTTP response code of 200 when a user password has been changed successfully", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe" },
+            user: { name: "john_doe", password: "password123" },
             newPassword: "newpassword",
         });
 
         const res = mockResponse();
+
+        prismaMock.user.findUnique.mockImplementation(() => ({
+            password:
+                "$2a$10$uHpKY9.QqmFBYX9sECtaj.1/6ReyfujejGt6ddypHQDKVFbe471uu",
+        }));
 
         prismaMock.user.update.mockImplementation((input) => ({
             password: input.data.password,
@@ -153,14 +158,14 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
 
         const updated = await changePassword(req, res);
 
-        expect(res.status).toHaveBeenCalled(200);
+        expect(res.status).toHaveBeenCalledWith(200);
         expect(bcrypt.compareSync(req.body.newPassword, updated.password));
     });
 
     test("changePassword() should send a HTTP response code of 500 when the user to be updated cannot be found", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            user: { name: "jane_doe" },
+            user: { name: "jane_doe", password: "password123" },
             newPassword: "newpassword",
         });
 
@@ -173,13 +178,36 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
 
         await changePassword(req, res);
 
-        expect(res.status).toHaveBeenCalled(500);
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+
+    test("changePassword() should send a HTTP response code of 401 when the entered password does not match the user's current password", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { name: "jane_doe", password: "pass456" },
+            newPassword: "newpassword",
+        });
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockImplementation(() => ({
+            password:
+                "$2a$10$uHpKY9.QqmFBYX9sECtaj.1/6ReyfujejGt6ddypHQDKVFbe471uu",
+        }));
+
+        prismaMock.user.update.mockImplementation((input) => ({
+            password: input.data.password,
+        }));
+
+        await changePassword(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(401);
     });
 
     test("changePassword() should send a HTTP response code of 422 if any of the fields are empty", async () => {
         let req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe" },
+            user: { name: "john_doe", password: "password123" },
             newPassword: "",
         });
 
@@ -191,7 +219,7 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
 
         req = mockRequest({
             requester: { id: 1 },
-            user: { name: "" },
+            user: { name: "", password: "password123" },
             newPassword: "newPassword",
         });
 
@@ -201,7 +229,7 @@ describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
 
         req = mockRequest({
             requester: { id: 1 },
-            user: { name: "" },
+            user: { name: "", password: "password123" },
             newPassword: "",
         });
 

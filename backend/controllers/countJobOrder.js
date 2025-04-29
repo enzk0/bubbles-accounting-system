@@ -1,10 +1,12 @@
-import pr
+import { PrismaClient } from "@prisma/client";
+import prisma from "../client";
+
 
 const custom = new PrismaClient().$extends({
-  model: {
-    jobOrder: {
-      async groupByDate(interval) {
-        const query = `
+    model: {
+      jobOrder: {
+        async groupByDate(interval) {
+          const query = `
           SELECT 
             DATE_TRUNC('${interval}', "JobOrder"."createdAt") AS interval_start, 
             SUM("JobOrderItem"."productPrice" * "JobOrderItem"."productQuantity") AS total, 
@@ -29,9 +31,42 @@ const custom = new PrismaClient().$extends({
           GROUP BY DATE_TRUNC('${interval}', "JobOrder"."createdAt") 
           ORDER BY interval_start
         `;
-        
-        return prisma.$queryRawUnsafe(query);
+          
+          return prisma.$queryRawUnsafe(query);
+        },
       },
-    },
   },
 });
+
+export async function countJobOrder(req, res) {
+  const { interval } = req.body;
+
+  if (!interval) {
+    return res.status(400).json({ error: "Interval is required" });
+  }
+
+  try {
+    const jobOrderCount = await custom.jobOrder.groupByDate(interval);
+    console.log(jobOrderCount);
+  
+    const { total, total_paid, total_unpaid, no_of_unpaid, no_of_unclaimed } = jobOrderCount[0];
+    
+    console.log("Total: ", total);
+    console.log("Total Paid: ", total_paid);
+    console.log("Total Unpaid: ", total_unpaid);
+    console.log("No of Unpaid: ", no_of_unpaid);
+    console.log("No of Unclaimed: ", no_of_unclaimed);
+
+    const result = {
+      total: total, total_paid: total_paid, total_unpaid: total_unpaid, no_of_unpaid: no_of_unpaid, no_of_unclaimed: no_of_unclaimed
+    }
+    res.status(200).json(result);
+    console.log(result)
+    return result
+  } catch (error) {
+    console.error("Error counting job orders:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+}
+
+

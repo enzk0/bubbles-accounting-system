@@ -29,10 +29,14 @@ describe("INTEGRATION TESTS FOR 'countJobOrder()' CONTROLLER", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
 
+    expect(result).toHaveProperty("interval_start");
     expect(result).toHaveProperty("total");
     expect(result).toHaveProperty("total_paid");
     expect(result).toHaveProperty("total_unpaid");
     expect(result).toHaveProperty("no_of_unpaid");
+    expect(result).toHaveProperty("no_of_job_orders");
+    expect(result).toHaveProperty("no_of_paid");
+    expect(result).toHaveProperty("no_of_claimed");
     expect(result).toHaveProperty("no_of_unclaimed");
     
     expect(result).toBeTypeOf("object");

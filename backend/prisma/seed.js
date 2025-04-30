@@ -106,32 +106,53 @@ await prisma.role.createMany({
 await prisma.user.createMany({
   data: [
     {
-      name: "cinderella",
+      username: "cinderella",
+      firstName: "Cinderella",
+      lastName: "Grimms",
       password: "password",
+      branchId: 1,
     },
     {
-      name: "snow_white",
+      username: "snow_white",
+      firstName: "Snow White",
+      lastName: "Grimms",
       password: "password",
+      branchId: 1,
     },
     {
-      name: "dorothy",
+      username: "dorothy",
+      firstName: "Dorothy",
+      lastName: "Grimms",
       password: "password",
+      branchId: 7,
     },
     {
-      name: "rapunzel",
+      username: "rapunzel",
+      firstName: "Rapunzel",
+      lastName: "Grimms",
       password: "password",
+      branchId: 4,
     },
     {
-      name: "little_mermaid",
+      username: "little_mermaid",
+      firstName: "Siren",
+      lastName: "Grimms",
       password: "password",
+      branchId: 3,
     },
     {
-      name: "hansel",
+      username: "hansel",
+      firstName: "Hansel",
+      lastName: "Grimms",
       password: "password",
+      branchId: 2,
     },
     {
-      name: "gretel",
+      username: "gretel",
+      firstName: "Gretel",
+      lastName: "Grimms",
       password: "password",
+      branchId: 2,
     },
   ],
 });
@@ -149,7 +170,7 @@ const employee_names = [
 for (const employee_name of employee_names) {
   await prisma.user.update({
     where: {
-      name: employee_name,
+      username: employee_name,
     },
     data: {
       role: {
@@ -173,15 +194,21 @@ console.log(
 await prisma.user.createMany({
   data: [
     {
-      name: "grave",
+      username: "grave",
+      firstName: "Grave",
+      firstName: "Grimms",
       password: "password",
     },
     {
-      name: "andersen",
+      username: "andersen",
+      firstName: "Andersen",
+      firstName: "Central",
       password: "password",
     },
     {
-      name: "lilith",
+      username: "lilith",
+      firstName: "Lilith",
+      firstName: "Goddess",
       password: "password",
     },
   ],
@@ -192,7 +219,7 @@ const admin_names = ["grave", "andersen", "lilith"];
 for (const admin_name of admin_names) {
   await prisma.user.update({
     where: {
-      name: admin_name,
+      username: admin_name,
     },
     data: {
       role: {
@@ -267,29 +294,34 @@ const job_order_branches = ["AB", "CD", "EF", "GH", "IJ"];
 
 const job_order_customers = [
   {
-    name: "Rapi",
+    firstName: "Rapi",
+    lastName: "Elysion",
     address: "Outpost",
-    contactNo: "9XX-XXX-XXXX",
+    phoneNumber: "9XX-XXX-XXXX",
   },
   {
-    name: "Anis",
+    firstName: "Anis",
+    lastName: "Tetra",
     address: "Outpost",
-    contactNo: "9XX-XXX-XXXX",
+    phoneNumber: "9XX-XXX-XXXX",
   },
   {
-    name: "Neon",
+    firstName: "Neon",
+    lastName: "Elysion",
     address: "Outpost",
-    contactNo: "9XX-XXX-XXXX",
+    phoneNumber: "9XX-XXX-XXXX",
   },
   {
-    name: "Eunhwa",
+    firstName: "Eunhwa",
+    lastName: "Elysion",
     address: "Outpost",
-    contactNo: "9XX-XXX-XXXX",
+    phoneNumber: "9XX-XXX-XXXX",
   },
   {
-    name: "Alice",
+    firstName: "Alice",
+    lastName: "Tetra",
     address: "Outpost",
-    contactNo: "9XX-XXX-XXXX",
+    phoneNumber: "9XX-XXX-XXXX",
   },
 ];
 
@@ -316,7 +348,6 @@ for (let index = 0; index < 5; index++) {
     data: {
       idCode: branch.code,
       idNumber: branch.counter,
-      employeeInCharge: job_order_employees[index],
       branch: {
         connect: { id: branch.id },
       },
@@ -344,7 +375,7 @@ for (let index = 0; index < 5; index++) {
         product: {
           connect: { id: product.id },
         },
-        JobOrder: {
+        jobOrder: {
           connect: {
             idCode_idNumber: {
               idCode: job_order.idCode,

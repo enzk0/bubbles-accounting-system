@@ -3,7 +3,6 @@ import {
     createUser,
     deleteUser,
     editPassword,
-    assignRole,
     getUser,
     getAllUsers,
     editUser,
@@ -106,24 +105,6 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(updated.username).toEqual(req.body.edit.username);
-    });
-
-    test("assignRole() should update the roleId field of a specified User in the database", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            user: { username: "jane_doe" },
-            role: { id: 1 },
-        });
-
-        const res = mockResponse();
-
-        const updated = await assignRole(req, res);
-
-        console.log("Assigned Role: ", updated);
-
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(typeof updated).toBe("object");
-        expect(updated.roleId).toEqual(req.body.role.id);
     });
 
     test("getUser() should get/fetch a User in the database via their name", async () => {

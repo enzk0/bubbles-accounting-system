@@ -4,7 +4,6 @@ import {
     deleteUser,
     editPassword,
     editUser,
-    assignRole,
     getUser,
     getAllUsers,
 } from "../userController";
@@ -422,56 +421,6 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
         await editPassword(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
-    });
-});
-
-describe("UNIT TEST SUITE FOR 'assignRole()' CONTROLLER", async () => {
-    test("assignRole() should send a HTTP response code of 200 if the user has been successfully assigned a role", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            user: { username: "john_doe" },
-            role: { id: 0, name: "ADMIN" },
-        });
-
-        const res = mockResponse();
-
-        const mock = {
-            id: 2,
-            name: "john_doe",
-            firstName: "John",
-            lastName: "Doe",
-            password:
-                "$2a$12$ajvYtpQcelZBBZYl.syd6exYqWyIgSLWp.HMrSn2fpISEnjPCOIQ2",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            roleId: 0,
-        };
-
-        prismaMock.user.update.mockResolvedValue(mock);
-
-        const updated = await assignRole(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(updated).toEqual(mock);
-    });
-
-    test("assignRole() should send a HTTP response code of 500 if the user cannot be found or updated", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            user: { username: "" },
-            role: { id: 0, name: "ADMIN" },
-        });
-
-        const res = mockResponse();
-
-        prismaMock.user.update.mockImplementation(() => {
-            let error = new Error();
-            throw error;
-        });
-
-        await assignRole(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(500);
     });
 });
 

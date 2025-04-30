@@ -203,5 +203,30 @@ describe("INTEGRATION TESTS FOR 'countJobOrderByBranch()' CONTROLLER", () => {
     
     expect(result).toBeTypeOf("object");
   });
+
+  test("countJobOrderByBranch() should return the count of job orders for interval: week and declared existing BranchID", async () => {
+    const req = mockRequest({
+      interval: "week",
+      branchId: 1,
+    });
+    const res = mockResponse();
+
+    const result = await countJobOrder(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalled();
+
+    expect(result).toHaveProperty("interval_start");
+    expect(result).toHaveProperty("total");
+    expect(result).toHaveProperty("total_paid");
+    expect(result).toHaveProperty("total_unpaid");
+    expect(result).toHaveProperty("no_of_unpaid");
+    expect(result).toHaveProperty("no_of_job_orders");
+    expect(result).toHaveProperty("no_of_paid");
+    expect(result).toHaveProperty("no_of_claimed");
+    expect(result).toHaveProperty("no_of_unclaimed");
+    
+    expect(result).toBeTypeOf("object");
+  });
 });
 

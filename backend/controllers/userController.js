@@ -59,11 +59,29 @@ export async function editUser(req, res) {
             return res.status(404);
         }
 
-        const updated = await prisma.user.update({
+        const { username, firstName, lastName, ...userRelations } = edit;
+
+        let updated = await prisma.user.update({
             where: {
                 username: user.username,
             },
-            data: user,
+            data: {
+                role: {
+                    connect: { id: userRelations.roleId },
+                },
+                branch: {
+                    connect: { id: userRelations.branchId },
+                },
+            },
+        });
+
+        const { branchId, roleId, ...userInfo } = edit;
+
+        updated = await prisma.user.update({
+            where: {
+                username: user.username,
+            },
+            data: userInfo,
         });
 
         res.status(200);

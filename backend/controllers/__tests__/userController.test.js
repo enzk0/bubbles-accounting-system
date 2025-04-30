@@ -137,6 +137,8 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
     });
 });
 
+describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {});
+
 describe("UNIT TESTING FOR 'changePassword()' CONTROLLER", () => {
     test("changePassword() should send a HTTP response code of 200 when a user password has been changed successfully", async () => {
         let req = mockRequest({

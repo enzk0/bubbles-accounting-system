@@ -2,7 +2,7 @@ import { test, expect, describe, vi } from "vitest";
 import {
     createUser,
     deleteUser,
-    changePassword,
+    editPassword,
     assignRole,
     getUser,
     getAllUsers,
@@ -27,7 +27,12 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("createUser() should create a User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe", password: "password123" },
+            user: {
+                username: "john_doe",
+                firstName: "John",
+                lastName: "Doe",
+                password: "password123",
+            },
         });
 
         const res = mockResponse();
@@ -38,43 +43,43 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(201);
         expect(typeof created).toBe("object");
-        expect(created.name).toBe(req.body.user.name);
+        expect(created.username).toBe(req.body.user.username);
         expect(
             bcrypt.compareSync(req.body.user.password, created.password)
         ).toBe(true);
 
         const found = await prisma.user.findUnique({
             where: {
-                name: created.name,
+                username: created.username,
             },
         });
 
         expect(created).toEqual(found);
     });
 
-    test("changePassword() should change the password of a User in the database", async () => {
+    test("editPassword() should change the password of a User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe", password: "password123" },
+            user: { username: "john_doe" },
             newPassword: "pass456",
         });
 
         const res = mockResponse();
 
-        const updated = await changePassword(req, res);
+        const updated = await editPassword(req, res);
 
         console.log(updated);
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof updated).toBe("object");
-        expect(updated.name).toBe(req.body.user.name);
+        expect(updated.username).toBe(req.body.user.username);
         expect(bcrypt.compareSync(req.body.newPassword, updated.password)).toBe(
             true
         );
 
         const found = await prisma.user.findUnique({
             where: {
-                name: updated.name,
+                username: updated.username,
             },
         });
 
@@ -84,7 +89,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("assignRole() should update the roleId field of a specified User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe" },
+            user: { username: "john_doe" },
             role: { id: 1 },
         });
 
@@ -102,7 +107,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("getUser() should get/fetch a User in the database via their name", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe" },
+            user: { username: "john_doe" },
         });
 
         const res = mockResponse();
@@ -113,7 +118,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof found).toBe("object");
-        expect(found.name).toEqual(req.body.user.name);
+        expect(found.username).toEqual(req.body.user.username);
     });
 
     test("getAllUsers() should get/fetch all Users in the database", async () => {
@@ -136,7 +141,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("deleteUser() should delete a User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe" },
+            user: { username: "john_doe" },
         });
 
         const res = mockResponse();
@@ -147,11 +152,11 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof deleted).toBe("object");
-        expect(deleted.name).toBe(req.body.user.name);
+        expect(deleted.username).toBe(req.body.user.username);
 
         const found = await prisma.user.findUnique({
             where: {
-                name: req.body.user.name,
+                username: req.body.user.username,
             },
         });
 

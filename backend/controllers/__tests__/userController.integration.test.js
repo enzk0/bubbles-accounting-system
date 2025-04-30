@@ -6,6 +6,7 @@ import {
     assignRole,
     getUser,
     getAllUsers,
+    editUser,
 } from "../userController";
 import prisma from "../../client";
 import bcrypt from "bcrypt";
@@ -86,10 +87,31 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
         expect(updated).toEqual(found);
     });
 
-    test("assignRole() should update the roleId field of a specified User in the database", async () => {
+    test("editUser() should update fields/information about a user in a database that is not the password", async () => {
         const req = mockRequest({
             requester: { id: 1 },
             user: { username: "john_doe" },
+            edit: {
+                username: "jane_doe",
+                firstName: "Jane",
+                lastName: "Doe",
+                branchId: 1,
+                roleId: 2,
+            },
+        });
+
+        const res = mockResponse();
+
+        const updated = await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(updated.username).toEqual(req.body.edit.username);
+    });
+
+    test("assignRole() should update the roleId field of a specified User in the database", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "jane_doe" },
             role: { id: 1 },
         });
 
@@ -107,7 +129,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("getUser() should get/fetch a User in the database via their name", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { username: "john_doe" },
+            user: { username: "jane_doe" },
         });
 
         const res = mockResponse();
@@ -124,7 +146,6 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("getAllUsers() should get/fetch all Users in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { name: "john_doe" },
         });
 
         const res = mockResponse();
@@ -141,7 +162,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("deleteUser() should delete a User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { username: "john_doe" },
+            user: { username: "jane_doe" },
         });
 
         const res = mockResponse();

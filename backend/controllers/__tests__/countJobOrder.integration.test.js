@@ -90,7 +90,7 @@ describe("INTEGRATION TESTS FOR 'countJobOrder()' CONTROLLER", () => {
 
     expect(result).toBeTypeOf("object");
   });
-  
+
   test("countJobOrder() should return the count of job orders for interval: year", async () => {
     const req = mockRequest({
       interval: "year",
@@ -114,4 +114,15 @@ describe("INTEGRATION TESTS FOR 'countJobOrder()' CONTROLLER", () => {
 
     expect(result).toBeTypeOf("object");
   });
+
+  test("countJobOrder() should return 400 if interval is not provided", async () => {
+    const req = mockRequest({});
+    const res = mockResponse();
+
+    await countJobOrder(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Interval is required" });
+  });
+  
 });

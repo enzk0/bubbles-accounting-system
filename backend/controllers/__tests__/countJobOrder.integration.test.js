@@ -1,6 +1,6 @@
 import { test, expect, describe, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
-import { countJobOrder } from "../countJobOrder.js"; 
+import { countJobOrder, countJobOrderByBranch } from "../countJobOrder.js"; 
 
 const prisma = new PrismaClient();
 
@@ -136,7 +136,7 @@ describe("INTEGRATION TESTS FOR 'countJobOrderByBranch()' CONTROLLER", () => {
     });
     const res = mockResponse();
 
-    const result = await countJobOrder(req, res);
+    const result = await countJobOrderByBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
@@ -161,7 +161,7 @@ describe("INTEGRATION TESTS FOR 'countJobOrderByBranch()' CONTROLLER", () => {
     });
     const res = mockResponse();
 
-    const result = await countJobOrder(req, res);
+    const result = await countJobOrderByBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
@@ -186,7 +186,7 @@ describe("INTEGRATION TESTS FOR 'countJobOrderByBranch()' CONTROLLER", () => {
     });
     const res = mockResponse();
 
-    const result = await countJobOrder(req, res);
+    const result = await countJobOrderByBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
@@ -211,7 +211,7 @@ describe("INTEGRATION TESTS FOR 'countJobOrderByBranch()' CONTROLLER", () => {
     });
     const res = mockResponse();
 
-    const result = await countJobOrder(req, res);
+    const result = await countJobOrderByBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
@@ -227,6 +227,18 @@ describe("INTEGRATION TESTS FOR 'countJobOrderByBranch()' CONTROLLER", () => {
     expect(result).toHaveProperty("no_of_unclaimed");
     
     expect(result).toBeTypeOf("object");
+  });
+
+  test("countJobOrderByBranch() should return 400 if interval is not provided", async () => {
+    const req = mockRequest({
+      branchId: 1,
+    });
+    const res = mockResponse();
+
+    await countJobOrderByBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Interval is required" });
   });
 });
 

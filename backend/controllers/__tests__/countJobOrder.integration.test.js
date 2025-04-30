@@ -252,5 +252,15 @@ describe("INTEGRATION TESTS FOR 'countJobOrderByBranch()' CONTROLLER", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "BranchID is required" });
   });
+
+  test("countJobOrderByBranch() should return 400 if interval and branchID is not provided", async () => {
+    const req = mockRequest({});
+    const res = mockResponse();
+
+    await countJobOrderByBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Interval and BranchID is required" });
+  });
 });
 

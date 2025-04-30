@@ -385,55 +385,28 @@ for (let index = 0; index < 5; index++) {
                 },
             },
         });
-
-        for (const product_item of job_order_items[index]) {
-            const product = await prisma.product.findUnique({
-                where: {
-                    id: product_item.id,
-                },
-            });
-
-            const job_order_item = await prisma.jobOrderItem.create({
-                data: {
-                    productName: product.name,
-                    productPrice: product.price,
-                    productQuantity: product_item.quantity,
-                    product: {
-                        connect: { id: product.id },
-                    },
-                    JobOrder: {
-                        connect: {
-                            idCode_idNumber: {
-                                idCode: job_order.idCode,
-                                idNumber: job_order.idNumber,
-                            },
-                        },
-                    },
-                },
-            });
-        }
-
-        let final_job_order = await prisma.jobOrder.findUnique({
-            where: {
-                idCode_idNumber: {
-                    idCode: job_order.idCode,
-                    idNumber: job_order.idNumber,
-                },
-            },
-            include: {
-                customer: true,
-                jobOrderItems: true,
-                branch: true,
-                user: true,
-            },
-        });
-
-        console.log(final_job_order);
-
-        console.log(
-            final_job_order.jobOrderItems.reduce((sum, item) => {
-                return sum + item.productQuantity * item.productPrice;
-            }, 0)
-        );
     }
+
+    let final_job_order = await prisma.jobOrder.findUnique({
+        where: {
+            idCode_idNumber: {
+                idCode: job_order.idCode,
+                idNumber: job_order.idNumber,
+            },
+        },
+        include: {
+            customer: true,
+            jobOrderItems: true,
+            branch: true,
+            user: true,
+        },
+    });
+
+    console.log(final_job_order);
+
+    console.log(
+        final_job_order.jobOrderItems.reduce((sum, item) => {
+            return sum + item.productQuantity * item.productPrice;
+        }, 0)
+    );
 }

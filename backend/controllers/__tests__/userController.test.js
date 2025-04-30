@@ -3,6 +3,7 @@ import {
     createUser,
     deleteUser,
     editPassword,
+    editUser,
     assignRole,
     getUser,
     getAllUsers,
@@ -175,7 +176,175 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {});
+describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
+    test("editUser() should send a HTTP response code of 200 when a user's information has been successfully updated (password not included)", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "john_doe" },
+            edit: {
+                username: "jane_doe",
+                firstName: "Jane",
+                lastName: "Doe",
+                roleId: 2,
+                branchId: 1,
+            },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.user.update.mockResolvedValue({
+            username: "jane_doe",
+            firstName: "Jane",
+            lastName: "Doe",
+            password:
+                "$2a$12$SlHOdt4sN8Ef/kJeZYDdH.rwOp0TZBnaGr.3BB1.EPxQrjwV8tF9m",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            roleId: 2,
+            branchId: 1,
+        });
+
+        const updated = await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("editUser() should send a HTTP response code of 404 when the user to be updated does not exist in the database", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "john_doe" },
+            edit: {
+                username: "jane_doe",
+                firstName: "Jane",
+                lastName: "Doe",
+                roleId: 2,
+                branchId: 1,
+            },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue(null);
+
+        const updated = await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("editUser() should send a HTTP response code of 422 when the username, firstName, and lastName fields are empty", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "john_doe" },
+            edit: {
+                username: "",
+                firstName: "",
+                lastName: "",
+                roleId: 2,
+                branchId: 1,
+            },
+        });
+
+        const res = mockResponse();
+
+        await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "john_doe" },
+            edit: {
+                username: "jane_doe",
+                firstName: "",
+                lastName: "",
+                roleId: 2,
+                branchId: 1,
+            },
+        });
+
+        await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "john_doe" },
+            edit: {
+                username: "",
+                firstName: "jane",
+                lastName: "",
+                roleId: 2,
+                branchId: 1,
+            },
+        });
+
+        await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "john_doe" },
+            edit: {
+                username: "",
+                firstName: "",
+                lastName: "doe",
+                roleId: 2,
+                branchId: 1,
+            },
+        });
+
+        await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("editUser() should send a HTTP response code of 500 when an error in the database client occurs", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            user: { username: "john_doe" },
+            edit: {
+                username: "jane_doe",
+                firstName: "Jane",
+                lastName: "Doe",
+                roleId: 2,
+                branchId: 1,
+            },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockImplementation(() => {
+            let error = new Error();
+            throw error;
+        });
+
+        await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+
+        prismaMock.user.findUnique.mockResolvedValue({
+            username: "jane_doe",
+            firstName: "Jane",
+            lastName: "Doe",
+            password:
+                "$2a$12$SlHOdt4sN8Ef/kJeZYDdH.rwOp0TZBnaGr.3BB1.EPxQrjwV8tF9m",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            roleId: 2,
+            branchId: 1,
+        });
+
+        prismaMock.user.update.mockImplementation(() => {
+            let error = new Error();
+            throw error;
+        });
+
+        await editUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
 
 describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
     test("editPassword() should send a HTTP response code of 200 when a user password has been changed successfully", async () => {

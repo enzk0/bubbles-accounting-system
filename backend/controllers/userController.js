@@ -79,6 +79,10 @@ export async function changePassword(req, res) {
     }
 }
 
+// TODO: Consolidate all update operations on the user that are non-sensitive
+//       into editUser()
+export async function editUser(req, res) {}
+
 export async function assignRole(req, res) {
     const { user, role } = req.body;
 

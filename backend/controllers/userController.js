@@ -41,6 +41,39 @@ export async function deleteUser(req, res) {
     }
 }
 
+export async function editUser(req, res) {
+    const { user, edit } = req.body;
+
+    if (!edit.username || !edit.firstName || !edit.lastName) {
+        return res.status(422);
+    }
+
+    try {
+        const found = await prisma.user.findUnique({
+            where: {
+                username: user.username,
+            },
+        });
+
+        if (found === null) {
+            return res.status(404);
+        }
+
+        const updated = await prisma.user.update({
+            where: {
+                username: user.username,
+            },
+            data: user,
+        });
+
+        res.status(200);
+        return updated;
+    } catch (error) {
+        console.log(error);
+        return res.status(500);
+    }
+}
+
 export async function editPassword(req, res) {
     const { user, newPassword } = req.body;
 
@@ -66,10 +99,6 @@ export async function editPassword(req, res) {
         return res.status(500);
     }
 }
-
-// TODO: Consolidate all update operations on the user that are non-sensitive
-//       into editUser()
-export async function editUser(req, res) {}
 
 export async function assignRole(req, res) {
     const { user, role } = req.body;

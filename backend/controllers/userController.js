@@ -6,7 +6,7 @@ const saltRounds = 10;
 export async function createUser(req, res) {
     const { user } = req.body;
 
-    if (!user.name || !user.password) {
+    if (!user.username || !user.password || !user.firstName || !user.lastName) {
         return res.status(422);
     }
 
@@ -30,7 +30,7 @@ export async function deleteUser(req, res) {
     try {
         const deleted = await prisma.user.delete({
             where: {
-                name: user.name,
+                username: user.username,
             },
         });
 
@@ -41,30 +41,18 @@ export async function deleteUser(req, res) {
     }
 }
 
-export async function changePassword(req, res) {
+export async function editPassword(req, res) {
     const { user, newPassword } = req.body;
 
-    if (!user.name || !user.password || !newPassword) {
+    if (!user.username || !newPassword) {
         return res.status(422);
     }
 
     try {
-        const found = await prisma.user.findUnique({
-            where: {
-                name: user.name,
-            },
-        });
-
-        const isVerified = bcrypt.compareSync(user.password, found.password);
-
-        if (!isVerified) {
-            return res.status(401);
-        }
-
         const hash = bcrypt.hashSync(newPassword, saltRounds);
         const updated = await prisma.user.update({
             where: {
-                name: user.name,
+                username: user.username,
             },
             data: {
                 password: hash,
@@ -89,7 +77,7 @@ export async function assignRole(req, res) {
     try {
         const updated = await prisma.user.update({
             where: {
-                name: user.name,
+                username: user.username,
             },
             data: {
                 role: {

@@ -115,12 +115,16 @@ export async function countJobOrder(req, res) {
 export async function countJobOrderByBranch(req, res) { 
   const { interval, branchId } = req.body;
 
+  if (!interval && !branchId) {
+    return res.status(400).json({ error: "Interval and BranchID is required" })
+  }
+
   if (!interval) {
     return res.status(400).json({ error: "Interval is required" });
   }
 
   if (!branchId) {
-    return res.status(400).json({ error: "Branch ID is required" });
+    return res.status(400).json({ error: "BranchID is required" });
   }
 
   try {

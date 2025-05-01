@@ -125,6 +125,29 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
     });
+
+    test("createUser() should send a HTTP response code of 500 if an error with the database client occurs", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            user: {
+                username: "john_doe",
+                firstName: "John",
+                lastName: "Doe",
+                password: "password123",
+            },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.user.create.mockImplementation((input) => {
+            let error = new Error();
+            throw new Error();
+        });
+
+        const created = await createUser(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
 });
 
 describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {

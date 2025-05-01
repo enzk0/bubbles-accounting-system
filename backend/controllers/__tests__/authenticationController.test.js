@@ -19,14 +19,16 @@ const mockResponse = () => {
 describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
   test("login() should send an HTTP response of 200 and a jwt access token when the user has been successfully authenticated", async () => {
     const req = mockRequest({
-      user: { name: "user123", password: "password456" },
+      user: { username: "user123", password: "password456" },
     });
 
     const res = mockResponse();
 
     prismaMock.user.findUnique.mockResolvedValue({
       id: 2,
-      name: "user123",
+      username: "user123",
+      firstName: "John",
+      lastName: "Doe",
       password: "$2a$10$9IZROxxaSXKpNE7ZYZxfReWVvRZlk2mi4R4xMeUAt/.V73vDeVmPG",
       createdAt: new Date(),
       roleId: 2,
@@ -40,14 +42,16 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
 
   test("login() should send an HTTP response of 401 when the incorrect password is used to authenticate the user", async () => {
     const req = mockRequest({
-      user: { name: "user123", password: "pass123" },
+      user: { username: "user123", password: "pass123" },
     });
 
     const res = mockResponse();
 
     prismaMock.user.findUnique.mockResolvedValue({
       id: 2,
-      name: "user123",
+      username: "user123",
+      firstName: "John",
+      lastName: "Doe",
       password: "$2a$10$9IZROxxaSXKpNE7ZYZxfReWVvRZlk2mi4R4xMeUAt/.V73vDeVmPG",
       createdAt: new Date(),
       roleId: 2,
@@ -58,9 +62,9 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
     expect(res.status).toHaveBeenCalledWith(401);
   });
 
-  test("login() should send an HTTP response of 404 when a user with the specified user name cannot be found", async () => {
+  test("login() should send an HTTP response of 404 when a user with the specified username cannot be found", async () => {
     const req = mockRequest({
-      user: { name: "use27", password: "password456" },
+      user: { username: "use27", password: "password456" },
     });
 
     const res = mockResponse();
@@ -74,7 +78,7 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
 
   test("login() should send an HTTP response of 500 when an error in the database client has occurred", async () => {
     const req = mockRequest({
-      user: { name: "use27", password: "password456" },
+      user: { username: "use27", password: "password456" },
     });
 
     const res = mockResponse();

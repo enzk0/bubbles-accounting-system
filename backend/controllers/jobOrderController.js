@@ -1,7 +1,59 @@
 import prisma from "../client";
 
+async function incrementBranchCounter(branchId) {
+  await prisma.branch.update({
+    where: {
+      id: branchId,
+    },
+    data: {
+      counter: {
+        increment: 1,
+      },
+    },
+  });
+}
+
+async function createJobOrderItems(
+  jobOrderIdCode,
+  jobOrderIdNumber,
+  jobOrderItems,
+) {
+  for (const item of jobOrderItems) {
+    try {
+      const job_order_item = await prisma.jobOrderItem.create({
+        data: {
+          productName: item.productName,
+          productPrice: item.productPrice,
+          productQuantity: item.productQuantity,
+          product: {
+            connect: { id: item.productId },
+          },
+          jobOrder: {
+            connect: {
+              idCode_idNumber: {
+                idCode: jobOrderIdCode,
+                idNumber: jobOrderIdNumber,
+              },
+            },
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
 export async function createJobOrder(req, res) {
   const { requester, branch, customer, jobOrder } = req.body;
+
+  if (!customer.firstName || !customer.lastName) {
+    return res.status(422);
+  }
+
+  if (jobOrder.items.length < 7) {
+    return res.status(422);
+  }
 
   try {
     const branchFound = await prisma.branch.findUnique({
@@ -18,7 +70,7 @@ export async function createJobOrder(req, res) {
       data: {
         idCode: branchFound.code,
         idNumber: branchFound.counter,
-        employeeInCharge: jobOrder.employeeInCharge,
+        remarks: jobOrder.remarks,
         branch: {
           connect: { id: branchFound.id },
         },
@@ -31,40 +83,18 @@ export async function createJobOrder(req, res) {
       },
     });
 
-    for (const item of jobOrder.items) {
-      const job_order_item = await prisma.jobOrderItem.create({
-        data: {
-          productName: item.name,
-          productPrice: item.price,
-          productQuantity: item.quantity,
-          product: {
-            connect: { id: item.id },
-          },
-          JobOrder: {
-            connect: {
-              idCode_idNumber: {
-                idCode: createdJobOrder.idCode,
-                idNumber: createdJobOrder.idNumber,
-              },
-            },
-          },
-        },
-      });
-    }
+    await createJobOrderItems(
+      createdJobOrder.idCode,
+      createdJobOrder.idNumber,
+      jobOrder.items,
+    );
 
-    await prisma.branch.update({
-      where: {
-        id: branchFound.id,
-      },
-      data: {
-        counter: {
-          increment: 1,
-        },
-      },
-    });
+    await incrementBranchCounter(branchFound.id);
+
+    res.status(201);
+    return createdJobOrder;
   } catch (error) {
-    return res.status(500);
+    console.log(error);
+    return res.status(500).send({ error: error });
   }
-
-  res.status(201);
 }

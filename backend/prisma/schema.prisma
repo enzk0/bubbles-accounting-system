@@ -11,33 +11,42 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    url      = env("TEST_DATABASE_URL")
+    url      = env("DATABASE_URL")
 }
 
 model Branch {
     id Int @id @default(autoincrement())
 
     code    String @unique
+    name    String
     address String
-    counter Int
+    counter Int    @default(1)
 
     createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-    JobOrder JobOrder[]
+    jobOrders JobOrder[]
+    users     User[]
 }
 
 model User {
     id Int @id @default(autoincrement())
 
-    name     String @unique
-    password String
+    username  String @unique
+    firstName String @default("")
+    lastName  String @default("")
+    password  String
 
-    createdAt DateTime
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     role   Role? @relation(fields: [roleId], references: [id])
     roleId Int?
 
-    JobOrder JobOrder[]
+    branch   Branch? @relation(fields: [branchId], references: [id])
+    branchId Int?
+
+    jobOrders JobOrder[]
 }
 
 model Role {
@@ -46,11 +55,11 @@ model Role {
     name        String  @unique
     description String?
 
-    user        User[]
-    permissions Permission[]
+    user       User[]
+    privileges Privilege[]
 }
 
-model Permission {
+model Privilege {
     id Int @id @default(autoincrement())
 
     name        String  @unique
@@ -62,13 +71,17 @@ model Permission {
 model Customer {
     id Int @id @default(autoincrement())
 
-    name      String
-    address   String @default("")
-    contactNo String @default("")
+    firstName   String
+    lastName    String
+    address     String?
+    phoneNumber String?
 
     createdAt DateTime @default(now())
 
-    JobOrder JobOrder[]
+    jobOrder JobOrder[]
+
+    @@unique([firstName, lastName, phoneNumber])
+    @@index([firstName, lastName, phoneNumber])
 }
 
 model Product {
@@ -77,22 +90,27 @@ model Product {
     name  String @unique
     price Float
 
-    JobOrderItem JobOrderItem[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    jobOrderItem JobOrderItem[]
 }
 
 model JobOrder {
     idCode   String
     idNumber Int
 
-    createdAt DateTime  @default(now())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
     paidAt    DateTime?
     claimedAt DateTime?
 
-    isPaid    Boolean
-    isClaimed Boolean
+    isPaid    Boolean @default(false)
+    isClaimed Boolean @default(false)
+    isHidden  Boolean @default(false)
 
-    employeeInCharge String @default("")
-    remarks          String @default("")
+    remarks String @default("")
 
     branch   Branch @relation(fields: [branchId], references: [id])
     branchId Int
@@ -118,7 +136,7 @@ model JobOrderItem {
     product   Product @relation(fields: [productId], references: [id])
     productId Int
 
-    JobOrder         JobOrder @relation(fields: [jobOrderIdCode, jobOrderIdNumber], references: [idCode, idNumber])
+    jobOrder         JobOrder @relation(fields: [jobOrderIdCode, jobOrderIdNumber], references: [idCode, idNumber])
     jobOrderIdCode   String
     jobOrderIdNumber Int
 }

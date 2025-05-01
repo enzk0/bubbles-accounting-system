@@ -24,8 +24,6 @@ export function checkPrivilege(privileges) {
         user.role.privileges.some((privilege) => privilege.name === required),
       );
 
-      console.log(hasPrivilege);
-
       if (!hasPrivilege) {
         return res.status(403);
       }

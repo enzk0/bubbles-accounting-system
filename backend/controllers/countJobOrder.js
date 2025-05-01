@@ -76,8 +76,11 @@ export async function countJobOrder(req, res) {
     return res.status(400).json({ error: "Interval is required" });
   }
 
+  console.log("Day: ", interval);
+
   try {
     const jobOrderCount = await custom.jobOrder.groupByDate(interval);
+    console.log("Starting the try block");
     console.log(jobOrderCount);
   
     const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
@@ -104,7 +107,9 @@ export async function countJobOrder(req, res) {
       no_of_unclaimed: no_of_unclaimed
     }
     res.status(200).json(result);
-    console.log(result)
+    
+    console.log(res.status);
+    console.log(result);
     return result
   } catch (error) {
     console.error("Error counting job orders:", error);

@@ -290,7 +290,7 @@ const job_order_items = [
   ],
 ];
 
-const job_order_branches = ["AB", "CD", "EF", "GH", "IJ"];
+const job_order_branches = ["AB", "AB", "CD", "EF", "GH"];
 
 const job_order_customers = [
   {
@@ -386,6 +386,17 @@ for (let index = 0; index < 5; index++) {
       },
     });
   }
+
+  await prisma.branch.update({
+    where: {
+      id: branch.id,
+    },
+    data: {
+      counter: {
+        increment: 1,
+      },
+    },
+  });
 
   let final_job_order = await prisma.jobOrder.findUnique({
     where: {

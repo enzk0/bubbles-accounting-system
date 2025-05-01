@@ -9,7 +9,7 @@ export async function login(req, res) {
   try {
     const fetchedUser = await prisma.user.findUnique({
       where: {
-        name: user.name,
+        username: user.username,
       },
     });
 
@@ -34,7 +34,9 @@ export async function login(req, res) {
 
     res.json({ accessToken: accessToken });
     res.status(200);
+    return { accessToken: accessToken };
   } catch (error) {
+    console.log(error);
     return res.status(500);
   }
 }

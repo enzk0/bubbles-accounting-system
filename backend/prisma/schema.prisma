@@ -80,7 +80,6 @@ model Customer {
 
     jobOrder JobOrder[]
 
-    @@unique([firstName, lastName, phoneNumber])
     @@index([firstName, lastName, phoneNumber])
 }
 

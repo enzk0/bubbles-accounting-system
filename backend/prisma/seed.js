@@ -310,11 +310,15 @@ async function seed() {
     await prisma.user.findMany({
       where: {
         role: {
-          name: "ADMIN",
+          id: 1,
         },
       },
       include: {
-        role: true,
+        role: {
+          include: {
+            privileges: true,
+          },
+        },
       },
     }),
   );

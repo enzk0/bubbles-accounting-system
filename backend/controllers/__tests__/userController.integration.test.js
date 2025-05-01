@@ -60,7 +60,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("editPassword() should change the password of a User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { username: "john_doe" },
+            user: { id: 11 },
             newPassword: "pass456",
         });
 
@@ -72,7 +72,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof updated).toBe("object");
-        expect(updated.username).toBe(req.body.user.username);
+        expect(updated.id).toBe(req.body.user.id);
         expect(bcrypt.compareSync(req.body.newPassword, updated.password)).toBe(
             true
         );
@@ -89,7 +89,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("editUser() should update fields/information about a user in a database that is not the password", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { username: "john_doe" },
+            user: { id: 11 },
             edit: {
                 username: "jane_doe",
                 firstName: "Jane",
@@ -110,7 +110,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("getUser() should get/fetch a User in the database via their name", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { username: "jane_doe" },
+            user: { id: 11 },
         });
 
         const res = mockResponse();
@@ -121,7 +121,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof found).toBe("object");
-        expect(found.username).toEqual(req.body.user.username);
+        expect(found.id).toEqual(req.body.user.id);
     });
 
     test("getAllUsers() should get/fetch all Users in the database", async () => {
@@ -143,7 +143,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("deleteUser() should delete a User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            user: { username: "jane_doe" },
+            user: { id: 11 },
         });
 
         const res = mockResponse();
@@ -154,12 +154,10 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof deleted).toBe("object");
-        expect(deleted.username).toBe(req.body.user.username);
+        expect(deleted.id).toBe(req.body.user.id);
 
         const found = await prisma.user.findUnique({
-            where: {
-                username: req.body.user.username,
-            },
+            where: req.body.user,
         });
 
         expect(found).toEqual(null);

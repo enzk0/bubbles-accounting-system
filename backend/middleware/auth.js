@@ -11,8 +11,9 @@ export async function authenticate(req, res, next) {
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
+    req.body.requester = { id: decoded.id };
     next();
-    return decoded;
+    return req.body;
   } catch (error) {
     console.log(error);
     return res.status(403).send({ message: "Token has already expired" });

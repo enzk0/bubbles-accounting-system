@@ -153,6 +153,28 @@ async function seed() {
     },
   });
 
+  console.log(
+    await prisma.role.findUnique({
+      where: {
+        id: 1,
+      },
+      include: {
+        privileges: true,
+      },
+    }),
+  );
+
+  console.log(
+    await prisma.role.findUnique({
+      where: {
+        id: 2,
+      },
+      include: {
+        privileges: true,
+      },
+    }),
+  );
+
   await prisma.user.createMany({
     data: [
       {
@@ -230,16 +252,21 @@ async function seed() {
     });
   }
 
-  console.log(
-    await prisma.user.findMany({
-      where: {
-        roleId: 2,
+  const employees = await prisma.user.findMany({
+    where: {
+      roleId: 2,
+    },
+    include: {
+      role: {
+        include: {
+          privileges: true,
+        },
       },
-      include: {
-        role: true,
-      },
-    }),
-  );
+    },
+  });
+
+  console.log(employees);
+  console.log(employees[0].role);
 
   await prisma.user.createMany({
     data: [

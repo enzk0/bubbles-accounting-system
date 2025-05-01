@@ -29,9 +29,7 @@ export async function deleteUser(req, res) {
 
     try {
         const deleted = await prisma.user.delete({
-            where: {
-                username: user.username,
-            },
+            where: user,
         });
 
         res.status(200);
@@ -50,9 +48,7 @@ export async function editUser(req, res) {
 
     try {
         const found = await prisma.user.findUnique({
-            where: {
-                username: user.username,
-            },
+            where: user,
         });
 
         if (found === null) {
@@ -62,9 +58,7 @@ export async function editUser(req, res) {
         const { username, firstName, lastName, ...userRelations } = edit;
 
         let updated = await prisma.user.update({
-            where: {
-                username: user.username,
-            },
+            where: user,
             data: {
                 role: {
                     connect: { id: userRelations.roleId },
@@ -78,9 +72,7 @@ export async function editUser(req, res) {
         const { branchId, roleId, ...userInfo } = edit;
 
         updated = await prisma.user.update({
-            where: {
-                username: user.username,
-            },
+            where: user,
             data: userInfo,
         });
 
@@ -95,16 +87,14 @@ export async function editUser(req, res) {
 export async function editPassword(req, res) {
     const { user, newPassword } = req.body;
 
-    if (!user.username || !newPassword) {
+    if (!user.id || !newPassword) {
         return res.status(422);
     }
 
     try {
         const hash = bcrypt.hashSync(newPassword, saltRounds);
         const updated = await prisma.user.update({
-            where: {
-                username: user.username,
-            },
+            where: user,
             data: {
                 password: hash,
             },

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import prisma from "../client";
+import prisma from "../client.js";
 
 
 const custom = new PrismaClient().$extends({
@@ -36,7 +36,7 @@ const custom = new PrismaClient().$extends({
         },
 
         async groupByDateByBranch(interval, branchId) {
-        const query = `
+          const query = `
           SELECT 
             DATE_TRUNC('${interval}', "JobOrder"."createdAt") AS interval_start, 
             COALESCE(
@@ -62,8 +62,7 @@ const custom = new PrismaClient().$extends({
           GROUP BY DATE_TRUNC('${interval}', "JobOrder"."createdAt") 
           ORDER BY interval_start
         `;
-        
-        return prisma.$queryRawUnsafe(query);
+          return prisma.$queryRawUnsafe(query);
       },
     },
   },
@@ -75,14 +74,24 @@ export async function countJobOrder(req, res) {
   if (!interval) {
     return res.status(400).json({ error: "Interval is required" });
   }
-
-  console.log("Day: ", interval);
+  if (interval !== "day" && interval !== "week" && interval !== "month" && interval !== "year") {
+    return res.status(400).json({ error: "Interval must be day, week, month, or year." });
+  }
 
   try {
     const jobOrderCount = await custom.jobOrder.groupByDate(interval);
-    console.log("Starting the try block");
     console.log(jobOrderCount);
-  
+
+    if ( jobOrderCount == null || jobOrderCount == undefined) {
+      console.log("No job orders found");
+      return res.status(404).json({ error: "No job orders found" });
+    }
+
+    if (jobOrderCount.length === 0) {
+      console.log("No job orders found");
+      return res.status(404).json({ error: "No job orders found" });
+    }
+
     const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
     
     console.log("Interval Start: ", interval_start);
@@ -97,9 +106,9 @@ export async function countJobOrder(req, res) {
 
     const result = {
       interval_start: interval_start,
-      total: total,
-      total_paid: total_paid,
-      total_unpaid: total_unpaid,
+      total: parseFloat(total), //round up to 2 decimal places
+      total_paid: parseFloat(total_paid),
+      total_unpaid: parseFloat(total_unpaid),
       no_of_job_orders: no_of_job_orders,
       no_of_paid: no_of_paid,
       no_of_unpaid: no_of_unpaid,
@@ -117,55 +126,54 @@ export async function countJobOrder(req, res) {
   }
 }
 
-export async function countJobOrderByBranch(req, res) { 
-  const { interval, branchId } = req.body;
+  export async function countJobOrderByBranch(req, res) {
+    const { interval, branchId } = req.body;
 
-  if (!interval && !branchId) {
-    return res.status(400).json({ error: "Interval and BranchID is required" })
-  }
-
-  if (!interval) {
-    return res.status(400).json({ error: "Interval is required" });
-  }
-
-  if (!branchId) {
-    return res.status(400).json({ error: "BranchID is required" });
-  }
-
-  try {
-    const jobOrderCount = await custom.jobOrder.groupByDateByBranch(interval, branchId);
-    console.log(jobOrderCount);
-  
-    const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
-    
-    console.log("Interval Start: ", interval_start);
-    console.log("Total: ", total);
-    console.log("Total Paid: ", total_paid);
-    console.log("Total Unpaid: ", total_unpaid);
-    console.log("No of Job Orders: ", no_of_job_orders);
-    console.log("No of Paid: ", no_of_paid);
-    console.log("No of Unpaid: ", no_of_unpaid);
-    console.log("No of Claimed: ", no_of_claimed);
-    console.log("No of Unclaimed: ", no_of_unclaimed);
-
-    const result = {
-      interval_start: interval_start,
-      total: total,
-      total_paid: total_paid,
-      total_unpaid: total_unpaid,
-      no_of_job_orders: no_of_job_orders,
-      no_of_paid: no_of_paid,
-      no_of_unpaid: no_of_unpaid,
-      no_of_claimed: no_of_claimed,
-      no_of_unclaimed: no_of_unclaimed
+    if (!interval && !branchId) {
+      return res.status(400).json({ error: "Interval and BranchID is required" })
     }
-    res.status(200).json(result);
-    console.log(result)
-    return result
-  } catch (error) {
-    console.error("Error counting job orders:", error);
-    return res.status(500).json({ error: "Internal server error" });
-  }
-}
 
+    if (!interval) {
+      return res.status(400).json({ error: "Interval is required" });
+    }
+
+    if (!branchId) {
+      return res.status(400).json({ error: "BranchID is required" });
+    }
+
+    try {
+      const jobOrderCount = await custom.jobOrder.groupByDateByBranch(interval, branchId);
+      console.log(jobOrderCount);
+  
+      const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
+    
+      console.log("Interval Start: ", interval_start);
+      console.log("Total: ", total);
+      console.log("Total Paid: ", total_paid);
+      console.log("Total Unpaid: ", total_unpaid);
+      console.log("No of Job Orders: ", no_of_job_orders);
+      console.log("No of Paid: ", no_of_paid);
+      console.log("No of Unpaid: ", no_of_unpaid);
+      console.log("No of Claimed: ", no_of_claimed);
+      console.log("No of Unclaimed: ", no_of_unclaimed);
+
+      const result = {
+        interval_start: interval_start,
+        total: total,
+        total_paid: total_paid,
+        total_unpaid: total_unpaid,
+        no_of_job_orders: no_of_job_orders,
+        no_of_paid: no_of_paid,
+        no_of_unpaid: no_of_unpaid,
+        no_of_claimed: no_of_claimed,
+        no_of_unclaimed: no_of_unclaimed
+      }
+      res.status(200).json(result);
+      console.log(result)
+      return result
+    } catch (error) {
+      console.error("Error counting job orders:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+}
 

@@ -55,6 +55,10 @@ const custom = new PrismaClient().$extends({
 
 export async function getJobOrder(req, res) {
   const { branchId } = req.body;
+  console.log(branchId)
+  if (!branchId) {
+    return res.status(400).json({ error: "No Branch ID declared."});
+  }
 
   try {
     const jobOrders = await custom.jobOrder.getByBranch(branchId);
@@ -63,7 +67,7 @@ export async function getJobOrder(req, res) {
       console.log("No job orders found");
       return res.status(404).json({ error: "No job orders found" });
     }
-    
+
     if (jobOrders.length === 0) {
       return res.status(404).json({ error: "No job orders found" });
     }

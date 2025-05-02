@@ -80,7 +80,6 @@ export async function countJobOrder(req, res) {
 
   try {
     const jobOrderCount = await custom.jobOrder.groupByDate(interval);
-    console.log(jobOrderCount);
 
     if ( jobOrderCount == null || jobOrderCount == undefined) {
       console.log("No job orders found");
@@ -118,7 +117,6 @@ export async function countJobOrder(req, res) {
     res.status(200).json(result);
     
     console.log(res.status);
-    console.log(result);
     return result
   } catch (error) {
     console.error("Error counting job orders:", error);
@@ -141,10 +139,23 @@ export async function countJobOrder(req, res) {
       return res.status(400).json({ error: "BranchID is required" });
     }
 
+    if (interval !== "day" && interval !== "week" && interval !== "month" && interval !== "year") {
+      return res.status(400).json({ error: "Interval must be day, week, month, or year." });
+    }
+
     try {
       const jobOrderCount = await custom.jobOrder.groupByDateByBranch(interval, branchId);
-      console.log(jobOrderCount);
-  
+      
+      if (jobOrderCount == null || jobOrderCount == undefined) {
+            console.log("No job orders found");
+            return res.status(404).json({ error: "No job orders found" });
+      }
+      
+      if (jobOrderCount.length === 0) {
+        console.log("No job orders found");
+        return res.status(404).json({ error: "No job orders found" });
+      }
+      
       const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
     
       console.log("Interval Start: ", interval_start);

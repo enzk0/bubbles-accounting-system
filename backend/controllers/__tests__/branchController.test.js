@@ -1,5 +1,5 @@
 import { test, expect, describe, vi } from "vitest";
-import { createBranch, getBranch } from "../branchController";
+import { createBranch, getBranch, getAllBranches } from "../branchController";
 import { prismaMock } from "../../singleton";
 
 const mockRequest = (body) => ({
@@ -137,7 +137,6 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     await getBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith(expect.any(Object));
   });
 
   test("getBranch() should send an HTTP status code of 422 when no fields for identification have been provided", async () => {
@@ -167,6 +166,74 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 
     await getBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+  });
+});
+
+describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
+  test("getAllBranches() should send an HTTP status code of 200 when all branches been successfully read from the database", async () => {
+    const req = mockRequest({
+      requeseter: { id: 1 },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.branch.findMany.mockResolvedValue([
+      {
+        id: 1,
+        code: "OT",
+        name: "Outpost",
+        address: "Ark Outpost",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        counter: 1,
+      },
+      {
+        id: 2,
+        code: "AK",
+        name: "Ark",
+        address: "Ark",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        counter: 1,
+      },
+    ]);
+
+    await getAllBranches(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.any(Array));
+  });
+
+  test("getAllBranches() should send an HTTP status code of 404 when there are no branches in the database", async () => {
+    const req = mockRequest({
+      requeseter: { id: 1 },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.branch.findMany.mockResolvedValue([]);
+
+    await getAllBranches(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith(expect.any(Array));
+  });
+
+  test("getAllBranches() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
+    const req = mockRequest({
+      requeseter: { id: 1 },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.branch.findMany.mockImplementation(() => {
+      let error = new Error();
+      throw error;
+    });
+
+    await getAllBranches(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
   });

@@ -4,7 +4,6 @@ import { countJobOrder, countJobOrderByBranch } from "../countJobOrder.js";
 
 const prisma = new PrismaClient();
 
-// Mock Express req/res objects
 const mockRequest = (body) => ({
   body: body,
 });
@@ -16,7 +15,6 @@ const mockResponse = () => {
 };
 
 describe("INTEGRATION TESTS FOR 'countJobOrder()' CONTROLLER", () => {
-  // We're using the seeded database, so no need for beforeEach/afterEach setup
 
   test("countJobOrder() should return the count of job orders for interval: day", async () => {
     const req = mockRequest({

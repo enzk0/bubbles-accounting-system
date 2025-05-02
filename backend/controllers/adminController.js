@@ -1,26 +1,12 @@
-import { verifyUserRole } from './RoleVerification';
-import { getSalesDataById, updateSalesData } from './SalesDataService';
+// controllers/adminController.js
+import * as jobOrderService from '../services/jobOrderService.js';
 
-export const modifySalesData = async (req, res) => {
-  const userId = req.userId; // Assume userId comes from authentication middleware
-  const { id } = req.params; // Sales data ID
-  const updatedFields = req.body; // Fields to be modified
+const modifyJobOrder = async (req, res) => {
+  const job = await jobOrderService.findJobOrderById(req.params.id);
+  if (!job) return res.status(404).json({ error: 'Job order not found' });
 
-  try {
-    const role = await verifyUserRole(userId);
-    if (role !== 'admin') {
-      return res.status(403).json({ message: 'Forbidden: Role not authorized.' });
-    }
-
-    const salesData = await getSalesDataById(id);
-    if (!salesData) {
-      return res.status(404).json({ message: 'Sales data not found.' });
-    }
-
-    // Update all fields provided in the request body
-    const updatedData = await updateSalesData(id, { ...salesData, ...updatedFields });
-    return res.status(200).json(updatedData);
-  } catch (error) {
-    return res.status(500).json({ message: 'Internal Server Error', error });
-  }
+  const updatedJob = await jobOrderService.updateJobOrder(req.params.id, req.body);
+  res.json({ updatedJob });
 };
+
+export { modifyJobOrder };

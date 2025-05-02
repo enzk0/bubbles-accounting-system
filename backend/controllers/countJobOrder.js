@@ -93,26 +93,16 @@ export async function countJobOrder(req, res) {
 
     const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
     
-    console.log("Interval Start: ", interval_start);
-    console.log("Total: ", total);
-    console.log("Total Paid: ", total_paid);
-    console.log("Total Unpaid: ", total_unpaid);
-    console.log("No of Job Orders: ", no_of_job_orders);
-    console.log("No of Paid: ", no_of_paid);
-    console.log("No of Unpaid: ", no_of_unpaid);
-    console.log("No of Claimed: ", no_of_claimed);
-    console.log("No of Unclaimed: ", no_of_unclaimed);
-
     const result = {
       interval_start: interval_start,
       total: parseFloat(total), //round up to 2 decimal places
       total_paid: parseFloat(total_paid),
       total_unpaid: parseFloat(total_unpaid),
-      no_of_job_orders: no_of_job_orders,
-      no_of_paid: no_of_paid,
-      no_of_unpaid: no_of_unpaid,
-      no_of_claimed: no_of_claimed,
-      no_of_unclaimed: no_of_unclaimed
+      no_of_job_orders: parseInt(no_of_job_orders),
+      no_of_paid: parseInt(no_of_paid),
+      no_of_unpaid: parseInt(no_of_unpaid),
+      no_of_claimed: parseInt(no_of_claimed),
+      no_of_unclaimed: parseInt(no_of_unclaimed),
     }
     res.status(200).json(result);
     
@@ -129,18 +119,18 @@ export async function countJobOrder(req, res) {
 
     if (!interval && !branchId) {
       return res.status(400).json({ error: "Interval and BranchID is required" })
-    }
-
-    if (!interval) {
+    } else if (!interval) {
       return res.status(400).json({ error: "Interval is required" });
-    }
-
-    if (!branchId) {
+    } else if (!branchId) {
       return res.status(400).json({ error: "BranchID is required" });
     }
 
     if (interval !== "day" && interval !== "week" && interval !== "month" && interval !== "year") {
       return res.status(400).json({ error: "Interval must be day, week, month, or year." });
+    }
+
+    if (!Number.isInteger(branchId)) {
+      return res.status(400).json({ error: "Branch ID must be a number." });
     }
 
     try {
@@ -155,32 +145,23 @@ export async function countJobOrder(req, res) {
         console.log("No job orders found");
         return res.status(404).json({ error: "No job orders found" });
       }
-      
+      ``
       const { interval_start, total, total_paid, total_unpaid, no_of_job_orders, no_of_paid, no_of_unpaid, no_of_claimed, no_of_unclaimed } = jobOrderCount[0];
-    
-      console.log("Interval Start: ", interval_start);
-      console.log("Total: ", total);
-      console.log("Total Paid: ", total_paid);
-      console.log("Total Unpaid: ", total_unpaid);
-      console.log("No of Job Orders: ", no_of_job_orders);
-      console.log("No of Paid: ", no_of_paid);
-      console.log("No of Unpaid: ", no_of_unpaid);
-      console.log("No of Claimed: ", no_of_claimed);
-      console.log("No of Unclaimed: ", no_of_unclaimed);
 
       const result = {
-        interval_start: interval_start,
-        total: total,
-        total_paid: total_paid,
-        total_unpaid: total_unpaid,
-        no_of_job_orders: no_of_job_orders,
-        no_of_paid: no_of_paid,
-        no_of_unpaid: no_of_unpaid,
-        no_of_claimed: no_of_claimed,
-        no_of_unclaimed: no_of_unclaimed
+      interval_start: interval_start,
+      total: parseFloat(total), //round up to 2 decimal places
+      total_paid: parseFloat(total_paid),
+      total_unpaid: parseFloat(total_unpaid),
+      no_of_job_orders: parseInt(no_of_job_orders),
+      no_of_paid: parseInt(no_of_paid),
+      no_of_unpaid: parseInt(no_of_unpaid),
+      no_of_claimed: parseInt(no_of_claimed),
+      no_of_unclaimed: parseInt(no_of_unclaimed),
       }
       res.status(200).json(result);
       console.log(result)
+      
       return result
     } catch (error) {
       console.error("Error counting job orders:", error);

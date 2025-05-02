@@ -66,3 +66,26 @@ export async function getAllBranches(req, res) {
     return res.status(500);
   }
 }
+
+export async function editBranch(req, res) {
+  const { requester, branch, edit } = req.body;
+
+  if (!edit.name || !edit.address) {
+    return res.status(422);
+  }
+
+  try {
+    const editedBranch = await prisma.branch.update({
+      where: {
+        id: branch.id,
+      },
+      data: edit,
+    });
+
+    res.status(200);
+    return editedBranch;
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
+}

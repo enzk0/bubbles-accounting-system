@@ -88,4 +88,15 @@ describe("UNIT test for 'countJobOrderByBranch()' controller", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "BranchID is required" });
   });
+
+  test("countJobOrderByBranch() should return 400 response for wrong interval", async () => {
+    const req = mockRequest({ interval: "wow", branchId: "1" });
+    const res = mockResponse();
+
+    await countJobOrderByBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Interval must be day, week, month, or year." });
+  });
+
 })

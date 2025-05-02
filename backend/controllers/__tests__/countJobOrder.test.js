@@ -45,4 +45,14 @@ describe("UNIT test for 'countJobOrder()' controller", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "Interval is required" });
   });
+
+  test("countJobOrder() should return 400 response for invalid interval", async () => { 
+    const req = mockRequest({ interval: "wow" });
+    const res = mockResponse();
+
+    await countJobOrder(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Interval must be day, week, month, or year." });
+  });
 });

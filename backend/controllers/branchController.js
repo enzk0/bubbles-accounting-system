@@ -46,3 +46,23 @@ export async function getBranch(req, res) {
     return res.status(500);
   }
 }
+
+export async function getAllBranches(req, res) {
+  const { requester } = req.body;
+
+  try {
+    const foundBranches = await prisma.branch.findMany();
+
+    if (foundBranches.length === 0) {
+      res.json([]);
+      return res.status(404);
+    }
+
+    res.status(200);
+    res.json(foundBranches);
+    return foundBranches;
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
+}

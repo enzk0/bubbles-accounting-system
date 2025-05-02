@@ -1,5 +1,10 @@
 import { test, expect, describe, vi } from "vitest";
-import { createBranch, getBranch, getAllBranches } from "../branchController";
+import {
+  createBranch,
+  getBranch,
+  getAllBranches,
+  editBranch,
+} from "../branchController";
 import { prismaMock } from "../../singleton";
 
 const mockRequest = (body) => ({
@@ -234,6 +239,75 @@ describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     });
 
     await getAllBranches(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+  });
+});
+
+describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
+  test("editBranch() should send an HTTP status code of 200 when a branch in the database has been successfully updated/edited", async () => {
+    const req = mockRequest({
+      requeseter: { id: 1 },
+      branch: { id: 1 },
+      edit: { name: "Ark Outpost", address: "Ark Outpost Command Center" },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.branch.update.mockResolvedValue({
+      id: 1,
+      code: "OT",
+      name: "Ark Outpost",
+      address: "Ark Outpost Command Center",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      counter: 1,
+    });
+
+    await editBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  test("editBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
+    let req = mockRequest({
+      requeseter: { id: 1 },
+      branch: { id: 1 },
+      edit: { name: "", address: "Ark Outpost Command Center" },
+    });
+
+    const res = mockResponse();
+
+    await editBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(422);
+
+    req = mockRequest({
+      requeseter: { id: 1 },
+      branch: { id: 1 },
+      edit: { name: "Ark Outpost", address: "" },
+    });
+
+    await editBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(422);
+  });
+
+  test("editBranch() should send an HTTP status code of 500 when an error with the database client occurs or when the queried branch to be updated does not exist", async () => {
+    const req = mockRequest({
+      requeseter: { id: 1 },
+      branch: { id: 1 },
+      edit: { name: "Ark Outpost", address: "Ark Outpost Command Center" },
+    });
+
+    const res = mockResponse();
+
+    prismaMock.branch.update.mockImplementation(() => {
+      let error = new Error();
+      throw error;
+    });
+
+    await editBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
   });

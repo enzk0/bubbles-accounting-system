@@ -24,7 +24,7 @@ export async function getBranch(req, res) {
   const { requester, branch } = req.body;
 
   try {
-    if (branch.id === null || branch.id === undefined) {
+    if (branch.id === null || branch.id === undefined || branch.id < 1) {
       return res.status(422);
     }
 
@@ -84,6 +84,27 @@ export async function editBranch(req, res) {
 
     res.status(200);
     return editedBranch;
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
+}
+
+export async function deleteBranch(req, res) {
+  const { requester, branch } = req.body;
+
+  if (branch.id === null || branch.id == undefined || branch.id < 1) {
+    return res.status(422);
+  }
+
+  try {
+    const deletedBranch = prisma.branch.delete({
+      where: {
+        id: branch.id,
+      },
+    });
+
+    return res.status(200);
   } catch (error) {
     console.log(error);
     return res.status(500);

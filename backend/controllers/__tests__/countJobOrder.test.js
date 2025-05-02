@@ -56,3 +56,16 @@ describe("UNIT test for 'countJobOrder()' controller", () => {
     expect(res.json).toHaveBeenCalledWith({ error: "Interval must be day, week, month, or year." });
   });
 });
+
+describe("UNIT test for 'countJobOrderByBranch()' controller", () => { 
+
+  test("countJobOrderByBranch() should return 404 response as there are no instances in the database", async () => { 
+    const req = mockRequest({ interval: "day", branchId: 1 });
+    const res = mockResponse();
+
+    await countJobOrderByBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: "No job orders found" });
+  });
+})

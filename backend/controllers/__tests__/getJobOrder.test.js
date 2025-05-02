@@ -28,12 +28,22 @@ const mockResponse = () => {
 describe("getJobOrder", () => { 
 
   test("getJobOrder() should return 404 response if database is empty", async () => {
-    const req = mockRequest({ branchID: "1" });
+    const req = mockRequest({ branchId: 1 });
     const res = mockResponse();
 
     await getJobOrder(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ error: "No job orders found" });
+  });
+
+  test("getJobOrder() should return 400 response if branchID is undeclared", async () => {
+    const req = mockRequest({ branchId: null });
+    const res = mockResponse();
+
+    await getJobOrder(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "No Branch ID declared." });
   });
 });

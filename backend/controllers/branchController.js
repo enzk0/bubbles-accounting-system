@@ -8,12 +8,39 @@ export async function createBranch(req, res) {
   }
 
   try {
-    const newBranch = prisma.branch.create({
+    const newBranch = await prisma.branch.create({
       branch: branch,
     });
 
     res.status(201);
     return newBranch;
+  } catch (error) {
+    console.log(error);
+    return res.status(500);
+  }
+}
+
+export async function getBranch(req, res) {
+  const { requester, branch } = req.body;
+
+  try {
+    if (branch.id === null || branch.id === undefined) {
+      return res.status(422);
+    }
+
+    const foundBranch = await prisma.branch.findUnique({
+      where: {
+        id: branch.id,
+      },
+    });
+
+    if (!foundBranch || foundBranch == null) {
+      return res.status(404);
+    }
+
+    res.status(200);
+    res.json(foundBranch);
+    return foundBranch;
   } catch (error) {
     console.log(error);
     return res.status(500);

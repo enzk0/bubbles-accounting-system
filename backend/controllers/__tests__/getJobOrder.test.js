@@ -43,4 +43,14 @@ describe("getAllJobOrderByBranch", () => {
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ error: "No job orders found" });
   });
+
+  test("getAllJobOrderByBranch() should return 400 response if branchId is not provided", async () => {
+    const req = mockRequest({branchId: null});
+    const res = mockResponse();
+
+    await getAllJobOrderByBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Branch ID is not provided" });
+  });
 })

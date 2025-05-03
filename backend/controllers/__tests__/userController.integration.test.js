@@ -1,7 +1,7 @@
 import { test, expect, describe, vi } from "vitest";
 import {
     createUser,
-    deleteUser,
+    deactivateUser,
     editPassword,
     getUser,
     getAllUsers,
@@ -140,7 +140,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
         expect(found.length).toBeGreaterThan(0);
     });
 
-    test("deleteUser() should delete a User in the database", async () => {
+    test("deactivateUser() should delete a User in the database", async () => {
         const req = mockRequest({
             requester: { id: 1 },
             user: { id: 11 },
@@ -148,18 +148,18 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         const res = mockResponse();
 
-        const deleted = await deleteUser(req, res);
+        const updated = await deactivateUser(req, res);
 
-        console.log(deleted);
+        console.log(updated);
 
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(typeof deleted).toBe("object");
-        expect(deleted.id).toBe(req.body.user.id);
+        expect(typeof updated).toBe("object");
+        expect(updated.id).toBe(req.body.user.id);
 
         const found = await prisma.user.findUnique({
             where: req.body.user,
         });
 
-        expect(found).toEqual(null);
+        expect(found.isActive).toEqual(false);
     });
 });

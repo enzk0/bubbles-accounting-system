@@ -5,13 +5,30 @@ import checkRole from '../auth/checkRole.js';
 
 const router = express.Router();
 
-// Simulated auth
+
 router.use((req, res, next) => {
-  req.user = { id: 1, role: req.headers['role'] }; // simulate user role
+  const role = req.headers['role'];
+  
+  if (!role) {
+    return res.status(401).json({ error: 'Missing role in headers' });
+  }
+
+  req.user = { id: 1, role }; 
   next();
 });
 
-router.patch('/employee/job-orders/:id', checkRole('employee'), employeeModify);
-router.patch('/admin/job-orders/:id', checkRole('admin'), adminModify);
+// Employee-only route
+router.patch(
+  '/employee/job-orders/:id',
+  checkRole('employee'),
+  employeeModify
+);
+
+// Admin-only route
+router.patch(
+  '/admin/job-orders/:id',
+  checkRole('admin'),
+  adminModify
+);
 
 export default router;

@@ -1,11 +1,11 @@
 import { test, expect, describe, vi } from "vitest";
 import {
     createUser,
-    deleteUser,
     editPassword,
     editUser,
     getUser,
     getAllUsers,
+    deactivateUser,
 } from "../userController";
 import { prismaMock } from "../../singleton";
 import bcrypt from "bcrypt";
@@ -150,8 +150,8 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
-    test("deleteUser() should send a HTTP response code of 200 when a user is deleted successfully", async () => {
+describe("UNIT TESTS for 'deactivateUser()' CONTROLLER", () => {
+    test("deactivateUser() should send a HTTP response code of 200 when a user is deleted successfully", async () => {
         let req = mockRequest({
             requester: { id: 1 },
             user: { id: 2 },
@@ -168,18 +168,19 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
                 "$2a$12$j82bxfd6gJTHiYJae7nK2.0hJQ.7zQ9luwED1rSYZn.CLai.5HWaC",
             createdAt: new Date(),
             updatedAt: new Date(),
+            isActive: false,
             roleId: 1,
         };
 
-        prismaMock.user.delete.mockResolvedValue(mock);
+        prismaMock.user.update.mockResolvedValue(mock);
 
-        const user = await deleteUser(req, res);
+        const user = await deactivateUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(mock).toEqual(user);
     });
 
-    test("deleteUser() should send a HTTP response code of 500 when an error in deleting a user in the database occurs", async () => {
+    test("deactivateUser() should send a HTTP response code of 500 when an error in deleting a user in the database occurs", async () => {
         let req = mockRequest({
             requester: { id: 1 },
             user: { id: 2 },
@@ -187,12 +188,12 @@ describe("UNIT TESTS for 'deleteUser()' CONTROLLER", () => {
 
         const res = mockResponse();
 
-        prismaMock.user.delete.mockImplementation(() => {
+        prismaMock.user.update.mockImplementation(() => {
             let error = new Error();
             throw error;
         });
 
-        await deleteUser(req, res);
+        await deactivateUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
     });

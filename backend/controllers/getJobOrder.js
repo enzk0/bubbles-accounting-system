@@ -59,7 +59,7 @@ export async function getAllJobOrderByBranch(req, res) {
   const { branchId } = req.body;
 
   if (!branchId) {
-    return res.status(400).json({ error: "No Branch ID declared."});
+    return res.status(400).json({ error: "Branch ID is not provided"});
   }
 
   try {

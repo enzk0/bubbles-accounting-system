@@ -24,16 +24,19 @@ export async function createUser(req, res) {
     }
 }
 
-export async function deleteUser(req, res) {
+export async function deactivateUser(req, res) {
     const { user } = req.body;
 
     try {
-        const deleted = await prisma.user.delete({
+        const updatedUser = await prisma.user.update({
             where: user,
+            data: {
+                isActive: false,
+            },
         });
 
         res.status(200);
-        return deleted;
+        return updatedUser;
     } catch (error) {
         return res.status(500);
     }

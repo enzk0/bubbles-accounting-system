@@ -66,6 +66,22 @@ export async function createJobOrder(req, res) {
             return res.status(404);
         }
 
+        if (branchFound.isActive === false) {
+            return res.status(403);
+        }
+
+        for (const item of jobOrder.items) {
+            const product = await prisma.product.findUnique({
+                where: {
+                    id: item.productId,
+                },
+            });
+
+            if (product.isActive === false) {
+                return res.status(403);
+            }
+        }
+
         const createdJobOrder = await prisma.jobOrder.create({
             data: {
                 idCode: branchFound.code,

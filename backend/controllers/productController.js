@@ -1,0 +1,194 @@
+import prisma from "../client";
+
+export async function createProduct(req, res) {
+    const { requester, product } = req.body;
+
+    if (
+        !product.name ||
+        product.price === null ||
+        product.price === undefined
+    ) {
+        return res
+            .status(422)
+            .send({ message: "Some of the required fields are empty." });
+    }
+    try {
+        const createdProduct = await prisma.product.create({
+            data: {
+                name: product.name,
+                price: product.price,
+            },
+        });
+
+        res.status(201);
+        return createdProduct;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred.",
+            error: error,
+        });
+    }
+}
+
+export async function getProduct(req, res) {
+    const { requester, product } = req.body;
+
+    if (product.id === null || product.id === undefined || product.id < 1) {
+        return res.status(422).send({
+            message: "Some of the required fields are empty or invalid.",
+        });
+    }
+
+    try {
+        const foundProduct = await prisma.product.findUnique({
+            where: {
+                id: product.id,
+            },
+        });
+
+        if (foundProduct === null || foundProduct === undefined) {
+            return res
+                .status(404)
+                .send({ message: "Product could not be found" });
+        }
+
+        res.status(200);
+        res.json(foundProduct);
+        return foundProduct;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred.",
+            error: error,
+        });
+    }
+}
+
+export async function getActiveProducts(req, res) {
+    const { requester } = req.body;
+
+    try {
+        const foundProducts = await prisma.product.findMany({
+            where: {
+                isActive: true,
+            },
+        });
+
+        if (
+            foundProducts === null ||
+            foundProducts === undefined ||
+            foundProducts.length === 0
+        ) {
+            return res
+                .status(404)
+                .send({ message: "No active products could not be found" });
+        }
+
+        res.status(200);
+        res.json(foundProducts);
+        return foundProducts;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred.",
+            error: error,
+        });
+    }
+}
+
+export async function getAllProducts(req, res) {
+    const { requester } = req.body;
+
+    try {
+        const foundProducts = await prisma.product.findMany();
+
+        if (
+            foundProducts === null ||
+            foundProducts === undefined ||
+            foundProducts.length === 0
+        ) {
+            return res
+                .status(404)
+                .send({ message: "No products could not be found" });
+        }
+
+        res.status(200);
+        res.json(foundProducts);
+        return foundProducts;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred.",
+            error: error,
+        });
+    }
+}
+
+export async function editProduct(req, res) {
+    const { requester, product, edit } = req.body;
+
+    if (product.id === null || product.id === undefined || product.id < 1) {
+        return res.status(422).send({ message: "Product id is not provided." });
+    }
+
+    if (
+        !edit.name ||
+        edit.price < 0 ||
+        edit.price === null ||
+        edit.price === undefined
+    ) {
+        return res
+            .status(422)
+            .send({ message: "Some of the required fields are empty." });
+    }
+
+    try {
+        const updatedProduct = await prisma.product.update({
+            where: {
+                id: product.id,
+            },
+            data: {
+                name: edit.name,
+                price: edit.price,
+            },
+        });
+
+        res.status(200);
+        return updatedProduct;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred.",
+            error: error,
+        });
+    }
+}
+
+export async function deactivateProduct(req, res) {
+    const { requester, product } = req.body;
+
+    if (product.id === null || product.id === undefined || product.id < 1) {
+        return res.status(422).send({ message: "Product id is not provided." });
+    }
+
+    try {
+        const updatedProduct = await prisma.product.update({
+            where: {
+                id: product.id,
+            },
+            data: {
+                isActive: false,
+            },
+        });
+
+        res.status(200);
+        return updatedProduct;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred.",
+            error: error,
+        });
+    }
+}

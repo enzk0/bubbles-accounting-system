@@ -2,7 +2,9 @@ import express from "express";
 
 const port = 3000;
 const app = express();
+const salesRoutes = require('./routes/salesRoutes');
 app.use(express.json());
+app.use('/api', salesRoutes);
 
 app.get("/", async (req, res) => {
   try {

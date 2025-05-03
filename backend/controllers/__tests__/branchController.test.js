@@ -4,7 +4,7 @@ import {
   getBranch,
   getAllBranches,
   editBranch,
-  deleteBranch,
+  deactivateBranch,
 } from "../branchController";
 import { prismaMock } from "../../singleton";
 
@@ -314,8 +314,8 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
   });
 });
 
-describe("UNIT TEST SUITE FOR 'deleteBranch()' CONTROLLER", () => {
-  test("deleteBranch() should send an HTTP status code of 200 when a branch in the database has been successfully deleted", async () => {
+describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
+  test("deactivateBranch() should send an HTTP status code of 200 when a branch in the database has been successfully deactivated", async () => {
     const req = mockRequest({
       requeseter: { id: 1 },
       branch: { id: 1 },
@@ -323,22 +323,23 @@ describe("UNIT TEST SUITE FOR 'deleteBranch()' CONTROLLER", () => {
 
     const res = mockResponse();
 
-    prismaMock.branch.delete.mockResolvedValue({
+    prismaMock.branch.update.mockResolvedValue({
       id: 1,
       code: "OT",
       name: "Outpost",
       address: "Ark Outpost",
       createdAt: new Date(),
       updatedAt: new Date(),
+      isActive: false,
       counter: 1,
     });
 
-    await deleteBranch(req, res);
+    await deactivateBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
-  test("deleteBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
+  test("deactivateBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
     const req = mockRequest({
       requeseter: { id: 1 },
       branch: { id: null },
@@ -346,12 +347,12 @@ describe("UNIT TEST SUITE FOR 'deleteBranch()' CONTROLLER", () => {
 
     const res = mockResponse();
 
-    await deleteBranch(req, res);
+    await deactivateBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(422);
   });
 
-  test("deleteBranch() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
+  test("deactivateBranch() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
     const req = mockRequest({
       requeseter: { id: 1 },
       branch: { id: 1 },
@@ -359,12 +360,12 @@ describe("UNIT TEST SUITE FOR 'deleteBranch()' CONTROLLER", () => {
 
     const res = mockResponse();
 
-    prismaMock.branch.delete.mockImplementation(() => {
+    prismaMock.branch.update.mockImplementation(() => {
       let error = new Error();
       throw error;
     });
 
-    await deleteBranch(req, res);
+    await deactivateBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
   });

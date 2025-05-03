@@ -47,8 +47,47 @@ export async function getProduct(req, res) {
             },
         });
 
+        if (foundProduct === null || foundProduct === undefined) {
+            return res
+                .status(404)
+                .send({ message: "Product could not be found" });
+        }
+
         res.status(200);
+        res.json(foundProduct);
         return foundProduct;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred.",
+            error: error,
+        });
+    }
+}
+
+export async function getActiveProducts(req, res) {
+    const { requester } = req.body;
+
+    try {
+        const foundProducts = await prisma.product.findMany({
+            where: {
+                isActive: true,
+            },
+        });
+
+        if (
+            foundProducts === null ||
+            foundProducts === undefined ||
+            foundProducts.length === 0
+        ) {
+            return res
+                .status(404)
+                .send({ message: "No active products could not be found" });
+        }
+
+        res.status(200);
+        res.json(foundProducts);
+        return foundProducts;
     } catch (error) {
         console.log(error);
         return res.status(500).send({

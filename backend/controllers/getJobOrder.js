@@ -33,11 +33,13 @@ async function getJobOrderByBranch(branchId) {
 export async function getAllJobOrder(req, res) {
   const { branchId } = req.body;
   console.log(branchId)
+
   if (!branchId) {
     return res.status(400).json({ error: "No Branch ID declared."});
   }
 
   try {
+    console.log("Fetching job orders...");
     const jobOrders = await getJobOrder();
     console.log("jobOrders", jobOrders);
 

@@ -1,5 +1,5 @@
 import { test, expect, describe, vi } from "vitest";
-import { getAllJobOrder } from "../getJobOrder.js";
+import { getAllJobOrder, getAllJobOrderByBranch } from "../getJobOrder.js";
 import prismaMock from "../../singleton.js";
 
 vi.mock("../../client", () => ({
@@ -22,7 +22,6 @@ const mockResponse = () => {
 };
 
 describe("getAllJobOrder", () => { 
-
   test("getAllJobOrder() should return 404 response if database is empty", async () => {
     const req = mockRequest({ branchId: 1 });
     const res = mockResponse();
@@ -32,14 +31,16 @@ describe("getAllJobOrder", () => {
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ error: "No job orders found" });
   });
+});
 
-  test("getAllJobOrder() should return 400 response if branchID is undeclared", async () => {
-    const req = mockRequest({ branchId: null });
+describe("getAllJobOrderByBranch", () => { 
+  test("getAllJobOrderByBranch() should return 404 response if database is empty", async () => {
+    const req = mockRequest({ branchId: 1 });
     const res = mockResponse();
 
-    await getAllJobOrder(req, res);
+    await getAllJobOrderByBranch(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "No Branch ID declared." });
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: "No job orders found" });
   });
-});
+})

@@ -5,6 +5,7 @@ import {
     getActiveProducts,
     getAllProducts,
     editProduct,
+    deactivateProduct,
 } from "../productController";
 import { prismaMock } from "../../singleton";
 
@@ -376,6 +377,77 @@ describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
         });
 
         await editProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
+    test("deactivateProduct() should update a product in the database and send a HTTP status code of 200", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.update.mockResolvedValue({
+            id: 1,
+            name: "WASHING",
+            price: 65.0,
+            isActive: false,
+        });
+
+        const updatedProduct = await deactivateProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(typeof updatedProduct).toBe("object");
+    });
+
+    test("deactivateProduct() should send an HTTP status code of 422 if id is null, undefined, or less than 1", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            product: { id: null },
+        });
+
+        const res = mockResponse();
+
+        await deactivateProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({
+            requester: { id: 1 },
+            product: { id: undefined },
+        });
+
+        await deactivateProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({
+            requester: { id: 1 },
+            product: { id: null },
+        });
+
+        await deactivateProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("deactivateProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.update.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await deactivateProduct(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
     });

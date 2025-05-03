@@ -3,6 +3,8 @@ import {
     createProduct,
     getProduct,
     getActiveProducts,
+    getAllProducts,
+    editProduct,
 } from "../productController";
 import { prismaMock } from "../../singleton";
 
@@ -237,8 +239,144 @@ describe("UNIT TEST SUITE FOR 'getActiveProducts()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {});
+describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
+    test("getAllProducts() should get all products from the database and send a HTTP status code of 200", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+        });
 
-describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {});
+        const res = mockResponse();
 
-describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {});
+        prismaMock.product.findMany.mockResolvedValue([
+            {
+                id: 1,
+                name: "WASH",
+                price: 60.0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                isActive: true,
+            },
+            {
+                id: 2,
+                name: "DRY",
+                price: 70.0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                isActive: true,
+            },
+        ]);
+
+        const foundProducts = await getAllProducts(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(expect.any(Array));
+        expect(typeof foundProducts).toBe("object");
+    });
+
+    test("getAllProducts() should send an HTTP status code of 404 if no active products exist or can be found in the database", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 21 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.findMany.mockResolvedValue([]);
+
+        await getAllProducts(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("getAllProducts() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.findMany.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await getAllProducts(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
+    test("editProduct() should update a product in the database and send a HTTP status code of 200", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+            edit: { name: "WASHING", price: 65.0 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.update.mockResolvedValue({
+            id: 1,
+            name: "WASHING",
+            price: 65.0,
+        });
+
+        const updatedProduct = await editProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(typeof updatedProduct).toBe("object");
+    });
+
+    test("editProduct() should send an HTTP status code of 422 if any of the fields are missing", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+            edit: { name: "", price: 60.0 },
+        });
+
+        const res = mockResponse();
+
+        await editProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+            edit: { name: "WASH", price: null },
+        });
+
+        await editProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+            edit: { name: "", price: null },
+        });
+
+        await editProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("editProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+            edit: { name: "WASHING", price: 65.0 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.update.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await editProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});

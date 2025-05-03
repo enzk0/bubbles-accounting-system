@@ -88,6 +88,13 @@ describe("UNIT TEST SUITE FOR 'createJobOrder()' CONTROLLER", () => {
             createdAt: new Date(),
         });
 
+        prismaMock.product.findUnique.mockResolvedValue({
+            id: 7,
+            name: "WASH",
+            price: 180.0,
+            isActive: true,
+        });
+
         prismaMock.jobOrder.create.mockResolvedValue({
             idCode: "GE",
             idNumber: "1",
@@ -99,6 +106,98 @@ describe("UNIT TEST SUITE FOR 'createJobOrder()' CONTROLLER", () => {
         await createJobOrder(req, res);
 
         expect(res.status).toHaveBeenCalledWith(201);
+    });
+
+    test("createJobOrder() should send an HTTP status code of 403 when either branch or product is not active/is deactivated", async () => {
+        const req = mockRequest({
+            requester: { id: 2 },
+            branch: {
+                id: 1,
+            },
+            customer: {
+                firstName: "Vivian",
+                lastName: "Banshee",
+                address: "Nazareth",
+                contactNo: "973 995 4609",
+            },
+            jobOrder: {
+                items: [
+                    {
+                        productId: 1,
+                        productName: "WASH",
+                        productPrice: 60.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 2,
+                        productName: "WASH",
+                        productPrice: 70.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 3,
+                        productName: "WASH",
+                        productPrice: 15.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 4,
+                        productName: "WASH",
+                        productPrice: 15.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 5,
+                        productName: "WASH",
+                        productPrice: 20.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 6,
+                        productName: "WASH",
+                        productPrice: 20.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 7,
+                        productName: "WASH",
+                        productPrice: 180.0,
+                        productQuantity: 0,
+                    },
+                ],
+            },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.branch.findUnique.mockResolvedValue({
+            id: req.body.branch.id,
+            code: "GE",
+            name: "Gran Europa",
+            address: "Upper Carmen",
+            counter: 1,
+            createdAt: new Date(),
+            isActive: false,
+        });
+
+        prismaMock.product.findUnique.mockResolvedValue({
+            id: 7,
+            name: "WASH",
+            price: 180.0,
+            isActive: false,
+        });
+
+        prismaMock.jobOrder.create.mockResolvedValue({
+            idCode: "GE",
+            idNumber: "1",
+            branchId: req.body.branch.id,
+            customerId: 1,
+            userId: req.body.requester.id,
+        });
+
+        await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
     });
 
     test("createJobOrder() should send a HTTP status code of 404 if queried branch cannot be found", async () => {

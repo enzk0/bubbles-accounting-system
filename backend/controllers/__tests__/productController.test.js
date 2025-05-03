@@ -1,5 +1,9 @@
 import { test, expect, describe, vi } from "vitest";
-import { createProduct, getProduct } from "../productController";
+import {
+    createProduct,
+    getProduct,
+    getActiveProducts,
+} from "../productController";
 import { prismaMock } from "../../singleton";
 
 const mockRequest = (body) => ({
@@ -107,7 +111,23 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
         const foundProduct = await getProduct(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(expect.any(Object));
         expect(typeof foundProduct).toBe("object");
+    });
+
+    test("getProduct() should send an HTTP status code of 404 if the queried product does not exist in the database", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 21 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.findUnique.mockResolvedValue(null);
+
+        await getProduct(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
     });
 
     test("getProduct() should send an HTTP status code of 422 if the id is null, undefined, or less than 1", async () => {
@@ -150,7 +170,72 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'getActiveProducts()' CONTROLLER", () => {});
+describe("UNIT TEST SUITE FOR 'getActiveProducts()' CONTROLLER", () => {
+    test("getActiveProducts() should get products whose 'isActive' is true from the database and send a HTTP status code of 200", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.findMany.mockResolvedValue([
+            {
+                id: 1,
+                name: "WASH",
+                price: 60.0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                isActive: true,
+            },
+            {
+                id: 2,
+                name: "DRY",
+                price: 70.0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                isActive: true,
+            },
+        ]);
+
+        const foundProducts = await getActiveProducts(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(expect.any(Array));
+        expect(typeof foundProducts).toBe("object");
+    });
+
+    test("getActiveProducts() should send an HTTP status code of 404 if no active products exist or can be found in the database", async () => {
+        let req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 21 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.findMany.mockResolvedValue([]);
+
+        await getActiveProducts(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("getActiveProducts() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            product: { id: 1 },
+        });
+
+        const res = mockResponse();
+
+        prismaMock.product.findMany.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await getActiveProducts(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
 
 describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {});
 

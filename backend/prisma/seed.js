@@ -502,6 +502,20 @@ async function seed() {
       }, 0),
     );
   }
+
+  const allJobOrders = await prisma.jobOrder.findMany({
+    where: {
+      branchId: 1,
+    },
+    include: {
+      branch: true,
+      customer: true,
+      user: true,
+      jobOrderItems: true,
+    },
+  });
+
+  console.dir(allJobOrders, { depth: null });
 }
 
 seed();

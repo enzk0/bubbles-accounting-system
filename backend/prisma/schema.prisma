@@ -22,6 +22,8 @@ model Branch {
     address String
     counter Int    @default(1)
 
+    isActive Boolean @default(true)
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -36,6 +38,8 @@ model User {
     firstName String @default("")
     lastName  String @default("")
     password  String
+
+    isActive Boolean @default(true)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -88,6 +92,8 @@ model Product {
 
     name  String @unique
     price Float
+
+    isActive Boolean @default(true)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../client";
 
 export async function createBranch(req, res) {
@@ -9,7 +10,7 @@ export async function createBranch(req, res) {
 
   try {
     const newBranch = await prisma.branch.create({
-      branch: branch,
+      data: branch,
     });
 
     res.status(201);
@@ -90,7 +91,7 @@ export async function editBranch(req, res) {
   }
 }
 
-export async function deleteBranch(req, res) {
+export async function deactivateBranch(req, res) {
   const { requester, branch } = req.body;
 
   if (branch.id === null || branch.id == undefined || branch.id < 1) {
@@ -98,13 +99,17 @@ export async function deleteBranch(req, res) {
   }
 
   try {
-    const deletedBranch = prisma.branch.delete({
+    const updatedBranch = prisma.branch.update({
       where: {
         id: branch.id,
       },
+      data: {
+        isActive: false,
+      },
     });
 
-    return res.status(200);
+    res.status(200);
+    return updatedBranch;
   } catch (error) {
     console.log(error);
     return res.status(500);

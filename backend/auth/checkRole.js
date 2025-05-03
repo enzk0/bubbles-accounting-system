@@ -3,7 +3,7 @@ function checkRole(role) {
       if (req.user && req.user.role === role) {
         next();
       } else {
-        res.status(403).json({ error: 'Forbidden: Insufficient role' });
+        res.status(403).json({ error: 'Access denied: Unauthorized role' });
       }
     };
   }

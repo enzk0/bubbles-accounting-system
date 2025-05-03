@@ -24,27 +24,22 @@ vi.mock("../services/jobOrderService.js", () => ({
   updateJobOrder: vi.fn((id, data) => Promise.resolve({ id: 1, ...data })),
 }));
 
-// Express app setup
 const app = express();
 app.use(express.json());
 app.use('/api', salesRoutes);
 
 describe("Employee Controller - Job Order Modification", () => {
   beforeAll(() => {
-    // Setup once before all tests (if needed)
   });
 
   afterAll(() => {
-    // Cleanup after all tests (if needed)
   });
 
   beforeEach(() => {
-    // Reset mocks before each test
     vi.clearAllMocks();
   });
 
   afterEach(() => {
-    // Optional cleanup after each test
   });
 
   test("should allow employee to toggle isPaid", async () => {

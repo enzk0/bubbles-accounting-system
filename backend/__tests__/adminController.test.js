@@ -13,7 +13,6 @@ import express from 'express';
 import salesRoutes from '../routes/salesRoutes.js';
 import * as jobOrderService from '../services/jobOrderService.js';
 
-// Mock the service module
 vi.mock('../services/jobOrderService.js', () => ({
   findJobOrderById: vi.fn((id) => {
     if (id === '1') {
@@ -24,26 +23,22 @@ vi.mock('../services/jobOrderService.js', () => ({
   updateJobOrder: vi.fn((id, data) => Promise.resolve({ id: 1, ...data })),
 }));
 
-// Setup Express app
 const app = express();
 app.use(express.json());
 app.use('/api', salesRoutes);
 
 describe('Admin Controller - Job Order Modification', () => {
   beforeAll(() => {
-    // Setup before all tests if needed
   });
 
   afterAll(() => {
-    // Cleanup after all tests if needed
   });
 
   beforeEach(() => {
-    vi.clearAllMocks(); // Reset all mocks before each test
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    // Optional: cleanup logic after each test
   });
 
   test('should allow admin to modify all fields', async () => {

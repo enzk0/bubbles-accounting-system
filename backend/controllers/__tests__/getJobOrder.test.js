@@ -4,14 +4,10 @@ import prismaMock from "../../singleton.js";
 
 vi.mock("../../client", () => ({
   default: {
-    $queryRawUnsafe: vi.fn(),
-    $extends: vi.fn().mockReturnValue({
-      jobOrder: {
-        groupByDate: vi.fn(),
-        groupByDateByBranch: vi.fn()
-      }
-    })
-  }
+    jobOrder: {
+      findMany: vi.fn(),
+    },
+  },
 }));
 
 const mockRequest = (body) => ({

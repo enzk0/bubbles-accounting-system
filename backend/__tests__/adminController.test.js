@@ -1,9 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
+import {
+  test,
+  expect,
+  describe,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+  vi,
+} from 'vitest';
 import request from 'supertest';
 import express from 'express';
 import salesRoutes from '../routes/salesRoutes.js';
 import * as jobOrderService from '../services/jobOrderService.js';
 
+// Mock the service module
 vi.mock('../services/jobOrderService.js', () => ({
   findJobOrderById: vi.fn((id) => {
     if (id === '1') {
@@ -14,11 +24,29 @@ vi.mock('../services/jobOrderService.js', () => ({
   updateJobOrder: vi.fn((id, data) => Promise.resolve({ id: 1, ...data })),
 }));
 
+// Setup Express app
 const app = express();
 app.use(express.json());
-app.use('/api', salesRoutes); 
-describe('Admin Controller', () => {
-  it('should allow admin to modify all fields', async () => {
+app.use('/api', salesRoutes);
+
+describe('Admin Controller - Job Order Modification', () => {
+  beforeAll(() => {
+    // Setup before all tests if needed
+  });
+
+  afterAll(() => {
+    // Cleanup after all tests if needed
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks(); // Reset all mocks before each test
+  });
+
+  afterEach(() => {
+    // Optional: cleanup logic after each test
+  });
+
+  test('should allow admin to modify all fields', async () => {
     const res = await request(app)
       .patch('/api/admin/job-orders/1')
       .set('role', 'admin')
@@ -29,8 +57,8 @@ describe('Admin Controller', () => {
     expect(res.body.updatedJob.isPaid).toBe(true);
   });
 
-  it('should return 404 if job order is not found', async () => {
-    jobOrderService.findJobOrderById.mockResolvedValueOnce(null); 
+  test('should return 404 if job order is not found', async () => {
+    jobOrderService.findJobOrderById.mockResolvedValueOnce(null);
 
     const res = await request(app)
       .patch('/api/admin/job-orders/999')

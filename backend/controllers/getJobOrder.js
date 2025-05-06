@@ -54,15 +54,16 @@ export async function getAllJobOrder(req, res) {
 }
 
 export async function getAllJobOrderByBranch(req, res) { 
-  const { branchId } = req.body;
-  console.log("branchId", branchId);
+  const { branchId: chosenBranchId } = req.body;
+  console.log("Fetching job orders by branch...");
+  console.log("branchId", chosenBranchId);
 
-  if (!branchId) {
+  if (!chosenBranchId) {
     return res.status(400).json({ error: "Branch ID is not provided"});
   }
 
   try {
-    const jobOrders = await getJobOrderByBranch(branchId);
+    const jobOrders = await getJobOrderByBranch(chosenBranchId);
     console.log("jobOrders:", jobOrders);
 
     if ( jobOrders == null || jobOrders == undefined) {
@@ -78,6 +79,7 @@ export async function getAllJobOrderByBranch(req, res) {
     }
 
     const result = jobOrders;
+    res.status(200).json({ result });
 
     return result
   } catch (error) {

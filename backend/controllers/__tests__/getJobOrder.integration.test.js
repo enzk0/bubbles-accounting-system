@@ -86,5 +86,15 @@ describe("INTEGRATION TESTS FOR 'getAllJobOrderByBranch()' CONTROLLER", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "Branch ID is not provided" });
   });
+
+  test("getAllJobOrderByBranch() should return 404 response if no job orders are found", async () => {
+    const req = mockRequest({ branchId: 9999 });
+    const res = mockResponse();
+
+    await getAllJobOrderByBranch(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: "No job orders found" });
+  });
 })
 

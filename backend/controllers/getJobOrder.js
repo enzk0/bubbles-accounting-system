@@ -72,11 +72,11 @@ export async function getAllJobOrderByBranch(req, res) {
       console.log("Response sent");
     }
 
-    const { idCode, idNumber, createdAt, updatedAt, paidAt, claimedAt, isPaid, isClaimed,  isHidden, remarks, branchId, customerId, userId, branch, customer, user, jobOrderItems } = jobOrders[0];
-
     if (jobOrders.length === 0) {
       return res.status(404).json({ error: "No job orders found" });
     }
+
+    const { idCode, idNumber, createdAt, updatedAt, paidAt, claimedAt, isPaid, isClaimed,  isHidden, remarks, branchId, customerId, userId, branch, customer, user, jobOrderItems } = jobOrders[0];
 
     const result = jobOrders;
     res.status(200).json({ result });

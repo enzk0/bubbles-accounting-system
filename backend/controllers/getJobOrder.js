@@ -39,16 +39,14 @@ export async function getAllJobOrder(req, res) {
     if ( jobOrders == null || jobOrders == undefined) {
       console.log("No job orders found");
       return res.status(404).json({ error: "No job orders found" });
-      console.log("Response sent");
     }
 
     if (jobOrders.length === 0) {
       return res.status(404).json({ error: "No job orders found" });
     }
+    res.status(200).json({ jobOrders });
 
-    const result = jobOrders;
-
-    return result
+    return jobOrders;
   } catch (error) {
     console.error("Error getting job orders:", error);
     return res.status(500).json({ error: "Internal server error" });

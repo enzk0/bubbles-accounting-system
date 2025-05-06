@@ -46,3 +46,35 @@ describe("INTEGRATION TESTS FOR 'getAllJobOrder()' CONTROLLER", () => {
   });
 });
 
+describe("INTEGRATION TESTS FOR 'getAllJobOrderByBranch()' CONTROLLER", () => { 
+  test("getAllJobOrderByBranch() should return all job orders by branch", async () => {
+    const req = mockRequest({ branchId: 1 });
+    const res = mockResponse();
+
+    const allJobOrders = await getAllJobOrderByBranch(req, res);
+    
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(allJobOrders).toBeTypeOf("object");
+
+    const instance1 = allJobOrders[0];
+    console.log("result1", instance1);
+    
+    expect(instance1).toHaveProperty("idCode");
+    expect(instance1).toHaveProperty("idNumber");
+    expect(instance1).toHaveProperty("createdAt");
+    expect(instance1).toHaveProperty("updatedAt");
+    expect(instance1).toHaveProperty("paidAt");
+    expect(instance1).toHaveProperty("isPaid");
+    expect(instance1).toHaveProperty("isClaimed");
+    expect(instance1).toHaveProperty("isHidden");
+    expect(instance1).toHaveProperty("remarks");
+    expect(instance1).toHaveProperty("branchId");
+    expect(instance1).toHaveProperty("customerId");
+    expect(instance1).toHaveProperty("userId");
+    expect(instance1).toHaveProperty("branch");
+    expect(instance1).toHaveProperty("customer");
+    expect(instance1).toHaveProperty("user");
+    expect(instance1).toHaveProperty("jobOrderItems");
+  });
+})
+

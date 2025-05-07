@@ -1,12 +1,10 @@
 import express from "express";
-import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
+import jobOrderRoutes from "./routes/jobOrder.js";
+import salesRoutes from "./routes/salesRoutes.js";
+import userRoutes from "./routes/user.js";
 
 const port = 3000;
 const app = express();
-
-const salesRoutes = require('./routes/salesRoutes');
-const userRoutes = require('./routes/user');
-const jobOrderRoutes = require('./routes/jobOrder');
 
 app.use(express.json());
 app.use('/api', salesRoutes);

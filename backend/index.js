@@ -1,10 +1,15 @@
 import express from "express";
+import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js";
 
 const port = 3000;
 const app = express();
+
 const salesRoutes = require('./routes/salesRoutes');
+const userRoutes = require('./routes/user');
+
 app.use(express.json());
 app.use('/api', salesRoutes);
+app.use('/user', userRoutes);
 
 app.get("/", async (req, res) => {
   try {

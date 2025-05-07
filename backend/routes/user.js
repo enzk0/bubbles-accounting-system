@@ -11,6 +11,7 @@ router.post('/create', (req, res) => {
 
     res.status(200).send({
       type: "POST",
+      request: "User creation request received",
       message: "Successfully received POST request.",
     });
   } catch (error) {
@@ -25,6 +26,7 @@ router.post('/deactivate', (req, res) => {
 
     res.status(200).send({
       type: "POST",
+      request: "User deactivation requrest received",
       message: "Successfully received POST request.",
     });
   } catch (error) {
@@ -32,28 +34,30 @@ router.post('/deactivate', (req, res) => {
   }
 });
 
-router.post('/edit', (req, res) => { 
+router.put('/edit', (req, res) => { 
   try {
     console.log('User edit request received');   
     //editUser
 
     res.status(200).send({
-      type: "POST",
-      message: "Successfully received POST request.",
+      type: "PUT",
+      request: "User edit re`quest received",
+      message: "Successfully received PUT request.",
     });
   } catch (error) {
     res.status(500).send({ message: error });
   }
 });
 
-router.post('/edit-password', (req, res) => {
+router.patch('/edit-password', (req, res) => {
   try {
     console.log('User password edit request received');
     //editPassword
 
     res.status(200).send({
-      type: "POST",
-      message: "Successfully received POST request.",
+      type: "PATCH",
+      request: "User password edit request received",
+      message: "Successfully received PATCH request.",
     });
   } catch (error) {
     res.status(500).send({ message: error });
@@ -67,6 +71,7 @@ router.get('/get', (req, res) => {
 
     res.status(200).send({
       type: "GET",
+      request: "User retrieval request received",
       message: "Successfully received GET request.",
     });
   } catch (error) {
@@ -81,6 +86,7 @@ router.get('/get-all', (req, res) => {
 
     res.status(200).send({
       type: "GET",
+      request: "All user retrieval request received",
       message: "Successfully received GET request.",
     });
   } catch (error) {

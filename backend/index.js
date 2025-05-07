@@ -6,10 +6,12 @@ const app = express();
 
 const salesRoutes = require('./routes/salesRoutes');
 const userRoutes = require('./routes/user');
+const jobOrderRoutes = require('./routes/jobOrder');
 
 app.use(express.json());
 app.use('/api', salesRoutes);
 app.use('/user', userRoutes);
+app.use('/job-order', jobOrderRoutes);
 
 app.get("/", async (req, res) => {
   try {

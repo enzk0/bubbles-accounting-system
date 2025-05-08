@@ -10,7 +10,7 @@ router.get('/count', async (req, res) => {
   try { 
     console.log('Job Order count request received');
     const result = await countJobOrder(req, res);
-    console.log(result);
+    console.log("Route result: ", result);
     
     res.status(200).send({
       type: "GET",

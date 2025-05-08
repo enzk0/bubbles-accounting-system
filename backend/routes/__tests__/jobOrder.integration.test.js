@@ -85,4 +85,12 @@ describe("Job Order Routes GET", () => {
 
     expect(response.body).toBeTypeOf("object");
   });
+
+  test("countJobOrder() should return 400 if interval is not provided", async () => {
+    const response = await request(app).get("/job-order/count").send({ interval: '' });
+    console.log("response: ", response.body);
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Interval is required");
+  });
 });

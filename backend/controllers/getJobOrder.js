@@ -39,16 +39,14 @@ export async function getAllJobOrder(req, res) {
     if ( jobOrders == null || jobOrders == undefined) {
       console.log("No job orders found");
       return res.status(404).json({ error: "No job orders found" });
-      console.log("Response sent");
     }
 
     if (jobOrders.length === 0) {
       return res.status(404).json({ error: "No job orders found" });
     }
+    res.status(200).json({ jobOrders });
 
-    const result = jobOrders;
-
-    return result
+    return jobOrders;
   } catch (error) {
     console.error("Error getting job orders:", error);
     return res.status(500).json({ error: "Internal server error" });
@@ -56,15 +54,17 @@ export async function getAllJobOrder(req, res) {
 }
 
 export async function getAllJobOrderByBranch(req, res) { 
-  const { branchId } = req.body;
+  const { branchId: chosenBranchId } = req.body;
+  console.log("Fetching job orders by branch...");
+  console.log("branchId", chosenBranchId);
 
-  if (!branchId) {
+  if (!chosenBranchId) {
     return res.status(400).json({ error: "Branch ID is not provided"});
   }
 
   try {
-    const jobOrders = await getJobOrderByBranch(branchId);
-    console.log("jobOrders", jobOrders);
+    const jobOrders = await getJobOrderByBranch(chosenBranchId);
+    console.log("jobOrders:", jobOrders);
 
     if ( jobOrders == null || jobOrders == undefined) {
       console.log("No job orders found");
@@ -76,7 +76,10 @@ export async function getAllJobOrderByBranch(req, res) {
       return res.status(404).json({ error: "No job orders found" });
     }
 
+    const { idCode, idNumber, createdAt, updatedAt, paidAt, claimedAt, isPaid, isClaimed,  isHidden, remarks, branchId, customerId, userId, branch, customer, user, jobOrderItems } = jobOrders[0];
+
     const result = jobOrders;
+    res.status(200).json({ result });
 
     return result
   } catch (error) {

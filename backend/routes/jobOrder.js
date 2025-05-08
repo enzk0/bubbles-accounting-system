@@ -6,7 +6,7 @@ import { modifyJobOrder as adminModify } from '../controllers/adminController.js
 
 const router = express.Router();
 
-router.get('/count', countJobOrder)
+router.get('/count', countJobOrder);
 
 router.get('/count-by-branch', async (req, res) => { 
   try { 

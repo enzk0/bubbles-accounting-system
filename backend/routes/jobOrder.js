@@ -9,12 +9,16 @@ const router = express.Router();
 router.get('/count', async (req, res) => { 
   try { 
     console.log('Job Order count request received');
-    //countJobOrder
+    const result = await countJobOrder(req, res);
+    console.log(result);
+    
     res.status(200).send({
       type: "GET",
       request: "Job Order count request received",
       message: "Successfully received GET request.",
     });
+
+    return result;
   } catch (error) {
     res.status(500).send({ message: error });
   }

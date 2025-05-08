@@ -6,23 +6,7 @@ import { modifyJobOrder as adminModify } from '../controllers/adminController.js
 
 const router = express.Router();
 
-router.get('/count', async (req, res) => { 
-  try { 
-    console.log('Job Order count request received');
-    const result = await countJobOrder(req, res);
-    console.log("Route result: ", result);
-    
-    res.status(200).send({
-      type: "GET",
-      request: "Job Order count request received",
-      message: "Successfully received GET request.",
-    });
-
-    return result;
-  } catch (error) {
-    res.status(500).send({ message: error });
-  }
-});
+router.get('/count', countJobOrder)
 
 router.get('/count-by-branch', async (req, res) => { 
   try { 

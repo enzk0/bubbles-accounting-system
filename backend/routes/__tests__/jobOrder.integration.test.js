@@ -93,4 +93,12 @@ describe("Job Order Routes GET", () => {
     expect(response.body).toHaveProperty("error");
     expect(response.body.error).toBe("Interval is required");
   });
+
+  test("countJobOrder() should return 400 if interval is not valid", async () => {
+    const response = await request(app).get("/job-order/count").send({ interval: "OogaBooga" });
+    console.log("response: ", response.body);
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Interval must be day, week, month, or year.");
+  });
 });

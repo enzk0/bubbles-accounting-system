@@ -1,1 +1,3 @@
-console.log("This is a test file for jobOrder routes.");
+import request from "supertest";
+import { test, expect, describe, vi } from "vitest";
+import app from "../../app.js";

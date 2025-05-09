@@ -51,6 +51,16 @@ describe("INTEGRATION TESTS FOR 'getJobOrderByIdController()' CONTROLLER", () =>
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ error: "No job order found" });
   });
+
+  test("getJobOrderByIdController() should return a 400 response if idCode or idNumber is not provided", async () => {
+    const req = mockRequest({ idCode: null, idNumber: null });
+    const res = mockResponse();
+
+    await getJobOrderByIdController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Job Order ID Code and ID Number is not provided" });
+  });;
 });
 
 describe("INTEGRATION TESTS FOR 'getAllJobOrder()' CONTROLLER", () => {

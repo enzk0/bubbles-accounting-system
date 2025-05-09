@@ -1,4 +1,4 @@
-import { prisma } from '../prisma/client.js';
+import prisma from '../client.js';
 
 async function findJobOrderById(id) {
   return prisma.jobOrder.findUnique({ where: { id: parseInt(id) } });

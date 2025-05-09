@@ -52,8 +52,12 @@ export async function getJobOrderByIdController(req, res) {
   console.log("jobOrderId", jobOrderIdCode);
   console.log("jobOrderIdNumber", jobOrderIdNumber);
 
-  if (!jobOrderIdCode) {
-    return res.status(400).json({ error: "Job Order ID is not provided" });
+  if (!jobOrderIdCode && !jobOrderIdNumber) {
+    return res.status(400).json({ error: "Job Order ID Code and ID Number is not provided" });
+  } else if (!jobOrderIdCode) {
+    return res.status(400).json({ error: "Job Order ID Code is not provided" });
+  } else if (!jobOrderIdNumber) {
+    return res.status(400).json({ error: "Job Order ID Number is not provided" });
   }
 
   try {

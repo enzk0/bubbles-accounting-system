@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/count', countJobOrder);
 
+//needs params
 router.get('/count-by-branch', async (req, res) => { 
   try { 
     console.log('Job Order count by branch request received');
@@ -22,19 +23,7 @@ router.get('/count-by-branch', async (req, res) => {
   }
 });
 
-router.get('/get', async (req, res) => { 
-  try { 
-    console.log('Job Order get request received');
-    //getAllJobOrder
-    res.status(200).send({
-      type: "GET",
-      request: "Job Order get request received",
-      message: "Successfully received GET request.",
-    });
-  } catch (error) {
-    res.status(500).send({ message: error });
-  }
-});
+router.get('/get', getAllJobOrder);
 
 router.get('/get-by-branch', async (req, res) => { 
   try { 

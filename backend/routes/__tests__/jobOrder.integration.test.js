@@ -2,13 +2,12 @@ import request from "supertest";
 import { test, expect, describe, vi } from "vitest";
 import app from "../../app.js";
 
-describe("Job Order Routes GET", () => {
+describe("/count GET route", () => {
   test("Should return a response of 200", async () => {
     const response = await request(app).get("/job-order/get");
     expect(response.statusCode).toBe(200);
   });
 
-    
   test("countAllJobOrder() should return the count of job orders for interval: day", async () => {
     const response = await request(app).get("/job-order/count").send({ interval: 'day' });
     console.log("response: ", response.body);
@@ -100,5 +99,12 @@ describe("Job Order Routes GET", () => {
     expect(response.statusCode).toBe(400);
     expect(response.body).toHaveProperty("error");
     expect(response.body.error).toBe("Interval must be day, week, month, or year.");
+  });
+});
+
+describe("/get GET route", () => { 
+  test("Should return a response of 200", async () => {
+    const response = await request(app).get("/job-order/get");
+    expect(response.statusCode).toBe(200);
   });
 });

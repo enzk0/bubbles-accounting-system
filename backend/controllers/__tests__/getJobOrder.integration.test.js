@@ -41,6 +41,16 @@ describe("INTEGRATION TESTS FOR 'getJobOrderByIdController()' CONTROLLER", () =>
     expect(jobOrder).toHaveProperty("user");
     expect(jobOrder).toHaveProperty("jobOrderItems");
   });
+
+  test("getJobOrderByIdController() should return a 404 response if no job order is found", async () => { 
+    const req = mockRequest({ idCode: 'ZZ', idNumber: 9999 });
+    const res = mockResponse();
+
+    await getJobOrderByIdController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: "No job order found" });
+  });
 });
 
 describe("INTEGRATION TESTS FOR 'getAllJobOrder()' CONTROLLER", () => {

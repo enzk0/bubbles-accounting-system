@@ -107,4 +107,13 @@ describe("/get GET route", () => {
     const response = await request(app).get("/job-order/get");
     expect(response.statusCode).toBe(200);
   });
+
+  test("getAllJobOrder() should return all job orders", async () => {
+    const response = await request(app).get("/job-order/get");
+    console.log("response: ", response.body);
+    
+    expect(response.statusCode).toBe(200);
+
+    expect(response.body).toBeTypeOf("object");
+  });
 });

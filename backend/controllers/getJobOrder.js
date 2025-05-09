@@ -13,6 +13,22 @@ async function getJobOrder() {
   return allJobOrders;
 }
 
+async function getJobOrderById(idCode, idNumber) {
+  const jobOrder = await prisma.jobOrder.findMany({
+    where: {
+      idCode: idCode,
+      idNumber: idNumber,
+    },
+    include: {
+      branch: true,
+      customer: true,
+      user: true,
+      jobOrderItems: true,
+    },
+  });
+  return jobOrder;
+}
+
 async function getJobOrderByBranch(branchId) {
   const JobOrders = await prisma.jobOrder.findMany({
     where: {
@@ -28,6 +44,39 @@ async function getJobOrderByBranch(branchId) {
     },
   });
   return JobOrders;
+}
+
+export async function getJobOrderByIdController(req, res) {
+  const { idCode: jobOrderIdCode, idNumber: jobOrderIdNumber } = req.body;
+  console.log("Fetching job order by ID Code and ID Number...");
+  console.log("jobOrderId", jobOrderIdCode);
+  console.log("jobOrderIdNumber", jobOrderIdNumber);
+
+  if (!jobOrderIdCode && !jobOrderIdNumber) {
+    return res.status(400).json({ error: "Job Order ID Code and ID Number is not provided" });
+  } else if (!jobOrderIdCode) {
+    return res.status(400).json({ error: "Job Order ID Code is not provided" });
+  } else if (!jobOrderIdNumber) {
+    return res.status(400).json({ error: "Job Order ID Number is not provided" });
+  }
+
+  try {
+    const jobOrder = await getJobOrderById(jobOrderIdCode);
+    const result = jobOrder[0];
+    console.log("jobOrder:", result);
+
+    if (result == null || result == undefined) {
+      console.log("No job order found");
+      return res.status(404).json({ error: "No job order found" });
+    }
+
+    res.status(200).json({ result });
+
+    return result;
+  } catch (error) {
+    console.error("Error getting job order:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
 
 export async function getAllJobOrder(req, res) {

@@ -47,9 +47,8 @@ async function getJobOrderByBranch(branchId) {
 }
 
 export async function getJobOrderByIdController(req, res) {
-  console.log("------------------------------------------------------------------------------------");
   const { idCode: jobOrderIdCode, idNumber: jobOrderIdNumber } = req.body;
-  console.log("Fetching job order by ID...");
+  console.log("Fetching job order by ID Code and ID Number...");
   console.log("jobOrderId", jobOrderIdCode);
   console.log("jobOrderIdNumber", jobOrderIdNumber);
 
@@ -61,14 +60,13 @@ export async function getJobOrderByIdController(req, res) {
     const jobOrder = await getJobOrderById(jobOrderIdCode);
     const result = jobOrder[0];
     console.log("jobOrder:", result);
-    console.log("-------------------------------------------------");
 
-    if (jobOrder == null || jobOrder == undefined) {
+    if (result == null || result == undefined) {
       console.log("No job order found");
       return res.status(404).json({ error: "No job order found" });
     }
 
-    res.status(200).json({ jobOrder });
+    res.status(200).json({ result });
 
     return result;
   } catch (error) {

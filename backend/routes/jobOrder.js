@@ -1,6 +1,6 @@
 import express from 'express';
 import { countJobOrder, countJobOrderByBranch } from '../controllers/countJobOrder.js';
-import { getAllJobOrder, getAllJobOrderByBranch } from '../controllers/getJobOrder.js';
+import { getAllJobOrder, getAllJobOrderByBranch, getJobOrderByIdController } from '../controllers/getJobOrder.js';
 import { modifyJobOrder as employeeModify } from '../controllers/employeeController.js';
 import { modifyJobOrder as adminModify } from '../controllers/adminController.js';
 

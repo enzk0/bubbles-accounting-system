@@ -1,5 +1,5 @@
 import { test, expect, describe, vi } from "vitest";
-import { getAllJobOrder, getAllJobOrderByBranch } from "../getJobOrder.js";
+import { getAllJobOrder, getAllJobOrderByBranch, getJobOrderByIdController} from "../getJobOrder.js";
 import prismaMock from "../../singleton.js";
 
 vi.mock("../../client", () => ({
@@ -20,6 +20,19 @@ const mockResponse = () => {
   res.json = vi.fn().mockReturnValue(res);
   return res;
 };
+
+describe("getJobOrderByIdController", () => { 
+  test("getJobOrderByIdController() should return a 500 response if function reads undefined when querying database", async () => {
+    const req = mockRequest({ idCode: 'ZZ', idNumber: 9999 });
+    const res = mockResponse();
+
+    await getJobOrderByIdController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: "Internal server error" });
+  });
+})
+
 
 describe("getAllJobOrder", () => { 
   test("getAllJobOrder() should return 404 response if database is empty", async () => {

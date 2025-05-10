@@ -51,6 +51,16 @@ describe("getJobOrderByIdController", () => {
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ error: "Job Order ID Code is not provided" });
   });
+
+  test("getJobOrderByIdController() should return a 400 response if idNumber is not provided", async () => {
+    const req = mockRequest({ idCode: "AB", idNumber: null });
+    const res = mockResponse();
+
+    await getJobOrderByIdController(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Job Order ID Number is not provided" });
+  });
 })
 
 

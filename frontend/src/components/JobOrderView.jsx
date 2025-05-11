@@ -2,7 +2,8 @@ import React, { useRef, useEffect, useState } from "react";
 
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
 
-
+import JobOrderTable from "./JobOrderTable";
+import EditModal from "./EditModal";
 
 function Header({ page, prevPage, nextPage }) {
     const leftSection = (
@@ -36,5 +37,9 @@ function Header({ page, prevPage, nextPage }) {
             {rightSection}
         </div>
     );
+}
+
+function Footer() {
+    return <div></div>;
 }
 

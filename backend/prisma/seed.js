@@ -66,6 +66,12 @@ async function seed() {
                 name: "Noberton",
                 address: "Dazzling Town",
             },
+            {
+                code: "MS",
+                name: "Moonshine",
+                address: "Moonshine Road",
+                isActive: false,
+            },
         ],
     });
 
@@ -98,6 +104,16 @@ async function seed() {
             {
                 name: "DROPOFF",
                 price: 180.0,
+            },
+            {
+                name: "WASH",
+                price: 50.0,
+                isActive: false,
+            },
+            {
+                name: "DRY",
+                price: 60.0,
+                isActive: false,
             },
         ],
     });

@@ -1,8 +1,12 @@
 import express from "express";
-import { createBranch } from "../controllers/branchController";
+import { createBranch, getBranch } from "../controllers/branchController";
+import { authenticate } from "../middleware/auth";
+import { checkPrivilege } from "../middleware/accessControl";
 
 const router = express.Router();
 
-router.post("/create", createBranch);
+router.post("/", authenticate, checkPrivilege(["admin"]), createBranch);
+
+router.get("/", authenticate, checkPrivilege([]), getBranch);
 
 export default router;

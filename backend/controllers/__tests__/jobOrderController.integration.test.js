@@ -102,6 +102,79 @@ describe("INTEGRATION TEST SUITE FOR `jobOrder` CONTROLLERS", () => {
         expect(jobOrder.jobOrderItems.length).toEqual(7);
     });
 
+    test("createJobOrder() should send an HTTP status code of 403 when branch information provided points to a inactive branch", async () => {
+        const req = mockRequest({
+            ...requestBodyTemplate,
+            branch: { id: 8 },
+        });
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    test("createJobOrder() should send an HTTP status code of 403 when any of the job order items are inactive", async () => {
+        const req = mockRequest({
+            ...requestBodyTemplate,
+            jobOrder: {
+                items: [
+                    {
+                        productId: 1,
+                        productName: "WASH",
+                        productPrice: 60.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 2,
+                        productName: "DRY",
+                        productPrice: 70.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 3,
+                        productName: "DETERGENT",
+                        productPrice: 15.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 4,
+                        productName: "FABCON",
+                        productPrice: 15.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 5,
+                        productName: "LOAD",
+                        productPrice: 20.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 8,
+                        productName: "PERFUME",
+                        productPrice: 50.0,
+                        productQuantity: 0,
+                    },
+                    {
+                        productId: 9,
+                        productName: "IRON",
+                        productPrice: 60.0,
+                        productQuantity: 0,
+                    },
+                ],
+            },
+        });
+
+        console.log(req.body);
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
+    });
+
     test("createJobOrder() should send an HTTP status code of 404 when branch information provided points to a branch that does not exist", async () => {
         const req = mockRequest({
             ...requestBodyTemplate,

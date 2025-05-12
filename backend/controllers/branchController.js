@@ -4,8 +4,6 @@ import prisma from "../client";
 export async function createBranch(req, res) {
     const { requester, branch } = req.body;
 
-    console.log("creatBranch controller called!");
-
     if (!branch.code || !branch.name || !branch.address) {
         return res.status(422).send({
             message:
@@ -13,15 +11,10 @@ export async function createBranch(req, res) {
         });
     }
 
-    console.log("Data validation checks passed!");
-
     try {
-        console.log("Creating branch...");
         const newBranch = await prisma.branch.create({
             data: branch,
         });
-
-        console.log("Branch created!");
 
         res.status(201).send({
             message: "Branch has been successfully created",
@@ -50,7 +43,9 @@ export async function getBranch(req, res) {
 
     try {
         if (branch.id === null || branch.id === undefined || branch.id < 1) {
-            return res.status(422);
+            return res
+                .status(422)
+                .send({ message: "A branchId was not provided" });
         }
 
         const foundBranch = await prisma.branch.findUnique({
@@ -60,7 +55,7 @@ export async function getBranch(req, res) {
         });
 
         if (!foundBranch || foundBranch == null) {
-            return res.status(404);
+            return res.status(404).send({ message: "Branch not found" });
         }
 
         res.status(200);

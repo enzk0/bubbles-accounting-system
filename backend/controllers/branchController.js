@@ -4,20 +4,44 @@ import prisma from "../client";
 export async function createBranch(req, res) {
     const { requester, branch } = req.body;
 
+    console.log("creatBranch controller called!");
+
     if (!branch.code || !branch.name || !branch.address) {
-        return res.status(422);
+        return res.status(422).send({
+            message:
+                "The information provided to create a branch is incomplete",
+        });
     }
 
+    console.log("Data validation checks passed!");
+
     try {
+        console.log("Creating branch...");
         const newBranch = await prisma.branch.create({
             data: branch,
         });
 
-        res.status(201);
+        console.log("Branch created!");
+
+        res.status(201).send({
+            message: "Branch has been successfully created",
+        });
         return newBranch;
     } catch (error) {
         console.log(error);
-        return res.status(500);
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                return res.status(500).send({
+                    message:
+                        "Attempted to create a branch with non-unique values on unique constraint fields",
+                    error: error,
+                });
+            }
+        }
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }
 

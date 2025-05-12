@@ -106,12 +106,12 @@ async function seed() {
                 price: 180.0,
             },
             {
-                name: "WASH",
+                name: "PERFUME",
                 price: 50.0,
                 isActive: false,
             },
             {
-                name: "DRY",
+                name: "IRON",
                 price: 60.0,
                 isActive: false,
             },

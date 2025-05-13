@@ -96,7 +96,9 @@ export async function editBranch(req, res) {
     const { requester, branch, edit } = req.body;
 
     if (!edit.name || !edit.address) {
-        return res.status(422);
+        return res
+            .status(422)
+            .send({ message: "Branch new name or new address is not valid" });
     }
 
     try {
@@ -107,11 +109,16 @@ export async function editBranch(req, res) {
             data: edit,
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: `Branch with id of ${branch.id} has been successfully updated`,
+        });
         return editedBranch;
     } catch (error) {
         console.log(error);
-        return res.status(500);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }
 

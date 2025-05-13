@@ -171,6 +171,29 @@ describe("/count-by-branch GET route", () => {
     
     expect(response.body).toBeTypeOf("object");
   })
+
+  test("countJobOrderByBranch() should return the count of job orders by branch", async () => { 
+    const response = await request(app)
+      .get("/job-order/count-by-branch")
+      .send({
+        branchId: 1,
+        interval: 'week'
+      });
+    console.log("Count by Branch response: ", response.body);
+    expect(response.statusCode).toBe(200);
+
+    expect(response.body).toHaveProperty("interval_start");
+    expect(response.body).toHaveProperty("total_unpaid");
+    expect(response.body).toHaveProperty("no_of_unpaid");
+    expect(response.body).toHaveProperty("total_paid");
+    expect(response.body).toHaveProperty("total");
+    expect(response.body).toHaveProperty("no_of_job_orders");
+    expect(response.body).toHaveProperty("no_of_paid");
+    expect(response.body).toHaveProperty("no_of_claimed");
+    expect(response.body).toHaveProperty("no_of_unclaimed");
+    
+    expect(response.body).toBeTypeOf("object");
+  })
 });
 
 //tests for getting all job orders

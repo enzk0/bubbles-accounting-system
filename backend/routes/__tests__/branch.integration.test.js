@@ -196,3 +196,35 @@ describe("INTEGRATION TESTS FOR /branch/ PATCH ROUTE", () => {
         expect(response.statusCode).toBe(422);
     });
 });
+
+describe("INTEGRATION TESTS FOR /branch/ DELETE ROUTE", () => {
+    test("/branch/ DELETE route should deactivate the specified branch and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .delete("/branch/")
+            .send({
+                requester: { id: 1 },
+                branch: { id: 1 },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        const branch = await prisma.branch.findUnique({
+            where: {
+                id: 1,
+            },
+        });
+
+        expect(branch.isActive).toEqual(false);
+    });
+
+    test("/branch/ DELETE route should send an HTTP status code of 422 when an invalid branch id is provided", async () => {
+        const response = await request(app)
+            .delete("/branch/")
+            .send({
+                requester: { id: 1 },
+                branch: { id: null },
+            });
+
+        expect(response.statusCode).toBe(422);
+    });
+});

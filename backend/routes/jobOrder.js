@@ -4,7 +4,8 @@ import { countJobOrder, countJobOrderByBranch } from '../controllers/countJobOrd
 import { getAllJobOrder, getAllJobOrderByBranch, getJobOrderByIdController } from '../controllers/getJobOrder.js';
 import { modifyJobOrder as employeeModify } from '../controllers/employeeController.js';
 import { modifyJobOrder as adminModify } from '../controllers/adminController.js';
-
+import { authenticate } from "../middleware/auth";
+import { checkPrivilege } from "../middleware/accessControl";
 const router = express.Router();
 
 router.use(bodyParser.urlencoded({  extended: true  }));

@@ -1,6 +1,7 @@
 import request from "supertest";
 import { test, expect, describe, vi } from "vitest";
 import app from "../../app";
+import prisma from "../../client";
 
 vi.mock("../../middleware/auth", () => ({
     authenticate: (req, res, next) => {
@@ -14,7 +15,7 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe("INTEGRATION TESTS FOR /branch/ POST ROUTE W/O MIDDLEWARE", () => {
+describe("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
     test("/branch/ POST route should create a branch in the database and send an HTTP status code of 200 along with a message", async () => {
         const response = await request(app)
             .post("/branch/")
@@ -87,3 +88,74 @@ describe("INTEGRATION TESTS FOR /branch/ GET ROUTE", () => {
     });
 });
 
+describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
+    test("/branch/all GET route should get all branches from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .get("/branch/all")
+            .send({
+                requester: { id: 1 },
+                filter: {},
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        console.log(response.body);
+
+        const branches = await prisma.branch.findMany();
+
+        expect(response.body.length).toEqual(branches.length);
+    });
+
+    test("/branch/all GET route should get all active branches from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .get("/branch/all")
+            .send({
+                requester: { id: 1 },
+                filter: { isActive: true },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        console.log(response.body);
+
+        const branches = await prisma.branch.findMany({
+            where: {
+                isActive: true,
+            },
+        });
+
+        expect(response.body.length).toEqual(branches.length);
+    });
+
+    test("/branch/all GET route should get all inactive branches from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .get("/branch/all")
+            .send({
+                requester: { id: 1 },
+                filter: { isActive: false },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        console.log(response.body);
+
+        const branches = await prisma.branch.findMany({
+            where: {
+                isActive: false,
+            },
+        });
+
+        expect(response.body.length).toEqual(branches.length);
+    });
+
+    test("/branch/all GET route should send an HTTP status code of 500 when the fields in the filter are invalid", async () => {
+        const response = await request(app)
+            .get("/branch/all")
+            .send({
+                requester: { id: 1 },
+                filter: { isPresent: false },
+            });
+
+        expect(response.statusCode).toBe(500);
+    });
+});

@@ -1,54 +1,26 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import { countJobOrder, countJobOrderByBranch } from '../controllers/countJobOrder.js';
-import { getAllJobOrder, getAllJobOrderByBranch } from '../controllers/getJobOrder.js';
+import { getAllJobOrder, getAllJobOrderByBranch, getJobOrderByIdController } from '../controllers/getJobOrder.js';
 import { modifyJobOrder as employeeModify } from '../controllers/employeeController.js';
 import { modifyJobOrder as adminModify } from '../controllers/adminController.js';
-
+import { authenticate } from "../middleware/auth";
+import { checkPrivilege } from "../middleware/accessControl";
 const router = express.Router();
 
-router.get('/count', countJobOrder);
+router.use(bodyParser.urlencoded({  extended: true  }));
 
-router.get('/count-by-branch', async (req, res) => { 
-  try { 
-    console.log('Job Order count by branch request received');
-    //countJobOrderByBranch
-    res.status(200).send({
-      type: "GET",
-      request: "Job Order count by branch request received",
-      message: "Successfully received GET request.",
-    });
-  } catch (error) {
-    res.status(500).send({ message: error });
-  }
-});
+//summarizes job orders depending on interval
+router.get('/count', authenticate, checkPrivilege(["admin"]), countJobOrder);
 
-router.get('/get', async (req, res) => { 
-  try { 
-    console.log('Job Order get request received');
-    //getAllJobOrder
-    res.status(200).send({
-      type: "GET",
-      request: "Job Order get request received",
-      message: "Successfully received GET request.",
-    });
-  } catch (error) {
-    res.status(500).send({ message: error });
-  }
-});
+//needs params
+router.get('/count-by-branch', authenticate, checkPrivilege(["admin"]), countJobOrderByBranch);
 
-router.get('/get-by-branch', async (req, res) => { 
-  try { 
-    console.log('Job Order get by branch request received');
-    //getAllJobOrderByBranch
-    res.status(200).send({
-      type: "GET",
-      request: "Job Order get by branch request received",
-      message: "Successfully received GET request.",
-    });
-  } catch (error) {
-    res.status(500).send({ message: error });
-  }
-});
+//gets all job orders
+router.get('/get', authenticate, checkPrivilege(["admin"]), getAllJobOrder);
+
+//gets all job orders depending on branch
+router.get('/get-by-branch', authenticate, checkPrivilege([]), getAllJobOrderByBranch);
 
 router.patch('/employee/job-orders/:id', async (req, res) => {
   try {

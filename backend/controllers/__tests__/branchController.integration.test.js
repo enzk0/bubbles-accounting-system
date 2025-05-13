@@ -91,7 +91,7 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     test("getAllBranches() should get all the branches in the database and send an HTTP status code of 200", async () => {
         const req = mockRequest({
             requester: { id: 1 },
-            branch: { id: 1 },
+            filter: {},
         });
 
         const res = mockResponse();
@@ -101,6 +101,59 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith(expect.any(Array));
         expect(typeof foundBranches).toBe("object");
+    });
+
+    test("getAllBranches() should get all inactive branches in the database and send an HTTP status code of 200", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            filter: { isActive: false },
+        });
+
+        const res = mockResponse();
+
+        const foundBranches = await getAllBranches(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(expect.any(Array));
+        expect(typeof foundBranches).toBe("object");
+
+        for (const branch of foundBranches) {
+            console.log(branch);
+            expect(branch.isActive).toEqual(false);
+        }
+    });
+
+    test("getAllBranches() should get all active branches in the database and send an HTTP status code of 200", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            filter: { isActive: true },
+        });
+
+        const res = mockResponse();
+
+        const foundBranches = await getAllBranches(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(expect.any(Array));
+        expect(typeof foundBranches).toBe("object");
+
+        for (const branch of foundBranches) {
+            console.log(branch);
+            expect(branch.isActive).toEqual(true);
+        }
+    });
+
+    test("getAllBranches() should send an HTTP status code of 500 if filter is invalid", async () => {
+        const req = mockRequest({
+            requester: { id: 1 },
+            filter: { isPresent: true },
+        });
+
+        const res = mockResponse();
+
+        const foundBranches = await getAllBranches(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 
     test("editBranch() should update a branch in the database and send an HTTP status code of 200", async () => {

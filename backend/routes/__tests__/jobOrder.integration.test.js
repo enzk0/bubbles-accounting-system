@@ -129,3 +129,10 @@ describe("/get GET route", () => {
     expect(response.body).toBeTypeOf("object");
   });
 });
+
+describe("/get GET route", () => { 
+  test("Should return a response of 200", async () => {
+    const response = await request(app).get("/job-order/get");
+    expect(response.statusCode).toBe(200);
+  });
+});

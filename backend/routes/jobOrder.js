@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.use(bodyParser.urlencoded({  extended: true  }));
 
+//summarizes job orders depending on interval
 router.get('/count', countJobOrder);
 
 //needs params
@@ -26,21 +27,11 @@ router.get('/count-by-branch', async (req, res) => {
   }
 });
 
+//gets all job orders
 router.get('/get', getAllJobOrder);
 
-router.get('/get-by-branch', async (req, res) => { 
-  try { 
-    console.log('Job Order get by branch request received');
-    //getAllJobOrderByBranch
-    res.status(200).send({
-      type: "GET",
-      request: "Job Order get by branch request received",
-      message: "Successfully received GET request.",
-    });
-  } catch (error) {
-    res.status(500).send({ message: error });
-  }
-});
+//gets all job orders depending on branch
+router.get('/get-by-branch', getAllJobOrderByBranch);
 
 router.patch('/employee/job-orders/:id', async (req, res) => {
   try {

@@ -14,3 +14,17 @@ const testExpiredToken = (data) => {
     return jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, { expiresIn: -10 });
 };
 
+describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE W/ MIDDLEWARE", () => { 
+    test("GET /job-order/count if requester is an admin", async () => {
+        const token = testToken({ id: 10 });
+
+        const response = await request(app)
+            .get("/job-order/count")
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                interval: "day",
+            });
+        
+        expect(response.statusCode).toBe(200);
+    });
+});

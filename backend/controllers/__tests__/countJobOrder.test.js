@@ -106,6 +106,6 @@ test("countJobOrderByBranch() should return 400 response for wrong Branch ID", a
     await countJobOrderByBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "Branch ID must be a number." });
+    expect(res.json).toHaveBeenCalledWith({ error: "Branch ID must be an integer." });
   });  
 })

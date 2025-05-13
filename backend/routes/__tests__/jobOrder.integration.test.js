@@ -279,6 +279,19 @@ describe("/count-by-branch GET route", () => {
     expect(response.body).toHaveProperty("error");
     expect(response.body.error).toBe("Interval is required");
   });
+
+  test("countJobOrder() should return 400 if interval is not a integer", async () => {
+    const response = await request(app)
+      .get("/job-order/count-by-branch")
+      .send({
+        branchId: 'affidavitofloss',
+        interval: 'day'
+      });
+    console.log("response: ", response.body);
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Branch ID must be an integer.");
+  });
 });
 
 //tests for getting all job orders

@@ -130,7 +130,7 @@ export async function countJobOrder(req, res) {
     }
 
     if (!Number.isInteger(branchId)) {
-      return res.status(400).json({ error: "Branch ID must be a number." });
+      return res.status(400).json({ error: "Branch ID must be an integer." });
     }
 
     try {

@@ -187,4 +187,35 @@ describe("/get-by-branch/ GET route", () => {
       });
     expect(response.statusCode).toBe(200);
   });
+
+  test("getAllJobOrderByBranch() should return all job orders by branch", async () => { 
+    const response = await request(app)
+      .get("/job-order/get-by-branch/")
+    .send({
+      branchId: 1
+    });
+    console.log("All Job Order by Branch response: ", response.body);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toBeTypeOf("object");
+
+    response.body.result.forEach((jobOrder) => { 
+      expect(jobOrder).toHaveProperty("idCode");
+      expect(jobOrder).toHaveProperty("idNumber");
+      expect(jobOrder).toHaveProperty("createdAt");
+      expect(jobOrder).toHaveProperty("updatedAt");
+      expect(jobOrder).toHaveProperty("paidAt");
+      expect(jobOrder).toHaveProperty("claimedAt");
+      expect(jobOrder).toHaveProperty("isPaid");
+      expect(jobOrder).toHaveProperty("isClaimed");
+      expect(jobOrder).toHaveProperty("isHidden");
+      expect(jobOrder).toHaveProperty("remarks");
+      expect(jobOrder).toHaveProperty("branchId");
+      expect(jobOrder).toHaveProperty("customerId");
+      expect(jobOrder).toHaveProperty("userId");
+      expect(jobOrder).toHaveProperty("branch");
+      expect(jobOrder).toHaveProperty("user");
+      expect(jobOrder).toHaveProperty("customer");
+      expect(jobOrder).toHaveProperty("jobOrderItems");
+    });
+  });
 });

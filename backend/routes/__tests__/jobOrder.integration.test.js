@@ -280,7 +280,7 @@ describe("/count-by-branch GET route", () => {
     expect(response.body.error).toBe("Interval is required");
   });
 
-  test("countJobOrder() should return 400 if interval is not a integer", async () => {
+  test("countJobOrder() should return 400 if branchId is not an integer", async () => {
     const response = await request(app)
       .get("/job-order/count-by-branch")
       .send({

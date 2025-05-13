@@ -240,6 +240,19 @@ describe("/count-by-branch GET route", () => {
     
     expect(response.body).toBeTypeOf("object");
   })
+
+  test("countJobOrder() should return 400 if branchId and interval is not provided", async () => {
+    const response = await request(app)
+      .get("/job-order/count-by-branch")
+      .send({
+        branchId: '',
+        interval: ''
+      });
+    console.log("response: ", response.body);
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toBe("Interval and BranchID is required");
+  });
 });
 
 //tests for getting all job orders

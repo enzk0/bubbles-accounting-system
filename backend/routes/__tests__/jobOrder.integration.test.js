@@ -149,7 +149,7 @@ describe("/count-by-branch GET route", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  test("countJobOrderByBranch() should return the count of job orders by branch", async () => { 
+  test("countJobOrderByBranch() should return the count of job orders by branch by day", async () => { 
     const response = await request(app)
       .get("/job-order/count-by-branch")
       .send({
@@ -172,7 +172,7 @@ describe("/count-by-branch GET route", () => {
     expect(response.body).toBeTypeOf("object");
   })
 
-  test("countJobOrderByBranch() should return the count of job orders by branch", async () => { 
+  test("countJobOrderByBranch() should return the count of job orders by branch by week", async () => { 
     const response = await request(app)
       .get("/job-order/count-by-branch")
       .send({
@@ -195,12 +195,35 @@ describe("/count-by-branch GET route", () => {
     expect(response.body).toBeTypeOf("object");
   })
 
-  test("countJobOrderByBranch() should return the count of job orders by branch", async () => { 
+  test("countJobOrderByBranch() should return the count of job orders by branch by month", async () => { 
     const response = await request(app)
       .get("/job-order/count-by-branch")
       .send({
         branchId: 1,
         interval: 'month'
+      });
+    console.log("Count by Branch response: ", response.body);
+    expect(response.statusCode).toBe(200);
+
+    expect(response.body).toHaveProperty("interval_start");
+    expect(response.body).toHaveProperty("total_unpaid");
+    expect(response.body).toHaveProperty("no_of_unpaid");
+    expect(response.body).toHaveProperty("total_paid");
+    expect(response.body).toHaveProperty("total");
+    expect(response.body).toHaveProperty("no_of_job_orders");
+    expect(response.body).toHaveProperty("no_of_paid");
+    expect(response.body).toHaveProperty("no_of_claimed");
+    expect(response.body).toHaveProperty("no_of_unclaimed");
+    
+    expect(response.body).toBeTypeOf("object");
+  })
+
+  test("countJobOrderByBranch() should return the count of job orders by branch by year", async () => { 
+    const response = await request(app)
+      .get("/job-order/count-by-branch")
+      .send({
+        branchId: 1,
+        interval: 'year'
       });
     console.log("Count by Branch response: ", response.body);
     expect(response.statusCode).toBe(200);

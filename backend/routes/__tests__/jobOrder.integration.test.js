@@ -17,12 +17,15 @@ vi.mock("../../middleware/accessControl", () => ({
 //tests for summarizing the job order
 describe("/count GET route", () => {
   test("Should return a response of 200", async () => {
-    const response = await request(app).get("/job-order/get");
+    const response = await request(app)
+      .get("/job-order/get");
     expect(response.statusCode).toBe(200);
   });
 
   test("countAllJobOrder() should return the count of job orders for interval: day", async () => {
-    const response = await request(app).get("/job-order/count").send({ interval: 'day' });
+    const response = await request(app)
+      .get("/job-order/count")
+      .send({ interval: 'day' });
     console.log("response: ", response.body);
     
     expect(response.statusCode).toBe(200);
@@ -41,7 +44,11 @@ describe("/count GET route", () => {
   });
 
   test("countJobOrder() should return the count of job orders for interval: week", async () => {
-    const response = await request(app).get("/job-order/count").send({ interval: 'week' });
+    const response = await request(app)
+      .get("/job-order/count")
+      .send({
+        interval: 'week'
+      });
     console.log("response: ", response.body);
 
     expect(response.statusCode).toBe(200);
@@ -61,7 +68,11 @@ describe("/count GET route", () => {
   );
 
   test("countJobOrder() should return the count of job orders for interval: month", async () => {
-    const response = await request(app).get("/job-order/count").send({ interval: 'month' });
+    const response = await request(app)
+      .get("/job-order/count")
+      .send({
+        interval: 'month'
+      });
     console.log("response: ", response.body);
 
     expect(response.statusCode).toBe(200);
@@ -80,7 +91,11 @@ describe("/count GET route", () => {
   });
 
   test("countJobOrder() should return the count of job orders for interval: year", async () => {
-    const response = await request(app).get("/job-order/count").send({ interval: 'year' });
+    const response = await request(app)
+      .get("/job-order/count")
+      .send({
+        interval: 'year'
+      });
     console.log("response: ", response.body);
 
     expect(response.statusCode).toBe(200);
@@ -99,7 +114,11 @@ describe("/count GET route", () => {
   });
 
   test("countJobOrder() should return 400 if interval is not provided", async () => {
-    const response = await request(app).get("/job-order/count").send({ interval: '' });
+    const response = await request(app)
+      .get("/job-order/count")
+      .send({
+        interval: ''
+      });
     console.log("response: ", response.body);
     expect(response.statusCode).toBe(400);
     expect(response.body).toHaveProperty("error");
@@ -107,7 +126,11 @@ describe("/count GET route", () => {
   });
 
   test("countJobOrder() should return 400 if interval is not valid", async () => {
-    const response = await request(app).get("/job-order/count").send({ interval: "OogaBooga" });
+    const response = await request(app)
+      .get("/job-order/count")
+      .send({
+        interval: "OogaBooga"
+      });
     console.log("response: ", response.body);
     expect(response.statusCode).toBe(400);
     expect(response.body).toHaveProperty("error");
@@ -118,12 +141,14 @@ describe("/count GET route", () => {
 //tests for getting all job orders
 describe("/get GET route", () => { 
   test("Should return a response of 200", async () => {
-    const response = await request(app).get("/job-order/get");
+    const response = await request(app)
+      .get("/job-order/get");
     expect(response.statusCode).toBe(200);
   });
 
   test("getAllJobOrder() should return all job orders", async () => { 
-    const response = await request(app).get("/job-order/get");
+    const response = await request(app)
+      .get("/job-order/get");
     console.log("All Job Order response: ", response.body);
     
     expect(response.statusCode).toBe(200);

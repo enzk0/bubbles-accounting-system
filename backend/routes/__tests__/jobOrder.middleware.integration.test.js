@@ -41,3 +41,19 @@ describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE W/ MIDDLEWARE", () =>
         expect(response.statusCode).toBe(403);
     });
 });
+
+describe("INTEGRATION TESTS FOR /job-order/count-by-branch GET ROUTE W/ MIDDLEWARE", () => { 
+    test("GET /job-order/count-by-branch if requester is an admin", async () => {
+        const token = testToken({ id: 10 });
+
+        const response = await request(app)
+            .get("/job-order/count-by-branch")
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                interval: "day",
+                branchId: 1,
+            });
+        
+        expect(response.statusCode).toBe(200);
+    });
+});

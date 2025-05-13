@@ -2,6 +2,18 @@ import request from "supertest";
 import { test, expect, describe, vi } from "vitest";
 import app from "../../app.js";
 
+vi.mock("../../middleware/auth", () => ({
+  authenticate: (req, res, next) => {
+      next();
+  },
+}));
+
+vi.mock("../../middleware/accessControl", () => ({
+  checkPrivilege: (privileges) => (req, res, next) => {
+      next();
+  },
+}));
+
 describe("/count GET route", () => {
   test("Should return a response of 200", async () => {
     const response = await request(app).get("/job-order/get");

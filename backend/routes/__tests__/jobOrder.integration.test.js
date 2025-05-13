@@ -138,6 +138,17 @@ describe("/count GET route", () => {
   });
 });
 
+describe("/count-by-branch GET route", () => { 
+  test("Should return a response of 200", async () => {
+    const response = await request(app)
+      .get("/job-order/count-by-branch")
+      .send({
+        branchId: 1
+      });
+    expect(response.statusCode).toBe(200);
+  });
+});
+
 //tests for getting all job orders
 describe("/get GET route", () => { 
   test("Should return a response of 200", async () => {

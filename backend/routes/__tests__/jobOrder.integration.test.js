@@ -14,6 +14,7 @@ vi.mock("../../middleware/accessControl", () => ({
   },
 }));
 
+//tests for summarizing the job order
 describe("/count GET route", () => {
   test("Should return a response of 200", async () => {
     const response = await request(app).get("/job-order/get");
@@ -114,22 +115,7 @@ describe("/count GET route", () => {
   });
 });
 
-describe("/get GET route", () => { 
-  test("Should return a response of 200", async () => {
-    const response = await request(app).get("/job-order/get");
-    expect(response.statusCode).toBe(200);
-  });
-
-  test("getAllJobOrder() should return all job orders", async () => {
-    const response = await request(app).get("/job-order/get");
-    console.log("response: ", response.body);
-    
-    expect(response.statusCode).toBe(200);
-
-    expect(response.body).toBeTypeOf("object");
-  });
-});
-
+//tests for getting all job orders
 describe("/get GET route", () => { 
   test("Should return a response of 200", async () => {
     const response = await request(app).get("/job-order/get");
@@ -149,6 +135,19 @@ describe("/get GET route", () => {
       expect(jobOrder).toHaveProperty("idNumber");
       expect(jobOrder).toHaveProperty("createdAt");
       expect(jobOrder).toHaveProperty("updatedAt");
+      expect(jobOrder).toHaveProperty("paidAt");
+      expect(jobOrder).toHaveProperty("claimedAt");
+      expect(jobOrder).toHaveProperty("isPaid");
+      expect(jobOrder).toHaveProperty("isClaimed");
+      expect(jobOrder).toHaveProperty("isHidden");
+      expect(jobOrder).toHaveProperty("remarks");
+      expect(jobOrder).toHaveProperty("branchId");
+      expect(jobOrder).toHaveProperty("customerId");
+      expect(jobOrder).toHaveProperty("userId");
+      expect(jobOrder).toHaveProperty("branch");
+      expect(jobOrder).toHaveProperty("user");
+      expect(jobOrder).toHaveProperty("customer");
+      expect(jobOrder).toHaveProperty("jobOrderItems");
     });
   })
 });

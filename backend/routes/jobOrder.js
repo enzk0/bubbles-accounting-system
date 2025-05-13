@@ -11,16 +11,16 @@ const router = express.Router();
 router.use(bodyParser.urlencoded({  extended: true  }));
 
 //summarizes job orders depending on interval
-router.get('/count', countJobOrder);
+router.get('/count', authenticate, checkPrivilege(["admin"]), countJobOrder);
 
 //needs params
-router.get('/count-by-branch', countJobOrderByBranch);
+router.get('/count-by-branch', authenticate, checkPrivilege(["admin"]), countJobOrderByBranch);
 
 //gets all job orders
-router.get('/get', getAllJobOrder);
+router.get('/get', authenticate, checkPrivilege(["admin"]), getAllJobOrder);
 
 //gets all job orders depending on branch
-router.get('/get-by-branch', getAllJobOrderByBranch);
+router.get('/get-by-branch', authenticate, checkPrivilege([]), getAllJobOrderByBranch);
 
 router.patch('/employee/job-orders/:id', async (req, res) => {
   try {

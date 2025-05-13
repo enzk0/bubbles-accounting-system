@@ -56,4 +56,18 @@ describe("INTEGRATION TESTS FOR /job-order/count-by-branch GET ROUTE W/ MIDDLEWA
         
         expect(response.statusCode).toBe(200);
     });
+
+    test("GET /job-order/count-by-branch if requester is not an admin", async () => {
+        const token = testToken({ id: 1 });
+
+        const response = await request(app)
+            .get("/job-order/count-by-branch")
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                interval: "day",
+                branchId: 1,
+            });
+        
+        expect(response.statusCode).toBe(403);
+    });
 });

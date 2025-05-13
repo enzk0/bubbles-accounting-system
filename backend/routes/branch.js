@@ -1,6 +1,7 @@
 import express from "express";
 import {
     createBranch,
+    deactivateBranch,
     editBranch,
     getAllBranches,
     getBranch,
@@ -17,5 +18,7 @@ router.get("/", authenticate, checkPrivilege([]), getBranch);
 router.get("/all", authenticate, checkPrivilege(["admin"]), getAllBranches);
 
 router.patch("/", authenticate, checkPrivilege(["admin"]), editBranch);
+
+router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateBranch);
 
 export default router;

@@ -151,3 +151,15 @@ describe("/get GET route", () => {
     });
   })
 });
+
+//tests for getting all job orders by branch
+describe("/get-by-branch/ GET route", () => { 
+  test("Should return a repsonse of 200", async () => {
+    const response = await request(app)
+      .get("/job-order/get-by-branch/")
+      .send({
+        branchId: 1
+      });
+    expect(response.statusCode).toBe(200);
+  });
+});

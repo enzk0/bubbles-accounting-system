@@ -75,7 +75,9 @@ export async function getAllBranches(req, res) {
 
         if (foundBranches.length === 0) {
             res.json([]);
-            return res.status(404);
+            return res
+                .status(404)
+                .send({ message: "No branches can be found in the database" });
         }
 
         res.status(200);
@@ -83,7 +85,10 @@ export async function getAllBranches(req, res) {
         return foundBranches;
     } catch (error) {
         console.log(error);
-        return res.status(500);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }
 

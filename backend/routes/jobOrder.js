@@ -1,10 +1,13 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import { countJobOrder, countJobOrderByBranch } from '../controllers/countJobOrder.js';
 import { getAllJobOrder, getAllJobOrderByBranch, getJobOrderByIdController } from '../controllers/getJobOrder.js';
 import { modifyJobOrder as employeeModify } from '../controllers/employeeController.js';
 import { modifyJobOrder as adminModify } from '../controllers/adminController.js';
 
 const router = express.Router();
+
+router.use(bodyParser.urlencoded({  extended: true  }));
 
 router.get('/count', countJobOrder);
 

@@ -99,7 +99,16 @@ describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
 
         expect(response.statusCode).toBe(200);
 
-        console.log(response.body);
+        response.body.forEach((branch) => {
+            expect(branch).toHaveProperty("name");
+            expect(branch).toHaveProperty("address");
+            expect(branch).toHaveProperty("code");
+            expect(branch).toHaveProperty("id");
+            expect(branch).toHaveProperty("counter");
+            expect(branch).toHaveProperty("isActive");
+            expect(branch).toHaveProperty("createdAt");
+            expect(branch).toHaveProperty("updatedAt");
+        });
 
         const branches = await prisma.branch.findMany();
 

@@ -95,3 +95,18 @@ describe("INTEGRATION TESTS FOR /job-order/get GET ROUTE W/ MIDDLEWARE", () => {
         expect(response.statusCode).toBe(403);
     });
 });
+
+describe("INTEGRATION TESTS FOR /job-order/get-by-branch GET ROUTE W/ MIDDLEWARE", () => {
+    test("GET /job-order/get-by-branch if requester is an admin", async () => {
+        const token = testToken({ id: 10 });
+
+        const response = await request(app)
+            .get("/job-order/get-by-branch")
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                branchId: 1,
+            });
+        
+        expect(response.statusCode).toBe(200);
+    });
+});

@@ -83,4 +83,15 @@ describe("INTEGRATION TESTS FOR /job-order/get GET ROUTE W/ MIDDLEWARE", () => {
         
         expect(response.statusCode).toBe(200);
     });
+
+    test("GET /job-order/get if requester is not an admin", async () => {
+        const token = testToken({ id: 1 });
+
+        const response = await request(app)
+            .get("/job-order/get")
+            .set("Authorization", `Bearer ${token}`)
+            .send({});
+        
+        expect(response.statusCode).toBe(403);
+    });
 });

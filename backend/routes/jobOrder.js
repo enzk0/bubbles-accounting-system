@@ -13,19 +13,7 @@ router.use(bodyParser.urlencoded({  extended: true  }));
 router.get('/count', countJobOrder);
 
 //needs params
-router.get('/count-by-branch', async (req, res) => { 
-  try { 
-    console.log('Job Order count by branch request received');
-    //countJobOrderByBranch
-    res.status(200).send({
-      type: "GET",
-      request: "Job Order count by branch request received",
-      message: "Successfully received GET request.",
-    });
-  } catch (error) {
-    res.status(500).send({ message: error });
-  }
-});
+router.get('/count-by-branch', countJobOrderByBranch);
 
 //gets all job orders
 router.get('/get', getAllJobOrder);

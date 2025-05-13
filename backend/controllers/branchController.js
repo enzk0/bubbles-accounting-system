@@ -126,7 +126,10 @@ export async function deactivateBranch(req, res) {
     const { requester, branch } = req.body;
 
     if (branch.id === null || branch.id == undefined || branch.id < 1) {
-        return res.status(422);
+        return res.status(422).send({
+            message:
+                "Branch id provided is invalid because it is null, undefined, or < 1",
+        });
     }
 
     try {
@@ -139,10 +142,17 @@ export async function deactivateBranch(req, res) {
             },
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: `Branch with id of ${branch.id} has been successfully deactivated`,
+        });
         return updatedBranch;
     } catch (error) {
         console.log(error);
-        return res.status(500);
+        return res
+            .status(500)
+            .send({
+                message: "An error has occured with the database client",
+                error: error,
+            });
     }
 }

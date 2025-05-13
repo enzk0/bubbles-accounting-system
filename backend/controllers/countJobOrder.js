@@ -125,6 +125,10 @@ export async function countJobOrder(req, res) {
       return res.status(400).json({ error: "BranchID is required" });
     }
 
+    if (interval !== "day" && interval !== "week" && interval !== "month" && interval !== "year" && !Number.isInteger(branchId)) {
+      return res.status(400).json({ error: "Interval must be day, week, month, or year and BranchID must be an integer." });
+    }
+    
     if (interval !== "day" && interval !== "week" && interval !== "month" && interval !== "year") {
       return res.status(400).json({ error: "Interval must be day, week, month, or year." });
     }

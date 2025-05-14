@@ -52,7 +52,9 @@ export async function editUser(req, res) {
     const { user, edit } = req.body;
 
     if (!edit.username || !edit.firstName || !edit.lastName) {
-        return res.status(422);
+        return res.status(422).send({
+            message: "Update values for certain user fields are invalid",
+        });
     }
 
     try {
@@ -61,22 +63,28 @@ export async function editUser(req, res) {
         });
 
         if (found === null) {
-            return res.status(404);
+            return res
+                .status(404)
+                .send({ message: "User to be updated cannot be found" });
         }
 
         const { username, firstName, lastName, ...userRelations } = edit;
 
-        let updated = await prisma.user.update({
-            where: user,
-            data: {
-                role: {
-                    connect: { id: userRelations.roleId },
+        let updated;
+
+        if (userRelations.roleId && userRelations.branchId) {
+            updated = await prisma.user.update({
+                where: user,
+                data: {
+                    role: {
+                        connect: { id: userRelations.roleId },
+                    },
+                    branch: {
+                        connect: { id: userRelations.branchId },
+                    },
                 },
-                branch: {
-                    connect: { id: userRelations.branchId },
-                },
-            },
-        });
+            });
+        }
 
         const { branchId, roleId, ...userInfo } = edit;
 
@@ -85,11 +93,16 @@ export async function editUser(req, res) {
             data: userInfo,
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: `User with id ${updated.id} has been updated successfully`,
+        });
         return updated;
     } catch (error) {
         console.log(error);
-        return res.status(500);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }
 

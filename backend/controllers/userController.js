@@ -42,10 +42,23 @@ export async function deactivateUser(req, res) {
             },
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: `User with id ${updatedUser.id} has been successfully deactivated`,
+        });
         return updatedUser;
     } catch (error) {
-        return res.status(500);
+        if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+            return res.status(500).send({
+                message: "An error with the database client has occurred",
+                error: error,
+            });
+        }
+        if (error.code === "P2025") {
+            return res.status(404).send({
+                message: "The user to be deactivated cannot be found",
+                error: error,
+            });
+        }
     }
 }
 

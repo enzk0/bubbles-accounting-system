@@ -288,3 +288,35 @@ describe("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
         expect(response.statusCode).toBe(422);
     });
 });
+
+describe("INTEGRATION TESTS FOR /user/ DELETE ROUTE", () => {
+    test("/user/ DELETE route should deactivate the specified user and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .delete("/user/")
+            .send({
+                requester: { id: 1 },
+                user: { username: "quandale_dingleberry" },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                username: "quandale_dingleberry",
+            },
+        });
+
+        expect(user.isActive).toEqual(false);
+    });
+
+    test("/user/ DELETE route should send an HTTP status code of 404 when the user to be deactivated cannot be found", async () => {
+        const response = await request(app)
+            .delete("/user/")
+            .send({
+                requester: { id: 1 },
+                user: { id: 2049 },
+            });
+
+        expect(response.statusCode).toBe(404);
+    });
+});

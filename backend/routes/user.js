@@ -27,4 +27,6 @@ router.patch(
     editPassword
 );
 
+router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateUser);
+
 export default router;

@@ -14,5 +14,7 @@ const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege(["admin"]), createUser);
 
+router.get("/", authenticate, checkPrivilege([]), getUser);
+
 export default router;
 

@@ -190,7 +190,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
 });
 
 describe("INTEGRATION TESTS FOR /user/ PATCH ROUTE", () => {
-    test("/user/ PATCH route should get all users in the database and send an HTTP status code of 200", async () => {
+    test("/user/ PATCH route should edit the specified in the database and send an HTTP status code of 200", async () => {
         const response = await request(app)
             .patch("/user/")
             .send({
@@ -245,6 +245,44 @@ describe("INTEGRATION TESTS FOR /user/ PATCH ROUTE", () => {
                     firstName: null,
                     lastName: undefined,
                 },
+            });
+
+        expect(response.statusCode).toBe(422);
+    });
+});
+
+describe("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
+    test("/user/password PATCH route updated the password of a user in the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .patch("/user/password")
+            .send({
+                requester: { id: 1 },
+                user: { username: "quandale_dingleberry" },
+                newPassword: "pass456",
+            });
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    test("/user/password PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
+        const response = await request(app)
+            .patch("/user/password")
+            .send({
+                requester: { id: 1 },
+                user: { id: 2050 },
+                newPassword: "pass456",
+            });
+
+        expect(response.statusCode).toBe(404);
+    });
+
+    test("/user/password PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
+        const response = await request(app)
+            .patch("/user/password")
+            .send({
+                requester: { id: 1 },
+                user: { id: 1 },
+                newPassword: undefined,
             });
 
         expect(response.statusCode).toBe(422);

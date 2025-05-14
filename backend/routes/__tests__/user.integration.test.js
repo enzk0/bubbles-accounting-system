@@ -22,9 +22,9 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
             .send({
                 requester: { id: 1 },
                 user: {
-                    username: "john_doe",
-                    firstName: "John",
-                    lastName: "Doe",
+                    username: "quandale_dingle",
+                    firstName: "Quandale",
+                    lastName: "Dingle",
                     password: "password123",
                 },
             });
@@ -33,13 +33,13 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
 
         const user = await prisma.user.findUnique({
             where: {
-                username: "john_doe",
+                username: "quandale_dingle",
             },
         });
 
-        expect(user.username).toEqual("john_doe");
-        expect(user.firstName).toEqual("John");
-        expect(user.lastName).toEqual("Doe");
+        expect(user.username).toEqual("quandale_dingle");
+        expect(user.firstName).toEqual("Quandale");
+        expect(user.lastName).toEqual("Dingle");
     });
 
     test("/user/ POST route should send an HTTP status code of 422 when any of the fields are incmomplete or invalid", async () => {
@@ -64,9 +64,9 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
             .send({
                 requester: { id: 1 },
                 user: {
-                    username: "john_doe",
-                    firstName: "John",
-                    lastName: "Doe",
+                    username: "quandale_dingle",
+                    firstName: "Quandale",
+                    lastName: "Dingle",
                     password: "password123",
                 },
             });
@@ -189,3 +189,64 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
     });
 });
 
+describe("INTEGRATION TESTS FOR /user/ PATCH ROUTE", () => {
+    test("/user/ PATCH route should get all users in the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .patch("/user/")
+            .send({
+                requester: { id: 1 },
+                user: { username: "quandale_dingle" },
+                edit: {
+                    username: "quandale_dingleberry",
+                    firstName: "Quandale",
+                    lastName: "Dingleberry",
+                    roleId: 1,
+                    branchId: 2,
+                },
+            });
+
+        const updated = await prisma.user.findUnique({
+            where: { username: "quandale_dingleberry" },
+        });
+
+        expect(response.statusCode).toBe(200);
+
+        expect(updated.username).toEqual("quandale_dingleberry");
+        expect(updated.firstName).toEqual("Quandale");
+        expect(updated.lastName).toEqual("Dingleberry");
+        expect(updated.roleId).toEqual(1);
+        expect(updated.branchId).toEqual(2);
+    });
+
+    test("/user/ PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
+        const response = await request(app)
+            .patch("/user/")
+            .send({
+                requester: { id: 1 },
+                user: { id: 2050 },
+                edit: {
+                    username: "anachiro",
+                    firstName: "Anachiro",
+                    lastName: "Grimms",
+                },
+            });
+
+        expect(response.statusCode).toBe(404);
+    });
+
+    test("/user/ PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
+        const response = await request(app)
+            .patch("/user/")
+            .send({
+                requester: { id: 1 },
+                user: { id: 1 },
+                edit: {
+                    username: "",
+                    firstName: null,
+                    lastName: undefined,
+                },
+            });
+
+        expect(response.statusCode).toBe(422);
+    });
+});

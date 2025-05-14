@@ -16,5 +16,7 @@ router.post("/", authenticate, checkPrivilege(["admin"]), createUser);
 
 router.get("/", authenticate, checkPrivilege([]), getUser);
 
+router.get("/all", authenticate, checkPrivilege(["admin"]), getAllUsers);
+
 export default router;
 

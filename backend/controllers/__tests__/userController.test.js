@@ -19,6 +19,7 @@ const mockResponse = () => {
 
     res.status = vi.fn().mockReturnValue(res);
     res.json = vi.fn().mockReturnValue(res);
+    res.send = vi.fn().mockReturnValue(res);
 
     return res;
 };
@@ -547,24 +548,22 @@ describe("UNIT TEST SUITE FOR 'getAllUsers()' CONTROLLER", () => {
         const found = await getAllUsers(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({
-            users: [
-                {
-                    user: {
-                        id: 1,
-                        username: "admin",
-                        roleId: 0,
-                    },
+        expect(res.json).toHaveBeenCalledWith([
+            {
+                user: {
+                    id: 1,
+                    username: "admin",
+                    roleId: 0,
                 },
-                {
-                    user: {
-                        id: 2,
-                        username: "employee",
-                        roleId: 1,
-                    },
+            },
+            {
+                user: {
+                    id: 2,
+                    username: "employee",
+                    roleId: 1,
                 },
-            ],
-        });
+            },
+        ]);
         expect(found).toEqual(mock);
     });
 

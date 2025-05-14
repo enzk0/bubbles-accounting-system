@@ -7,7 +7,10 @@ export async function createUser(req, res) {
     const { user } = req.body;
 
     if (!user.username || !user.password || !user.firstName || !user.lastName) {
-        return res.status(422);
+        return res.status(422).send({
+            message:
+                "Information provided to make a user is incomplete or invalid",
+        });
     }
 
     const hash = bcrypt.hashSync(user.password, saltRounds);
@@ -17,10 +20,13 @@ export async function createUser(req, res) {
             data: { ...user, password: hash },
         });
 
-        res.status(201);
+        res.status(201).send({ message: "User has been successfully created" });
         return created;
     } catch (error) {
-        return res.status(500);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }
 

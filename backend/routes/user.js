@@ -20,5 +20,11 @@ router.get("/all", authenticate, checkPrivilege(["admin"]), getAllUsers);
 
 router.patch("/", authenticate, checkPrivilege(["admin"]), editUser);
 
-export default router;
+router.patch(
+    "/password",
+    authenticate,
+    checkPrivilege(["admin"]),
+    editPassword
+);
 
+export default router;

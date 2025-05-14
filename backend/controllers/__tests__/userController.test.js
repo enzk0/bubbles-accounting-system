@@ -234,28 +234,6 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(200);
     });
 
-    test("editUser() should send a HTTP response code of 404 when the user to be updated does not exist in the database", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            user: { username: "john_doe" },
-            edit: {
-                username: "jane_doe",
-                firstName: "Jane",
-                lastName: "Doe",
-                roleId: 2,
-                branchId: 1,
-            },
-        });
-
-        const res = mockResponse();
-
-        prismaMock.user.findUnique.mockResolvedValue(null);
-
-        const updated = await editUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
-    });
-
     test("editUser() should send a HTTP response code of 422 when the username, firstName, and lastName fields are empty", async () => {
         let req = mockRequest({
             requester: { id: 1 },

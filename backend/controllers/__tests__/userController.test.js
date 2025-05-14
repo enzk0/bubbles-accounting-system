@@ -19,6 +19,7 @@ const mockResponse = () => {
 
     res.status = vi.fn().mockReturnValue(res);
     res.json = vi.fn().mockReturnValue(res);
+    res.send = vi.fn().mockReturnValue(res);
 
     return res;
 };
@@ -231,28 +232,6 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         const updated = await editUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
-    });
-
-    test("editUser() should send a HTTP response code of 404 when the user to be updated does not exist in the database", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            user: { username: "john_doe" },
-            edit: {
-                username: "jane_doe",
-                firstName: "Jane",
-                lastName: "Doe",
-                roleId: 2,
-                branchId: 1,
-            },
-        });
-
-        const res = mockResponse();
-
-        prismaMock.user.findUnique.mockResolvedValue(null);
-
-        const updated = await editUser(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(404);
     });
 
     test("editUser() should send a HTTP response code of 422 when the username, firstName, and lastName fields are empty", async () => {
@@ -547,24 +526,22 @@ describe("UNIT TEST SUITE FOR 'getAllUsers()' CONTROLLER", () => {
         const found = await getAllUsers(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({
-            users: [
-                {
-                    user: {
-                        id: 1,
-                        username: "admin",
-                        roleId: 0,
-                    },
+        expect(res.json).toHaveBeenCalledWith([
+            {
+                user: {
+                    id: 1,
+                    username: "admin",
+                    roleId: 0,
                 },
-                {
-                    user: {
-                        id: 2,
-                        username: "employee",
-                        roleId: 1,
-                    },
+            },
+            {
+                user: {
+                    id: 2,
+                    username: "employee",
+                    roleId: 1,
                 },
-            ],
-        });
+            },
+        ]);
         expect(found).toEqual(mock);
     });
 

@@ -146,11 +146,16 @@ export async function getUser(req, res) {
 }
 
 export async function getAllUsers(req, res) {
+    const { filter } = req.body;
     try {
-        const found = await prisma.user.findMany();
+        const found = await prisma.user.findMany({
+            where: filter,
+        });
 
         if (found.length === 0) {
-            res.status(404);
+            res.status(404).send({
+                message: "No users can be found in the database",
+            });
             res.json({
                 users: found,
             });
@@ -158,11 +163,12 @@ export async function getAllUsers(req, res) {
         }
 
         res.status(200);
-        res.json({
-            users: found,
-        });
+        res.json(found);
         return found;
     } catch (error) {
-        return res.status(500);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }

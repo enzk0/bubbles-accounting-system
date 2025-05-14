@@ -18,5 +18,7 @@ router.get("/", authenticate, checkPrivilege([]), getUser);
 
 router.get("/all", authenticate, checkPrivilege(["admin"]), getAllUsers);
 
+router.patch("/", authenticate, checkPrivilege(["admin"]), editUser);
+
 export default router;
 

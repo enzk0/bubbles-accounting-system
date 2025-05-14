@@ -76,7 +76,7 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
 });
 
 describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
-    test("/user/ POST route should fetch a user in the database with the specified user id and send an HTTP status code of 200", async () => {
+    test("/user/ GET route should fetch a user in the database with the specified user id and send an HTTP status code of 200", async () => {
         const response = await request(app)
             .get("/user/")
             .send({
@@ -98,7 +98,7 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
         expect(response.body.lastName).toEqual(user.lastName);
     });
 
-    test("/user/ POST route should send an HTTP status code of 404 when the queried user does not exist or cannot be found", async () => {
+    test("/user/ GET route should send an HTTP status code of 404 when the queried user does not exist or cannot be found", async () => {
         const response = await request(app)
             .get("/user/")
             .send({
@@ -109,7 +109,7 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
         expect(response.statusCode).toBe(404);
     });
 
-    test("/user/ POST route should send an HTTP status code of 422 when the user id used in the query is invalid", async () => {
+    test("/user/ GET route should send an HTTP status code of 422 when the user id used in the query is invalid", async () => {
         const response = await request(app)
             .get("/user/")
             .send({
@@ -121,8 +121,8 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
-    test("/user/all POST route should get all users in the database and send an HTTP status code of 200", async () => {
+describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
+    test("/user/all GET route should get all users in the database and send an HTTP status code of 200", async () => {
         const response = await request(app)
             .get("/user/all")
             .send({
@@ -143,7 +143,7 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
         });
     });
 
-    test("/user/all POST route should get all users in the database who has a role of employee and send an HTTP status code of 200", async () => {
+    test("/user/all GET route should get all users in the database who has a role of employee and send an HTTP status code of 200", async () => {
         const response = await request(app)
             .get("/user/all")
             .send({
@@ -166,7 +166,7 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
         });
     });
 
-    test("/user/all POST route should send an HTTP status code of 404 when no users can be found in the database when a filter is applied", async () => {
+    test("/user/all GET route should send an HTTP status code of 404 when no users can be found in the database when a filter is applied", async () => {
         const response = await request(app)
             .get("/user/all")
             .send({
@@ -177,7 +177,7 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
         expect(response.statusCode).toBe(404);
     });
 
-    test("/user/all POST route should send an HTTP status code of 500 when the filter provided is invalid", async () => {
+    test("/user/all GET route should send an HTTP status code of 500 when the filter provided is invalid", async () => {
         const response = await request(app)
             .get("/user/all")
             .send({

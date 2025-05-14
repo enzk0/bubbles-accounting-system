@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../client.js";
 import bcrypt from "bcrypt";
 
@@ -58,22 +59,10 @@ export async function editUser(req, res) {
     }
 
     try {
-        const found = await prisma.user.findUnique({
-            where: user,
-        });
-
-        if (found === null) {
-            return res
-                .status(404)
-                .send({ message: "User to be updated cannot be found" });
-        }
-
         const { username, firstName, lastName, ...userRelations } = edit;
 
-        let updated;
-
         if (userRelations.roleId && userRelations.branchId) {
-            updated = await prisma.user.update({
+            await prisma.user.update({
                 where: user,
                 data: {
                     role: {
@@ -88,7 +77,7 @@ export async function editUser(req, res) {
 
         const { branchId, roleId, ...userInfo } = edit;
 
-        updated = await prisma.user.update({
+        const updated = await prisma.user.update({
             where: user,
             data: userInfo,
         });
@@ -98,19 +87,28 @@ export async function editUser(req, res) {
         });
         return updated;
     } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            message: "An error has occurred with the database client",
-            error: error,
-        });
+        if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+            return res.status(500).send({
+                message: "An error with the database client has occurred",
+                error: error,
+            });
+        }
+        if (error.code === "P2025") {
+            return res.status(404).send({
+                message: "The user to be updated cannot be found",
+                error: error,
+            });
+        }
     }
 }
 
 export async function editPassword(req, res) {
     const { user, newPassword } = req.body;
 
-    if (!user.id || !newPassword) {
-        return res.status(422);
+    if (!(!user.id || !user.username) || !newPassword) {
+        return res.status(422).send({
+            message: "The  new password fields are invalid",
+        });
     }
 
     try {
@@ -122,11 +120,25 @@ export async function editPassword(req, res) {
             },
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: "The user's password has been successfully updated",
+        });
         return updated;
     } catch (error) {
         console.log(error);
-        return res.status(500);
+        if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
+            return res.status(500).send({
+                message: "An error with the database client has occurred",
+                error: error,
+            });
+        }
+        if (error.code === "P2025") {
+            return res.status(404).send({
+                message:
+                    "The user whose password is to be updated cannot be found",
+                error: error,
+            });
+        }
     }
 }
 

@@ -120,13 +120,17 @@ export async function editPassword(req, res) {
 export async function getUser(req, res) {
     const { user } = req.body;
 
+    if (!user.id) {
+        res.status(422).send({ message: "User id provided is invalid" });
+    }
+
     try {
         const found = await prisma.user.findUnique({
             where: user,
         });
 
         if (!found || found === null) {
-            res.status(404);
+            res.status(404).send({ message: "User not found" });
             return found;
         }
 
@@ -134,7 +138,10 @@ export async function getUser(req, res) {
         res.json(found);
         return found;
     } catch (error) {
-        return res.status(500);
+        return res.status(500).send({
+            message: "An error with the database client has occurred",
+            error: error,
+        });
     }
 }
 

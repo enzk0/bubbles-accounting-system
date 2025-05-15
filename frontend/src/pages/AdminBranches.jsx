@@ -1,7 +1,7 @@
 import React from "react";
 
-function AdminBranches() {
-    return <div>AdminBranches</div>;
+function AdminEmployees() {
+    return <div>AdminEmployees</div>;
 }
 
-export default AdminBranches;
+export default AdminEmployees;

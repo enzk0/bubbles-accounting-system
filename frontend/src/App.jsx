@@ -45,7 +45,7 @@ function App() {
                     <Route path="login" element={<AdminLogin />} />
                     <Route path="job_orders" element={<AdminJobOrders />} />
                     <Route path="employees" element={<AdminEmployees />} />
-                    <Route path="employees" element={<AdminBranches />} />
+                    <Route path="branches" element={<AdminBranches />} />
                 </Route>
                 <Route path="*" element={<PageNotFound />} />
             </Routes>

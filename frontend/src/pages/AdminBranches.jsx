@@ -1,7 +1,7 @@
 import React from "react";
 
 function AdminEmployees() {
-    return <div>AdminEmployees</div>;
+    return <div>AdminBranches</div>;
 }
 
 export default AdminEmployees;

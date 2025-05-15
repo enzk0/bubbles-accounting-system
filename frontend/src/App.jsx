@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
+import AdminLogin from "./pages/AdminLogin";
 import AdminLayout from "./components/AdminLayout";
 import AdminHome from "./pages/AdminHome";
 import EmployeeLogin from "./pages/EmployeeLogin";
@@ -38,6 +39,7 @@ function App() {
                 </Route>
                 <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminHome />} />
+                    <Route path="login" element={<AdminLogin />} />
                 </Route>
                 <Route path="*" element={<PageNotFound />} />
             </Routes>

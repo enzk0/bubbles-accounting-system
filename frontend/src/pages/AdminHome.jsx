@@ -36,6 +36,85 @@ function BranchSelection() {
     );
 }
 
+function Summary() {
+    const [tabState, setTabState] = useState({
+        daily: false,
+        weekly: true,
+        monthly: false,
+        quarterly: false,
+        yearly: false,
+    });
+
+    const handleTab = (tab) => {
+        setTabState((prev) => ({
+            ...Object.fromEntries(Object.keys(prev).map((key) => [key, false])),
+            [tab]: true,
+        }));
+    };
+
+    const activeStyle = "border-1 border-slate-300/100 bg-white shadow-xs";
+
+    const SummaryColumn = ({ title, subtitle, value, isLast = false }) => (
+        <div
+            className={`grow p-1 m-3 ${
+                isLast ? "" : "border-r-1 border-slate-300"
+            }`}
+        >
+            <p>{title}</p>
+            <p className="text-sm font-bold text-gray-400">{subtitle}</p>
+            <div className="mt-6 flex flex-row items-baseline">
+                <p className="text-xl font-bold ">{value.toFixed(2)}</p>
+                <p className="text-xs">PHP</p>
+            </div>
+        </div>
+    );
+
+    const SummaryTabs = (
+        <div className="flex flex-row p-1 m-2 gap-2 rounded bg-slate-200 inset-shadow-2xs">
+            {Object.keys(tabState).map((key) => {
+                return (
+                    <button
+                        type="button"
+                        className={`px-2 rounded-sm border-1 border-slate-300/0 cursor-pointer ${
+                            tabState[key] ? activeStyle : "hover:bg-slate-300"
+                        }`}
+                        onClick={() => handleTab(key)}
+                    >
+                        {key[0].toUpperCase() + key.slice(1)}
+                    </button>
+                );
+            })}
+        </div>
+    );
+
+    return (
+        <div className="mb-4">
+            <p className="text-lg mb-2 font-bold">Summary</p>
+            <div className="flex flex-col p-2 rounded-lg border-1 border-slate-300 bg-white">
+                <div className="flex flex-row">{SummaryTabs}</div>
+                <div className="flex flex-row ">
+                    <SummaryColumn
+                        title={"Total"}
+                        subtitle={"Unpaid + Paid"}
+                        value={100}
+                    />
+                    <SummaryColumn
+                        title={"Total Unpaid"}
+                        subtitle={"Unpaid Job Orders"}
+                        value={70}
+                    />
+                    <SummaryColumn
+                        title={"Total Paid"}
+                        subtitle={"Paid Job Orders"}
+                        value={20}
+                        isLast={true}
+                    />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function AdminHome() {
     return (
         <div className="p-8 pt-2">

@@ -1,5 +1,5 @@
 import { test, expect, describe, vi, beforeEach, beforeAll } from "vitest";
-import { login } from "../authenticationController";
+import { adminLogin, employeeLogin, login } from "../authenticationController";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import prisma from "../../client";
@@ -14,6 +14,7 @@ const mockResponse = () => {
 
     res.status = vi.fn().mockReturnValue(res);
     res.json = vi.fn().mockReturnValue(res);
+    res.send = vi.fn().mockReturnValue(res);
 
     return res;
 };
@@ -75,5 +76,61 @@ describe("INTEGRATION TEST SUITE FOR AUTHENTICATION CONTROLLER", () => {
         });
 
         expect(user.username).toEqual(req.body.user.username);
+    });
+
+    test("adminLogin() should allow an admin account to login", async () => {
+        const req = mockRequest({
+            user: { username: "grave", password: "password" },
+        });
+
+        const res = mockResponse();
+
+        const token = await adminLogin(req, res);
+
+        console.log(token);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(typeof token).toBe("object");
+        expect(token).toHaveProperty("accessToken");
+        expect(typeof token.accessToken).toBe("string");
+    });
+
+    test("adminLogin() should not allow a non-admin account to login", async () => {
+        const req = mockRequest({
+            user: { username: "cinderella", password: "password" },
+        });
+
+        const res = mockResponse();
+
+        const token = await adminLogin(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    test("employeeLogin() should allow an employee account to login", async () => {
+        const req = mockRequest({
+            user: { username: "cinderella", password: "password" },
+        });
+
+        const res = mockResponse();
+
+        const token = await employeeLogin(req, res);
+
+        console.log(token);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(typeof token).toBe("object");
+        expect(token).toHaveProperty("accessToken");
+        expect(typeof token.accessToken).toBe("string");
+    });
+
+    test("employeeLogin() should not allow a non-employee account to login", async () => {
+        const req = mockRequest({
+            user: { username: "grave", password: "password" },
+        });
+
+        const res = mockResponse();
+
+        const token = await employeeLogin(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
     });
 });

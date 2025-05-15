@@ -35,9 +35,15 @@ function BranchSelection() {
 }
 
 function AdminJobOrders() {
+    const jobOrders = mixedJobOrders;
+
+    const [pageRows, setPageRows] = useState(11);
+
     return (
-        <div>
-            <h1>Hello</h1>
+        <div className="p-8 pt-2">
+            <BranchSelection />
+
+            <JobOrderView pageRows={pageRows} jobOrders={jobOrders} />
         </div>
     );
 }

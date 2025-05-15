@@ -85,3 +85,77 @@ describe("INTEGRATION TESTS FOR /product/ GET ROUTE", () => {
         expect(response.statusCode).toBe(404);
     });
 });
+
+describe("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
+    test("/product/all GET route should get all products from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .get("/product/all")
+            .send({
+                requester: { id: 1 },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        response.body.forEach((branch) => {
+            expect(branch).toHaveProperty("id");
+            expect(branch).toHaveProperty("name");
+            expect(branch).toHaveProperty("price");
+            expect(branch).toHaveProperty("isActive");
+            expect(branch).toHaveProperty("createdAt");
+            expect(branch).toHaveProperty("updatedAt");
+        });
+
+        const products = await prisma.product.findMany();
+
+        expect(response.body.length).toEqual(products.length);
+    });
+
+    test("/product/all GET route should get all active products from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .get("/product/all")
+            .send({
+                requester: { id: 1 },
+                filter: { isActive: true },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        const products = await prisma.product.findMany({
+            where: {
+                isActive: true,
+            },
+        });
+
+        expect(response.body.length).toEqual(products.length);
+    });
+
+    test("/product/all GET route should get all inactive products from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .get("/product/all")
+            .send({
+                requester: { id: 1 },
+                filter: { isActive: false },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        const products = await prisma.product.findMany({
+            where: {
+                isActive: false,
+            },
+        });
+
+        expect(response.body.length).toEqual(products.length);
+    });
+
+    test("/product/all GET route should send an HTTP status code of 500 when the fields in the filter are invalid", async () => {
+        const response = await request(app)
+            .get("/product/all")
+            .send({
+                requester: { id: 1 },
+                filter: { isPresent: false },
+            });
+
+        expect(response.statusCode).toBe(500);
+    });
+});

@@ -1,9 +1,11 @@
-// controllers/jobOrderModification.js
 import * as jobOrderService from '../services/jobOrderService.js';
 
 const modifyJobOrder = async (req, res) => {
+
   const job = await jobOrderService.findJobOrderById(req.params.id);
-  if (!job) return res.status(404).json({ error: 'Job order not found' });
+  if (!job) {
+    return res.status(404).json({ error: 'Job order not found' });
+  }
 
   const role = req.user?.role;
 
@@ -15,10 +17,21 @@ const modifyJobOrder = async (req, res) => {
     }
 
     const updateData = {};
-    if (typeof isPaid === 'boolean') updateData.isPaid = isPaid;
-    if (typeof isClaimed === 'boolean') updateData.isClaimed = isClaimed;
+
+    if (typeof isPaid === 'boolean') {
+      updateData.isPaid = isPaid;
+    }
+
+    if (typeof isClaimed === 'boolean') {
+      updateData.isClaimed = isClaimed;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: 'No valid fields to update' });
+    }
 
     const updatedJob = await jobOrderService.updateJobOrder(req.params.id, updateData);
+
     return res.json({ updatedJob });
   }
 
@@ -27,7 +40,7 @@ const modifyJobOrder = async (req, res) => {
     return res.json({ updatedJob });
   }
 
-  return res.status(403).json({ error: 'Forbidden: Insufficient role' });
+  return res.status(403).json({ error: 'Access Blocked: Role not authorized' });
 };
 
 export { modifyJobOrder };

@@ -124,7 +124,9 @@ export async function editProduct(req, res) {
             },
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: "Product has been sucessfully updated",
+        });
         return updatedProduct;
     } catch (error) {
         console.log(error);

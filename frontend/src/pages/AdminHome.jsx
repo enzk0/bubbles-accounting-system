@@ -37,7 +37,11 @@ function BranchSelection() {
 }
 
 function AdminHome() {
-    return <h1>Hello</h1>;
+    return (
+        <div className="p-8 pt-2">
+            <BranchSelection />
+        </div>
+    );
 }
 
 export default AdminHome;

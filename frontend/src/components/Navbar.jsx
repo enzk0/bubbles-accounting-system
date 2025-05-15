@@ -35,7 +35,7 @@ function Navbar() {
     return (
         <div className="flex flex-row p-2 px-4">
             <div className="flex flex-row grow items-center font-bold">
-                Admin Account
+                Employee Account
             </div>
             <div className="flex flex-row grow justify-end items-center gap-4">
                 <div>

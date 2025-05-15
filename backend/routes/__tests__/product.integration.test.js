@@ -195,3 +195,41 @@ describe("INTEGRATION TESTS FOR /product/ PATCH ROUTE", () => {
         expect(response.statusCode).toBe(422);
     });
 });
+
+describe("INTEGRATION TESTS FOR /product/ DELETE ROUTE", () => {
+    test("/product/ DELETE route should deactivate the specified product and send an HTTP status code of 200", async () => {
+        let product = await prisma.product.findUnique({
+            where: {
+                name: "WASHING",
+            },
+        });
+
+        const response = await request(app)
+            .delete("/product/")
+            .send({
+                requester: { id: 1 },
+                product: { id: product.id },
+            });
+
+        expect(response.statusCode).toBe(200);
+
+        product = await prisma.product.findUnique({
+            where: {
+                id: product.id,
+            },
+        });
+
+        expect(product.isActive).toEqual(false);
+    });
+
+    test("/product/ DELETE route should send an HTTP status code of 422 when an invalid product id is provided", async () => {
+        const response = await request(app)
+            .delete("/product/")
+            .send({
+                requester: { id: 1 },
+                product: { id: null },
+            });
+
+        expect(response.statusCode).toBe(422);
+    });
+});

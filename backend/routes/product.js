@@ -3,6 +3,7 @@ import { authenticate } from "../middleware/auth";
 import { checkPrivilege } from "../middleware/accessControl";
 import {
     createProduct,
+    editProduct,
     getAllProducts,
     getProduct,
 } from "../controllers/productController";
@@ -14,5 +15,7 @@ router.post("/", authenticate, checkPrivilege(["admin"]), createProduct);
 router.get("/", authenticate, checkPrivilege([]), getProduct);
 
 router.get("/all", authenticate, checkPrivilege([]), getAllProducts);
+
+router.patch("/", authenticate, checkPrivilege(["admin"]), editProduct);
 
 export default router;

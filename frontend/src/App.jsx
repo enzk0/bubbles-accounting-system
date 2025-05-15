@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
+import AdminLayout from "./components/AdminLayout";
+import AdminHome from "./pages/AdminHome";
 import EmployeeLogin from "./pages/EmployeeLogin";
 import EmployeeHome from "./pages/EmployeeHome";
 import EmployeeJobOrders from "./pages/EmployeeJobOrders";

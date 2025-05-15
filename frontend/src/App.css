@@ -1,2 +1,23 @@
 @import "tailwindcss";
-/* For applying Tailwind */
+
+@layer utilities {
+
+    th {
+        @apply p-2;
+    }
+
+    td {
+        @apply p-3;
+    }
+}
+
+@layer base {
+
+    input[type='number']::-webkit-outer-spin-button,
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number'] {
+        -webkit-appearance: none;
+        margin: 0;
+        -moz-appearance: textfield !important;
+    }
+}

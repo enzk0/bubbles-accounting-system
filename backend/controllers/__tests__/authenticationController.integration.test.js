@@ -1,4 +1,4 @@
-import { test, expect, describe, vi, beforeEach, beforeAll } from "vitest";
+import { test, expect, describe, vi, beforeAll, afterAll } from "vitest";
 import { adminLogin, employeeLogin, login } from "../authenticationController";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
@@ -20,23 +20,6 @@ const mockResponse = () => {
 };
 
 describe("INTEGRATION TEST SUITE FOR AUTHENTICATION CONTROLLER", () => {
-    beforeAll(async () => {
-        const users = await prisma.user.findMany();
-
-        for (const user of users) {
-            const hash = bcrypt.hashSync(user.password, 10);
-
-            await prisma.user.update({
-                where: {
-                    id: user.id,
-                },
-                data: {
-                    password: hash,
-                },
-            });
-        }
-    });
-
     test("login() should create a jwt access token when user has been successfully authenticated", async () => {
         const req = mockRequest({
             user: { username: "cinderella", password: "password" },
@@ -61,6 +44,8 @@ describe("INTEGRATION TEST SUITE FOR AUTHENTICATION CONTROLLER", () => {
         const res = mockResponse();
 
         const token = await login(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
 
         const contents = jwt.verify(
             token.accessToken,

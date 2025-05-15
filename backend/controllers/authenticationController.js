@@ -76,8 +76,11 @@ export async function login(req, res) {
             fetchedUser.password
         );
 
+        console.log(user.password, fetchedUser.password, user);
+        console.log(bcrypt.compareSync(user.password, fetchedUser.password));
+
         if (!isPasswordCorrect) {
-            return res.status(401);
+            return res.status(401).send({ message: "Password is incorrect" });
         }
 
         const accessToken = jwt.sign(
@@ -86,12 +89,15 @@ export async function login(req, res) {
             { expiresIn: "12h" }
         );
 
-        res.json({ accessToken: accessToken });
         res.status(200);
+        res.json({ accessToken: accessToken });
         return { accessToken: accessToken };
     } catch (error) {
         console.log(error);
-        return res.status(500);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }
 

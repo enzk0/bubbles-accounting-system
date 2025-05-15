@@ -3,6 +3,7 @@ import jobOrderRoutes from "./routes/jobOrder.js";
 import salesRoutes from "./routes/salesRoutes.js";
 import userRoutes from "./routes/user.js";
 import branchRoutes from "./routes/branch.js";
+import productRoutes from "./routes/product.js";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use("/api", salesRoutes);
 app.use("/user", userRoutes);
 app.use("/job-order", jobOrderRoutes);
 app.use("/branch", branchRoutes);
+app.use("/product", productRoutes);
 
 app.get("/", async (req, res) => {
     try {
@@ -57,4 +59,3 @@ app.delete("/", async (req, res) => {
 });
 
 export default app;
-

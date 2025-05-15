@@ -154,7 +154,9 @@ export async function deactivateProduct(req, res) {
             },
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: "Product has been sucessfully deactivated",
+        });
         return updatedProduct;
     } catch (error) {
         console.log(error);

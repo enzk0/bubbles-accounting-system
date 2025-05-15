@@ -34,7 +34,9 @@ function App() {
                         />
                     </Route>
                 </Route>
-                <Route path="/admin" element={<AdminLayout />}></Route>
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminHome />} />
+                </Route>
                 <Route path="*" element={<PageNotFound />} />
             </Routes>
         </div>

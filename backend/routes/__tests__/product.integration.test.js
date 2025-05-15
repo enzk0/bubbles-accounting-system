@@ -49,3 +49,39 @@ describe("INTEGRATION TESTS FOR /product/ POST ROUTE", () => {
         expect(response.statusCode).toBe(500);
     });
 });
+
+describe("INTEGRATION TESTS FOR /product/ GET ROUTE", () => {
+    test("/product/ GET route should get the queried product from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app)
+            .get("/product/")
+            .send({
+                requester: { id: 1 },
+                product: { id: 1 },
+            });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.id).toBe(1);
+    });
+
+    test("/product/ GET route should send an HTTP status code of 422 if the provided productId in the query is null or undefined", async () => {
+        const response = await request(app)
+            .get("/product/")
+            .send({
+                requester: { id: 1 },
+                product: { id: null },
+            });
+
+        expect(response.statusCode).toBe(422);
+    });
+
+    test("/product/ GET route should send an HTTP status code of 404 if the queried product cannot be found", async () => {
+        const response = await request(app)
+            .get("/product/")
+            .send({
+                requester: { id: 1 },
+                product: { id: 2077 },
+            });
+
+        expect(response.statusCode).toBe(404);
+    });
+});

@@ -1,80 +1,92 @@
-import {
-  test,
-  expect,
-  describe,
-  beforeAll,
-  vi,
-} from 'vitest';
-import request from "supertest";
-import app from "../../index.js";
-import { PrismaClient } from "@prisma/client";
+import { describe, test, expect, vi } from "vitest";
+import { modifyJobOrder } from "../jobOrderModificationController.js";
+import * as jobOrderService from "../../services/jobOrderService.js";
 
-const prisma = new PrismaClient();
+vi.mock("../../services/jobOrderService.js");
 
-describe("INTEGRATION TEST: jobOrderModification() for admin and employee", () => {
-  let branch;
-  let jobAdmin, jobEmp1, jobEmp2, jobEmp3;
+const mockRequest = (params = {}, body = {}, role = "employee") => ({
+  params,
+  body,
+  user: { id: 1, role },
+});
 
-  beforeAll(async () => {
-    // Clean up database with proper order due to FK constraints
-    await prisma.jobOrderItem.deleteMany();
-    await prisma.jobOrder.deleteMany();
-    await prisma.branch.deleteMany();
+const mockResponse = () => {
+  const res = {};
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
+  return res;
+};
 
-    // Create test branch with required 'code'
-    branch = await prisma.branch.create({
-      data: {
-        name: "Test Branch",
-        code: "TEST-BRANCH", // <-- REQUIRED FIELD
-      },
-    });
+const mockJobOrder = {
+  id: 1,
+  isPaid: false,
+  isClaimed: false,
+  customerName: "Old Name",
+};
 
-    // Create job orders for test cases
-    jobAdmin = await prisma.jobOrder.create({
-      data: {
-        idCode: "TEST-ADMIN-001",
-        idNumber: 1,
-        isPaid: false,
-        isClaimed: false,
-        remarks: "Initial",
-        customerName: "Admin Customer",
-        branchId: branch.id,
-      },
-    });
+describe("INTEGRATION TESTS FOR 'modifyJobOrder()' CONTROLLER", () => {
+  test("should allow employee to toggle isPaid field", async () => {
+    const req = mockRequest({ id: "1" }, { isPaid: true }, "employee");
+    const res = mockResponse();
 
-    jobEmp1 = await prisma.jobOrder.create({
-      data: {
-        idCode: "TEST-EMP-001",
-        idNumber: 2,
-        isPaid: false,
-        isClaimed: false,
-        customerName: "Employee Customer 1",
-        branchId: branch.id,
-      },
-    });
+    jobOrderService.findJobOrderById.mockResolvedValue(mockJobOrder);
+    jobOrderService.updateJobOrder.mockResolvedValue({ ...mockJobOrder, isPaid: true });
 
-    jobEmp2 = await prisma.jobOrder.create({
-      data: {
-        idCode: "TEST-EMP-002",
-        idNumber: 3,
-        isPaid: true,
-        isClaimed: true,
-        customerName: "Blocked",
-        branchId: branch.id,
-      },
-    });
+    await modifyJobOrder(req, res);
 
-    jobEmp3 = await prisma.jobOrder.create({
-      data: {
-        idCode: "TEST-EMP-003",
-        idNumber: 4,
-        isPaid: false,
-        isClaimed: false,
-        customerName: "Protected",
-        branchId: branch.id,
-      },
+    expect(res.status).not.toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      updatedJob: { ...mockJobOrder, isPaid: true },
     });
   });
 
-  // ... your test cases follow here
+  test("should block employee if job is already paid and claimed", async () => {
+    const req = mockRequest({ id: "1" }, { isPaid: true }, "employee");
+    const res = mockResponse();
+
+    jobOrderService.findJobOrderById.mockResolvedValue({ ...mockJobOrder, isPaid: true, isClaimed: true });
+
+    await modifyJobOrder(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "Cannot modify when both isPaid and isClaimed are true" });
+  });
+
+  test("should allow admin to update other fields", async () => {
+    const req = mockRequest({ id: "1" }, { customerName: "Updated Name" }, "admin");
+    const res = mockResponse();
+
+    jobOrderService.findJobOrderById.mockResolvedValue(mockJobOrder);
+    jobOrderService.updateJobOrder.mockResolvedValue({ ...mockJobOrder, customerName: "Updated Name" });
+
+    await modifyJobOrder(req, res);
+
+    expect(res.json).toHaveBeenCalledWith({
+      updatedJob: { ...mockJobOrder, customerName: "Updated Name" },
+    });
+  });
+
+  test("should return 403 if invalid role is provided", async () => {
+    const req = mockRequest({ id: "1" }, { isPaid: true }, "invalidRole");
+    const res = mockResponse();
+
+    jobOrderService.findJobOrderById.mockResolvedValue(mockJobOrder);
+
+    await modifyJobOrder(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ error: "Access Blocked: Role not authorized" });
+  });
+
+  test("should return 404 if job order not found", async () => {
+    const req = mockRequest({ id: "999" }, { isPaid: true }, "employee");
+    const res = mockResponse();
+
+    jobOrderService.findJobOrderById.mockResolvedValue(null);
+
+    await modifyJobOrder(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: "Job order not found" });
+  });
 });

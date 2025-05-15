@@ -42,12 +42,6 @@ export async function getProduct(req, res) {
         });
     }
 
-    if (product.name === null || product.name === undefined) {
-        return res.status(422).send({
-            message: "Some of the required fields are empty or invalid.",
-        });
-    }
-
     try {
         const foundProduct = await prisma.product.findUnique({
             where: product,

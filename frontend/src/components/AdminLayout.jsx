@@ -16,7 +16,42 @@ import SidebarItem from "./SidebarItem";
 import Navbar from "./Navbar";
 
 function AdminLayout() {
-    return <h1>Hello</h1>;
+    const location = useLocation();
+    const isDisabled = location.pathname === "/admin/login";
+
+    return (
+        <div className="w-screen flex flex-row">
+            {isDisabled ? null : (
+                <Sidebar>
+                    <SidebarItem icon={<IoHome />} text="Home" to="/admin" />
+                    <SidebarItem
+                        icon={<IoReceipt />}
+                        text="Job Orders"
+                        to="/admin/job_orders"
+                    />
+                    <SidebarItem
+                        icon={<IoPeople />}
+                        text={"Employees"}
+                        to="/admin/employees"
+                    />
+                    <SidebarItem
+                        icon={<FaShop />}
+                        text={"Branches"}
+                        to="/admin/branches"
+                    />
+                    <SidebarItem
+                        icon={<FiShoppingBag />}
+                        text={"Products"}
+                        to="/admin/products"
+                    />
+                </Sidebar>
+            )}
+            <main className="grow">
+                {isDisabled ? null : <Navbar />}
+                <Outlet />
+            </main>
+        </div>
+    );
 }
 
 export default AdminLayout;

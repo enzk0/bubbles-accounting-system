@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
+import AdminProducts from "./pages/AdminProducts";
 import AdminBranches from "./pages/AdminBranches";
 import AdminEmployees from "./pages/AdminEmployees";
 import AdminJobOrders from "./pages/AdminJobOrders";
@@ -46,6 +47,7 @@ function App() {
                     <Route path="job_orders" element={<AdminJobOrders />} />
                     <Route path="employees" element={<AdminEmployees />} />
                     <Route path="branches" element={<AdminBranches />} />
+                    <Route path="products" element={<AdminProducts />} />
                 </Route>
                 <Route path="*" element={<PageNotFound />} />
             </Routes>

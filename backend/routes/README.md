@@ -91,3 +91,49 @@ router.get("/all", authenticate, checkPrivilege(["admin"]), getAllBranches);
 ```
 url/branch/all
 ```
+
+## POST Routes
+
+#### Post User
+
+---
+
+**_Create user_**
+router.post("/", authenticate, checkPrivilege(["admin"]), createUser);
+
+```
+url/user/
+```
+
+#### Post Product
+
+---
+
+**_Create Product_**
+router.post("/", authenticate, checkPrivilege(["admin"]), createProduct);
+
+```
+url/product/
+```
+
+#### Post Job Order
+
+---
+
+**_Create job order_**
+router.post("/", authenticate, checkPrivilege([]), createJobOrder);
+
+```
+url/job-order/
+```
+
+#### Post Branch
+
+---
+
+**_Create branch_**
+router.post("/", authenticate, checkPrivilege(["admin"]), createBranch);
+
+```
+url/branch/
+```

@@ -48,11 +48,15 @@ export async function createJobOrder(req, res) {
     const { requester, branch, customer, jobOrder } = req.body;
 
     if (!customer.firstName || !customer.lastName) {
-        return res.status(422);
+        return res
+            .status(422)
+            .send({ message: "Required Customer Information is incomplete" });
     }
 
     if (jobOrder.items.length < 7) {
-        return res.status(422);
+        return res
+            .status(422)
+            .send({ message: "The job order is missing job order items" });
     }
 
     try {
@@ -63,11 +67,17 @@ export async function createJobOrder(req, res) {
         });
 
         if (branchFound === null || !branchFound) {
-            return res.status(404);
+            return res.status(404).send({
+                message:
+                    "The branch the job order is to be assigned to cannot be found",
+            });
         }
 
         if (branchFound.isActive === false) {
-            return res.status(403);
+            return res.status(403).send({
+                message:
+                    "The branch the job order is to be assigned to is inactive",
+            });
         }
 
         for (const item of jobOrder.items) {
@@ -78,7 +88,10 @@ export async function createJobOrder(req, res) {
             });
 
             if (product.isActive === false) {
-                return res.status(403);
+                return res.status(403).send({
+                    message:
+                        "The product of a job order item of the job order is inactive",
+                });
             }
         }
 
@@ -107,10 +120,15 @@ export async function createJobOrder(req, res) {
 
         await incrementBranchCounter(branchFound.id);
 
-        res.status(201);
+        res.status(201).send({
+            message: "Job Order has been successfully created",
+        });
         return createdJobOrder;
     } catch (error) {
         console.log(error);
-        return res.status(500).send({ error: error });
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
     }
 }

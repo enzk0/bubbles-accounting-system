@@ -179,3 +179,38 @@ router.patch("/", authenticate, checkPrivilege(["admin"]), editBranch);
 ```
 url/branch/
 ```
+
+## DELETE Routes
+
+#### Delete User
+
+---
+
+**_Deactivate user_**
+router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateUser);
+
+```
+url/delete/
+```
+
+#### Delete Product
+
+---
+
+**_Deactivate Product_**
+router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateProduct);
+
+```
+url/product/
+```
+
+#### Delete Branch
+
+---
+
+**_Deactivate Branch_**
+router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateBranch);
+
+```
+url/branch/
+```

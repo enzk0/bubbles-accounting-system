@@ -137,3 +137,45 @@ router.post("/", authenticate, checkPrivilege(["admin"]), createBranch);
 ```
 url/branch/
 ```
+
+## PATCH Routes
+
+#### Patch User
+
+---
+
+**_Edit user_**
+router.patch("/", authenticate, checkPrivilege(["admin"]), editUser);
+
+```
+url/user/
+```
+
+**_Edit Password_**
+router.patch("/password", authenticate, checkPrivilege(["admin"]), editPassword);
+
+```
+url/user/password
+```
+
+#### Patch Product
+
+---
+
+**_Edit product_**
+router.patch("/", authenticate, checkPrivilege(["admin"]), editProduct);
+
+```
+url/product/
+```
+
+#### Patch Branch
+
+---
+
+**_Edit branch_**
+router.patch("/", authenticate, checkPrivilege(["admin"]), editBranch);
+
+```
+url/branch/
+```

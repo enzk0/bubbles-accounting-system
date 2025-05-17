@@ -174,12 +174,9 @@ describe.only("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     test("getAllBranches() should send an HTTP status code of 200 when all branches been successfully read from the database", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            filter: {},
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -211,9 +208,7 @@ describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     });
 
     test("getAllBranches() should send an HTTP status code of 404 when there are no branches in the database", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -226,9 +221,7 @@ describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     });
 
     test("getAllBranches() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 

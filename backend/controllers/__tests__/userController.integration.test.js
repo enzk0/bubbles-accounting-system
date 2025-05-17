@@ -9,7 +9,6 @@ import {
 } from "../userController";
 import prisma from "../../client";
 import bcrypt from "bcrypt";
-import { parse } from "dotenv";
 
 const mockRequest = (body, user, params, query) => ({
     body: body,
@@ -126,9 +125,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     });
 
     test("getAllUsers() should get/fetch all Users in the database", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-        });
+        const req = mockRequest({}, {}, {}, {});
 
         const res = mockResponse();
 
@@ -139,6 +136,70 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof found).toBe("object");
         expect(found.length).toBeGreaterThan(0);
+    });
+
+    test("getAllUsers() should get/fetch all active users in the database when isActive filter is true", async () => {
+        const req = mockRequest({}, {}, {}, { isActive: "true" });
+
+        const res = mockResponse();
+
+        const found = await getAllUsers(req, res);
+
+        console.log(found);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const users = await prisma.user.findMany({
+            where: { isActive: true },
+        });
+
+        users.forEach((user) => {
+            expect(user.isActive).toEqual(true);
+        });
+    });
+
+    test("getAllUsers() should get/fetch all active users in the database when isActive filter is true", async () => {
+        const req = mockRequest({}, {}, {}, { isActive: "false" });
+
+        const res = mockResponse();
+
+        const found = await getAllUsers(req, res);
+
+        console.log(found);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const users = await prisma.user.findMany({
+            where: { isActive: false },
+        });
+
+        console.log(users);
+
+        users.forEach((user) => {
+            expect(user.isActive).toEqual(false);
+        });
+    });
+
+    test("getAllUsers() should get/fetch all users in the specified branch from the database when branchId is defined in the reqest query", async () => {
+        const req = mockRequest({}, {}, {}, { branchId: "1" });
+
+        const res = mockResponse();
+
+        const found = await getAllUsers(req, res);
+
+        console.log(found);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const users = await prisma.user.findMany({
+            where: { branchId: 1 },
+        });
+
+        console.log(users);
+
+        users.forEach((user) => {
+            expect(user.branchId).toEqual(1);
+        });
     });
 
     test("deactivateUser() should delete a User in the database", async () => {

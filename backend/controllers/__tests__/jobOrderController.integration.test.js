@@ -1,5 +1,5 @@
 import { test, expect, describe, vi } from "vitest";
-import { createJobOrder } from "../jobOrderController";
+import { countJobOrders, createJobOrder } from "../jobOrderController";
 import prisma from "../../client";
 
 const mockRequest = (body, user, params, query) => ({
@@ -78,7 +78,7 @@ const mockRequestBody = {
     },
 };
 
-describe("INTEGRATION TEST SUITE FOR `jobOrder` CONTROLLERS", () => {
+describe("INTEGRATION TEST SUITE FOR `createJobOrder()` CONTROLLER", () => {
     test("createJobOrder() should create a jobOrder in the database and send an HTTP status code of 201", async () => {
         const req = mockRequest(mockRequestBody, { id: 1 }, {}, {});
 
@@ -264,6 +264,30 @@ describe("INTEGRATION TEST SUITE FOR `jobOrder` CONTROLLERS", () => {
         const res = mockResponse();
 
         let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+});
+
+describe.only("INTEGRATION TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
+    test("countJobOrders() should send an HTTP status of 200 and send an array of job order grouped by interval from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
+
+        const res = mockResponse();
+
+        let jobOrders = await countJobOrders(req, res);
+
+        console.log(jobOrders);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("countJobOrders() should send an HTTP status of 422 when the interval is invalid", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "daily" });
+
+        const res = mockResponse();
+
+        let jobOrders = await countJobOrders(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
     });

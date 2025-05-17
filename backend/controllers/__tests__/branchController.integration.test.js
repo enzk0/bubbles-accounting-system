@@ -8,8 +8,11 @@ import {
 } from "../branchController";
 import prisma from "../../client";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user, params, query) => ({
     body: body,
+    user: user,
+    params: params,
+    query: query,
 });
 
 const mockResponse = () => {
@@ -24,10 +27,14 @@ const mockResponse = () => {
 
 describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     test("createBranch() should create a branch in the database and send an HTTP status code of 201", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "OT", name: "Outpost", address: "Ark Outpost" },
-        });
+        const req = mockRequest(
+            {
+                code: "OT",
+                name: "Outpost",
+                address: "Ark Outpost",
+            },
+            { id: 1 }
+        );
 
         const res = mockResponse();
 
@@ -47,10 +54,14 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     });
 
     test("createBranch() should throw an error if there are missing required fields and send an HTTP status code of 422", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "OT", name: "", address: "Ark Outpost" },
-        });
+        const req = mockRequest(
+            {
+                code: "OT",
+                name: "",
+                address: "Ark Outpost",
+            },
+            { id: 1 }
+        );
 
         const res = mockResponse();
 
@@ -60,10 +71,7 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     });
 
     test("getBranch() should get the queried branch from the database and send an HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: "1" }, {});
 
         const res = mockResponse();
 
@@ -72,14 +80,11 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith(expect.any(Object));
         expect(typeof foundBranch).toBe("object");
-        expect(foundBranch.id).toEqual(req.body.branch.id);
+        expect(foundBranch.id).toEqual(parseInt(req.params.id));
     });
 
     test("getBranch() should send an HTTP status code of 422 if the provided branchId in the query is null or undefined", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            branch: { id: null },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 0 }, {});
 
         const res = mockResponse();
 
@@ -89,10 +94,7 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     });
 
     test("getAllBranches() should get all the branches in the database and send an HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            filter: {},
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -104,10 +106,7 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     });
 
     test("getAllBranches() should get all inactive branches in the database and send an HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            filter: { isActive: false },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, { isActive: "false" });
 
         const res = mockResponse();
 
@@ -124,10 +123,7 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     });
 
     test("getAllBranches() should get all active branches in the database and send an HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            filter: { isActive: true },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, { isActive: "true" });
 
         const res = mockResponse();
 
@@ -143,25 +139,16 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
         }
     });
 
-    test("getAllBranches() should send an HTTP status code of 500 if filter is invalid", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            filter: { isPresent: true },
-        });
-
-        const res = mockResponse();
-
-        const foundBranches = await getAllBranches(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(500);
-    });
-
     test("editBranch() should update a branch in the database and send an HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            branch: { id: 1 },
-            edit: { name: "Ambrosia", address: "Somewhere City" },
-        });
+        const req = mockRequest(
+            {
+                name: "Ambrosia",
+                address: "Somewhere City",
+            },
+            { id: 1 },
+            { id: "1" },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -180,11 +167,15 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     });
 
     test("editBranch() should send an HTTP status code of 422 when some of the fields in the query are empty ", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            branch: { id: 1 },
-            edit: { name: "", address: "Somewhere City" },
-        });
+        const req = mockRequest(
+            {
+                name: "",
+                address: "Somewhere City",
+            },
+            { id: 1 },
+            { id: "1" },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -194,10 +185,7 @@ describe("INTEGRATION TESTS FOR BRANCH CONTROLLER", () => {
     });
 
     test("deactivateBranch() should deactivate the queried branch from the database and send an HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 

@@ -17,7 +17,7 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe.only("INTEGRATION TESTS FOR /auth/login/employee POST ROUTE", () => {
+describe("INTEGRATION TESTS FOR /auth/login/employee POST ROUTE", () => {
     test("/auth/login/employee POST route should send a HTTP status code of 200 and send a jwt token containing an employee user's id upon successful login", async () => {
         const response = await request(app).post("/auth/login/employee").send({
             username: "cinderella",
@@ -67,11 +67,10 @@ describe.only("INTEGRATION TESTS FOR /auth/login/employee POST ROUTE", () => {
 
 describe("INTEGRATION TESTS FOR /auth/login/admin POST ROUTE", () => {
     test("/auth/login/admin POST route should send a HTTP status code of 200 and send a jwt token containing an employee user's id upon successful login", async () => {
-        const response = await request(app)
-            .post("/auth/login/admin")
-            .send({
-                user: { username: "grave", password: "password" },
-            });
+        const response = await request(app).post("/auth/login/admin").send({
+            username: "grave",
+            password: "password",
+        });
 
         expect(response.statusCode).toBe(200);
 
@@ -87,31 +86,28 @@ describe("INTEGRATION TESTS FOR /auth/login/admin POST ROUTE", () => {
     });
 
     test("/auth/login/admin POST route should send an HTTP status code of 401 when the incorrect password is used to authenticate the user", async () => {
-        const response = await request(app)
-            .post("/auth/login/admin")
-            .send({
-                user: { username: "grave", password: "beautiful" },
-            });
+        const response = await request(app).post("/auth/login/admin").send({
+            username: "grave",
+            password: "beautiful",
+        });
 
         expect(response.statusCode).toBe(401);
     });
 
     test("/auth/login/admin POST route should send an HTTP status code of 403 when a non-employee account is used to login", async () => {
-        const response = await request(app)
-            .post("/auth/login/admin")
-            .send({
-                user: { username: "cinderella", password: "password" },
-            });
+        const response = await request(app).post("/auth/login/admin").send({
+            username: "cinderella",
+            password: "password",
+        });
 
         expect(response.statusCode).toBe(403);
     });
 
     test("/auth/login/admin POST route should send an HTTP status code of 404 if the non-existent admin account is used to login", async () => {
-        const response = await request(app)
-            .post("/auth/login/admin")
-            .send({
-                user: { username: "SKK", password: "password" },
-            });
+        const response = await request(app).post("/auth/login/admin").send({
+            username: "SKK",
+            password: "password",
+        });
 
         expect(response.statusCode).toBe(404);
     });

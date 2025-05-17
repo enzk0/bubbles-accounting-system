@@ -112,10 +112,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     });
 
     test("getUser() should get/fetch a User in the database via their name", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            user: { id: 11 },
-        });
+        const req = mockRequest({}, {}, { id: "11" }, {});
 
         const res = mockResponse();
 
@@ -125,7 +122,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof found).toBe("object");
-        expect(found.id).toEqual(req.body.user.id);
+        expect(found.id).toEqual(parseInt(req.params.id));
     });
 
     test("getAllUsers() should get/fetch all Users in the database", async () => {

@@ -9,8 +9,11 @@ import {
 } from "../productController";
 import { prismaMock } from "../../singleton";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user, params, query) => ({
     body: body,
+    user: user,
+    params: params,
+    query: query,
 });
 
 const mockResponse = () => {
@@ -23,12 +26,17 @@ const mockResponse = () => {
     return res;
 };
 
-describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     test("createProduct() should create a product in the database and send a HTTP status code of 201", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "WASH", price: 60.0 },
-        });
+        const req = mockRequest(
+            {
+                name: "WASH",
+                price: 60.0,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         const res = mockResponse();
 
@@ -45,10 +53,15 @@ describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     });
 
     test("createProduct() should send an HTTP status code of 422 if any of the fields are missing", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "", price: 60.0 },
-        });
+        let req = mockRequest(
+            {
+                name: "",
+                price: 60.0,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         const res = mockResponse();
 
@@ -56,19 +69,29 @@ describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "WASH", price: null },
-        });
+        req = mockRequest(
+            {
+                name: "WASH",
+                price: null,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         await createProduct(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "", price: null },
-        });
+        req = mockRequest(
+            {
+                name: "",
+                price: null,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         await createProduct(req, res);
 
@@ -76,10 +99,15 @@ describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     });
 
     test("createProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "WASH", price: 60.0 },
-        });
+        const req = mockRequest(
+            {
+                name: "WASH",
+                price: 60.0,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         const res = mockResponse();
 

@@ -108,11 +108,7 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
 
 describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
     test("/user/all GET route should get all users in the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/user/all")
-            .send({
-                requester: { id: 1 },
-            });
+        const response = await request(app).get("/user/all");
 
         expect(response.statusCode).toBe(200);
 
@@ -129,12 +125,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
     });
 
     test("/user/all GET route should get all users in the database who has a role of employee and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/user/all")
-            .send({
-                requester: { id: 1 },
-                filter: { roleId: 2 },
-            });
+        const response = await request(app).get("/user/all?roleId=2");
 
         expect(response.statusCode).toBe(200);
 
@@ -151,26 +142,48 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         });
     });
 
-    test("/user/all GET route should send an HTTP status code of 404 when no users can be found in the database when a filter is applied", async () => {
-        const response = await request(app)
-            .get("/user/all")
-            .send({
-                requester: { id: 1 },
-                filter: { roleId: 3 },
-            });
+    test("/user/all GET route should get all users in the database who are active and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/user/all?isActive=true");
 
-        expect(response.statusCode).toBe(404);
+        expect(response.statusCode).toBe(200);
+
+        response.body.forEach((user) => {
+            expect(user).toHaveProperty("id");
+            expect(user).toHaveProperty("username");
+            expect(user).toHaveProperty("firstName");
+            expect(user).toHaveProperty("lastName");
+            expect(user).toHaveProperty("password");
+            expect(user).toHaveProperty("createdAt");
+            expect(user).toHaveProperty("updatedAt");
+            expect(user).toHaveProperty("isActive");
+            expect(user.isActive).toEqual(true);
+        });
     });
 
-    test("/user/all GET route should send an HTTP status code of 500 when the filter provided is invalid", async () => {
-        const response = await request(app)
-            .get("/user/all")
-            .send({
-                requester: { id: 1 },
-                filter: { parentId: 2 },
-            });
+    test("/user/all GET route should get all users in the database who are inactive and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/user/all?isActive=false");
 
-        expect(response.statusCode).toBe(500);
+        expect(response.statusCode).toBe(200);
+
+        console.log(response.body);
+
+        response.body.forEach((user) => {
+            expect(user).toHaveProperty("id");
+            expect(user).toHaveProperty("username");
+            expect(user).toHaveProperty("firstName");
+            expect(user).toHaveProperty("lastName");
+            expect(user).toHaveProperty("password");
+            expect(user).toHaveProperty("createdAt");
+            expect(user).toHaveProperty("updatedAt");
+            expect(user).toHaveProperty("isActive");
+            expect(user.isActive).toEqual(false);
+        });
+    });
+
+    test("/user/all GET route should send an HTTP status code of 404 when no users can be found in the database when a filter is applied", async () => {
+        const response = await request(app).get("/user/all?roleId=3");
+
+        expect(response.statusCode).toBe(404);
     });
 });
 

@@ -15,7 +15,7 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe.only("INTEGRATION TESTS FOR /product/ POST ROUTE", () => {
+describe("INTEGRATION TESTS FOR /product/ POST ROUTE", () => {
     test("/product/ POST route should create a product in the database and send an HTTP status code of 201 along with a message", async () => {
         const response = await request(app).post("/product/").send({
             name: "WASHING",
@@ -44,7 +44,7 @@ describe.only("INTEGRATION TESTS FOR /product/ POST ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /product/ GET ROUTE", () => {
+describe("INTEGRATION TESTS FOR /product/ GET ROUTE", () => {
     test("/product/ GET route should get the queried product from the database and send an HTTP status code of 200", async () => {
         const response = await request(app).get("/product/1");
 
@@ -65,7 +65,7 @@ describe.only("INTEGRATION TESTS FOR /product/ GET ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
+describe("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
     test("/product/all GET route should get all products from the database and send an HTTP status code of 200", async () => {
         const response = await request(app).get("/product/all");
 
@@ -114,7 +114,7 @@ describe.only("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /product/ PATCH ROUTE", () => {
+describe("INTEGRATION TESTS FOR /product/ PATCH ROUTE", () => {
     test("/product/ PATCH route should edit the specified product and send an HTTP status code of 200", async () => {
         const response = await request(app).patch("/product/1").send({
             name: "WASH",
@@ -152,12 +152,7 @@ describe("INTEGRATION TESTS FOR /product/ DELETE ROUTE", () => {
             },
         });
 
-        const response = await request(app)
-            .delete("/product/")
-            .send({
-                requester: { id: 1 },
-                product: { id: product.id },
-            });
+        const response = await request(app).delete(`/product/${product.id}`);
 
         expect(response.statusCode).toBe(200);
 
@@ -171,12 +166,7 @@ describe("INTEGRATION TESTS FOR /product/ DELETE ROUTE", () => {
     });
 
     test("/product/ DELETE route should send an HTTP status code of 422 when an invalid product id is provided", async () => {
-        const response = await request(app)
-            .delete("/product/")
-            .send({
-                requester: { id: 1 },
-                product: { id: null },
-            });
+        const response = await request(app).delete(`/product/-1`);
 
         expect(response.statusCode).toBe(422);
     });

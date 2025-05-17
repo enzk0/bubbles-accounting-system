@@ -3,15 +3,13 @@ import express from 'express';
 import request from 'supertest';
 import checkRole from '../checkRole.js';
 
-// Fake controller to test after middleware
-const fakeHandler = (req, res) => {
+const simplecontroller = (req, res) => {
   res.status(200).json({ message: 'Access granted' });
 };
 
 describe('Integration Test for checkRole Middleware', () => {
   const app = express();
 
-  // Simulate setting req.user via a mock middleware before checkRole
   app.use((req, res, next) => {
     const role = req.headers['role'];
     if (role) {
@@ -20,8 +18,7 @@ describe('Integration Test for checkRole Middleware', () => {
     next();
   });
 
-  // Protected route using checkRole middleware
-  app.get('/protected', checkRole('admin'), fakeHandler);
+  app.get('/protected', checkRole('admin'), simplecontroller);
 
   test('should allow access when role is admin', async () => {
     const response = await request(app)

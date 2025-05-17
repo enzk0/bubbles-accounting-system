@@ -121,12 +121,9 @@ describe.only("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     test("getProduct() should get the queried product from the database and send a HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 
@@ -147,10 +144,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 
     test("getProduct() should send an HTTP status code of 404 if the queried product does not exist in the database", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 21 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 201 }, {});
 
         const res = mockResponse();
 
@@ -162,10 +156,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 
     test("getProduct() should send an HTTP status code of 422 if the id is null, undefined, or less than 1", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: null },
-        });
+        let req = mockRequest({}, { id: 1 }, { id: 0 }, {});
 
         const res = mockResponse();
 
@@ -173,10 +164,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: -1 },
-        });
+        req = mockRequest({}, { id: 1 }, { id: -1 }, {});
 
         await getProduct(req, res);
 
@@ -184,10 +172,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 
     test("getProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 

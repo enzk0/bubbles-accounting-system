@@ -45,7 +45,8 @@ async function createJobOrderItems(
 }
 
 export async function createJobOrder(req, res) {
-    const { requester, branch, customer, jobOrder } = req.body;
+    const user = req.user;
+    const { branch, customer, jobOrder } = req.body;
 
     if (!customer.firstName || !customer.lastName) {
         return res
@@ -107,7 +108,7 @@ export async function createJobOrder(req, res) {
                     create: customer,
                 },
                 user: {
-                    connect: { id: requester.id },
+                    connect: { id: user.id },
                 },
             },
         });

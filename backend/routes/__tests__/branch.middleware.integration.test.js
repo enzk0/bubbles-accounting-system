@@ -21,7 +21,9 @@ describe("INTEGRATION TESTS FOR /branch/ POST ROUTE W/ MIDDLEWARE", () => {
             .post("/branch/")
             .set("Authorization", `Bearer ${token}`)
             .send({
-                branch: { code: "PS", name: "Persian", address: "Persia" },
+                code: "PS",
+                name: "Persian",
+                address: "Persia",
             });
 
         expect(response.statusCode).toBe(201);
@@ -34,7 +36,9 @@ describe("INTEGRATION TESTS FOR /branch/ POST ROUTE W/ MIDDLEWARE", () => {
             .post("/branch/")
             .set("Authorization", `Bearer ${token}`)
             .send({
-                branch: { code: "PS", name: "Persian", address: "Persia" },
+                code: "PS",
+                name: "Persian",
+                address: "Persia",
             });
 
         expect(response.statusCode).toBe(403);
@@ -47,7 +51,9 @@ describe("INTEGRATION TESTS FOR /branch/ POST ROUTE W/ MIDDLEWARE", () => {
             .post("/branch/")
             .set("Authorization", `Bearer ${token}`)
             .send({
-                branch: { code: "PS", name: "Persian", address: "Persia" },
+                code: "PS",
+                name: "Persian",
+                address: "Persia",
             });
 
         expect(response.statusCode).toBe(403);

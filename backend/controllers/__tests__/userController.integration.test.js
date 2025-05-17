@@ -9,9 +9,13 @@ import {
 } from "../userController";
 import prisma from "../../client";
 import bcrypt from "bcrypt";
+import { parse } from "dotenv";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user, params, query) => ({
     body: body,
+    user: user,
+    params: params,
+    query: query,
 });
 
 const mockResponse = () => {
@@ -27,7 +31,6 @@ const mockResponse = () => {
 describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     test("createUser() should create a User in the database", async () => {
         const req = mockRequest({
-            requester: { id: 1 },
             user: {
                 username: "john_doe",
                 firstName: "John",
@@ -60,7 +63,6 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
     test("editPassword() should change the password of a User in the database", async () => {
         const req = mockRequest({
-            requester: { id: 1 },
             user: { id: 11 },
             newPassword: "pass456",
         });
@@ -89,7 +91,6 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
     test("editUser() should update fields/information about a user in a database that is not the password", async () => {
         const req = mockRequest({
-            requester: { id: 1 },
             user: { id: 11 },
             edit: {
                 username: "jane_doe",
@@ -142,10 +143,9 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     });
 
     test("deactivateUser() should delete a User in the database", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            user: { id: 11 },
-        });
+        const req = mockRequest({}, {}, { id: "11" }, {});
+
+        console.log(req.params);
 
         const res = mockResponse();
 
@@ -155,10 +155,10 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof updated).toBe("object");
-        expect(updated.id).toBe(req.body.user.id);
+        expect(updated.id).toBe(parseInt(req.params.id));
 
         const found = await prisma.user.findUnique({
-            where: req.body.user,
+            where: { id: parseInt(req.params.id) },
         });
 
         expect(found.isActive).toEqual(false);

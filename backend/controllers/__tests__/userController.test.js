@@ -174,13 +174,7 @@ describe("UNIT TESTS FOR 'createUser()' CONTROLLER", () => {
 
 describe("UNIT TESTS for 'deactivateUser()' CONTROLLER", () => {
     test("deactivateUser() should send a HTTP response code of 200 when a user is deleted successfully", async () => {
-        const req = mockRequest(
-            { id: 1 },
-            {
-                user: { id: 2 },
-            },
-            {}
-        );
+        const req = mockRequest({ id: 1 }, {}, { id: "" }, {});
 
         const res = mockResponse();
 
@@ -206,13 +200,7 @@ describe("UNIT TESTS for 'deactivateUser()' CONTROLLER", () => {
     });
 
     test("deactivateUser() should send a HTTP response code of 500 when an error in deleting a user in the database occurs", async () => {
-        const req = mockRequest(
-            { id: 1 },
-            {
-                user: { id: 2 },
-            },
-            {}
-        );
+        const req = mockRequest({ id: 1 }, {}, { id: "2" }, {});
 
         const res = mockResponse();
 
@@ -348,7 +336,6 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         const req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2 },
                 edit: {
                     username: "jane_doe",
                     firstName: "Jane",
@@ -357,7 +344,7 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
                     branchId: 1,
                 },
             },
-            {}
+            { id: 2 }
         );
 
         const res = mockResponse();

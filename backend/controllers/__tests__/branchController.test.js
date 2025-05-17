@@ -8,8 +8,11 @@ import {
 } from "../branchController";
 import { prismaMock } from "../../singleton";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user, params, query) => ({
     body: body,
+    user: user,
+    params: params,
+    query: query,
 });
 
 const mockResponse = () => {
@@ -111,12 +114,9 @@ describe.only("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     test("getBranch() should send an HTTP status code of 200 when the queried branch has been successfully read from the database", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: "1" }, {});
 
         const res = mockResponse();
 
@@ -137,10 +137,7 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 
     test("getBranch() should send an HTTP status code of 404 when the queried branch does not exist", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 21 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: "21" }, {});
 
         const res = mockResponse();
 
@@ -152,10 +149,7 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 
     test("getBranch() should send an HTTP status code of 422 when no fields for identification have been provided", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: null },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 0 }, {});
 
         const res = mockResponse();
 
@@ -165,10 +159,7 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 
     test("getBranch() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: "1" }, {});
 
         const res = mockResponse();
 

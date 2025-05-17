@@ -1,10 +1,11 @@
 import { test, expect, describe, vi } from "vitest";
 import {
+    countJobOrders,
     createJobOrder,
     getAllJobOrders,
     getJobOrder,
 } from "../jobOrderController";
-import { prismaMock } from "../../singleton";
+import { prismaMock, customMock } from "../../singleton";
 
 const mockRequest = (body, user, params, query) => ({
     body: body,
@@ -287,7 +288,7 @@ describe("UNIT TEST SUITE FOR 'getJobOrder()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(422);
     });
 
-    test("getJobOrder() should send an HTTP status of 500 and send the specified job order", async () => {
+    test("getJobOrder() should send an HTTP status of 500 when an error occurs", async () => {
         const req = mockRequest(
             {},
             { id: 1 },
@@ -344,7 +345,7 @@ describe("UNIT TEST SUITE FOR 'getAllJobOrders()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(404);
     });
 
-    test("getJobOrder() should send an HTTP status of 500 and send the specified job order", async () => {
+    test("getJobOrder() should send an HTTP status of 500 when an error occurs", async () => {
         const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
@@ -354,6 +355,70 @@ describe("UNIT TEST SUITE FOR 'getAllJobOrders()' CONTROLLER", () => {
         });
 
         await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
+    test("countJobOrders() should send an HTTP status of 200 and send an array of all job orders", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "daily" });
+
+        const res = mockResponse();
+
+        customMock.jobOrder.groupByDate.mockResolvedValue([
+            {
+                interval_start: "2024-05-01T00:00:00Z",
+                total: 1000,
+                total_paid: 700,
+                total_unpaid: 300,
+                no_of_job_orders: 5,
+                no_of_paid: 3,
+                no_of_unpaid: 2,
+                no_of_claimed: 2,
+                no_of_unclaimed: 3,
+            },
+        ]);
+
+        const jobOrders = await countJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("countJobOrders() should send an HTTP status of 404 when no job order can be grouped", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "daily" });
+
+        const res = mockResponse();
+
+        customMock.jobOrder.groupByDate.mockResolvedValue([]);
+
+        const jobOrders = await countJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("countJobOrders() should send an HTTP status of 422 when interval provided is not supported", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "deliciously" });
+
+        const res = mockResponse();
+
+        customMock.jobOrder.groupByDate.mockResolvedValue([]);
+
+        const jobOrders = await countJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("countJobOrders() should send an HTTP status of 500 when an error occurs", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "deliciously" });
+
+        const res = mockResponse();
+
+        customMock.jobOrder.groupByDate.mockImplementation(() => {
+            throw new Error();
+        });
+
+        const jobOrders = await countJobOrders(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
     });

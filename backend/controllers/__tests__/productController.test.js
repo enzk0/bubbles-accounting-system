@@ -186,11 +186,9 @@ describe.only("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     test("getAllProducts() should get all products from the database and send a HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -221,10 +219,7 @@ describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     });
 
     test("getAllProducts() should send an HTTP status code of 404 if no active products exist or can be found in the database", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 21 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -236,10 +231,7 @@ describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     });
 
     test("getAllProducts() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 

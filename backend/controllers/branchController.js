@@ -73,7 +73,13 @@ export async function getBranch(req, res) {
 }
 
 export async function getAllBranches(req, res) {
-    const { requester, filter } = req.body;
+    const { isActive } = req.query;
+
+    let filter = {};
+
+    if (isActive !== undefined) {
+        filter.isActive = isActive === "true";
+    }
 
     try {
         const foundBranches = await prisma.branch.findMany({ where: filter });

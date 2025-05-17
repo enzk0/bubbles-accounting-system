@@ -166,7 +166,61 @@ export async function getJobOrder(req, res) {
                 .send({ message: "Job Order could not be found" });
         }
 
-        return res.status(200).json(found);
+        res.status(200).json(found);
+        return found;
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}
+
+export async function getAllJobOrders(req, res) {
+    const {
+        branchId: rawBranchId,
+        userId: rawUserId,
+        customerId: rawCustomerId,
+    } = req.query;
+
+    const branchId = parseInt(rawBranchId);
+    const userId = parseInt(rawUserId);
+    const customerId = parseInt(rawCustomerId);
+
+    let filter = {};
+
+    if (branchId !== undefined && branchId !== NaN) {
+        filter.branchId = branchId;
+    }
+
+    if (userId !== undefined && userId !== NaN) {
+        filter.userId = userId;
+    }
+
+    if (customerId !== undefined && customerId !== NaN) {
+        filter.customerId = customerId;
+    }
+
+    try {
+        const found = await prisma.jobOrder.findMany({
+            where: filter,
+            include: {
+                branch: true,
+                customer: true,
+                user: true,
+                jobOrderItems: true,
+            },
+        });
+
+        if (found.length === 0 || found === null || found === undefined) {
+            return res
+                .status(404)
+                .send({ message: "No job orders could be found" });
+        }
+
+        res.status(200).json(found);
+        return found;
     } catch (error) {
         console.log(error);
         res.status(500).send({

@@ -220,16 +220,13 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         let req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2 },
-                edit: {
-                    username: "jane_doe",
-                    firstName: "Jane",
-                    lastName: "Doe",
-                    roleId: 2,
-                    branchId: 1,
-                },
+                username: "jane_doe",
+                firstName: "Jane",
+                lastName: "Doe",
+                roleId: 2,
+                branchId: 1,
             },
-            {}
+            { id: "2" }
         );
 
         const res = mockResponse();
@@ -256,16 +253,13 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         let req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2 },
-                edit: {
-                    username: "",
-                    firstName: "",
-                    lastName: "",
-                    roleId: 2,
-                    branchId: 1,
-                },
+                username: "",
+                firstName: "",
+                lastName: "",
+                roleId: 2,
+                branchId: 1,
             },
-            {}
+            { id: "2" }
         );
 
         const res = mockResponse();
@@ -277,16 +271,13 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2 },
-                edit: {
-                    username: "jane_doe",
-                    firstName: "",
-                    lastName: "",
-                    roleId: 2,
-                    branchId: 1,
-                },
+                username: "jane_doe",
+                firstName: "",
+                lastName: "",
+                roleId: 2,
+                branchId: 1,
             },
-            {}
+            { id: "2" }
         );
 
         await editUser(req, res);
@@ -296,16 +287,13 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2 },
-                edit: {
-                    username: "",
-                    firstName: "jane",
-                    lastName: "",
-                    roleId: 2,
-                    branchId: 1,
-                },
+                username: "",
+                firstName: "jane",
+                lastName: "",
+                roleId: 2,
+                branchId: 1,
             },
-            {}
+            { id: "2" }
         );
 
         await editUser(req, res);
@@ -315,16 +303,13 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2 },
-                edit: {
-                    username: "",
-                    firstName: "",
-                    lastName: "doe",
-                    roleId: 2,
-                    branchId: 1,
-                },
+                username: "",
+                firstName: "",
+                lastName: "doe",
+                roleId: 2,
+                branchId: 1,
             },
-            {}
+            { id: "2" }
         );
 
         await editUser(req, res);
@@ -336,15 +321,13 @@ describe("UNIT TEST SUITE FOR 'editUser()' CONTROLLER", () => {
         const req = mockRequest(
             { id: 1 },
             {
-                edit: {
-                    username: "jane_doe",
-                    firstName: "Jane",
-                    lastName: "Doe",
-                    roleId: 2,
-                    branchId: 1,
-                },
+                username: "jane_doe",
+                firstName: "Jane",
+                lastName: "Doe",
+                roleId: 2,
+                branchId: 1,
             },
-            { id: 2 }
+            { id: "2" }
         );
 
         const res = mockResponse();

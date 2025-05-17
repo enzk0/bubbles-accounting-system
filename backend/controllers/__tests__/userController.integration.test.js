@@ -90,23 +90,25 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     });
 
     test("editUser() should update fields/information about a user in a database that is not the password", async () => {
-        const req = mockRequest({
-            user: { id: 11 },
-            edit: {
+        const req = mockRequest(
+            {
                 username: "jane_doe",
                 firstName: "Jane",
                 lastName: "Doe",
                 branchId: 1,
                 roleId: 2,
             },
-        });
+            {},
+            { id: "11" },
+            {}
+        );
 
         const res = mockResponse();
 
         const updated = await editUser(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(updated.username).toEqual(req.body.edit.username);
+        expect(updated.username).toEqual(req.body.username);
     });
 
     test("getUser() should get/fetch a User in the database via their name", async () => {

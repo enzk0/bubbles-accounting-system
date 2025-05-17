@@ -4,11 +4,11 @@ import bcrypt from "bcrypt";
 import "dotenv/config";
 
 export async function employeeLogin(req, res) {
-    const { user } = req.body;
+    const { username } = req.body;
 
     const fetchedUser = await prisma.user.findUnique({
         where: {
-            username: user.username,
+            username: username,
         },
     });
 

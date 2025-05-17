@@ -2,9 +2,9 @@ import { Prisma } from "@prisma/client";
 import prisma from "../client.js";
 
 export async function createBranch(req, res) {
-    const { requester, branch } = req.body;
+    const { code, name, address } = req.body;
 
-    if (!branch.code || !branch.name || !branch.address) {
+    if (!code || !name || !address) {
         return res.status(422).send({
             message:
                 "The information provided to create a branch is incomplete",
@@ -13,7 +13,11 @@ export async function createBranch(req, res) {
 
     try {
         const newBranch = await prisma.branch.create({
-            data: branch,
+            data: {
+                code: code,
+                name: name,
+                address: address,
+            },
         });
 
         res.status(201).send({

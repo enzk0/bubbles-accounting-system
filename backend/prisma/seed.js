@@ -206,6 +206,7 @@ async function seed() {
                 lastName: "Grimms",
                 password: "password",
                 branchId: 3,
+                isActive: false,
             },
             {
                 username: "hansel",

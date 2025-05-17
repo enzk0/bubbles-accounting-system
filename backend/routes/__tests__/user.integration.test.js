@@ -15,7 +15,7 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe.only("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
+describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
     test("/user/ POST route should create a user in the database and send an HTTP status code of 201", async () => {
         const response = await request(app)
             .post("/user/")
@@ -187,7 +187,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
+describe("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
     test("/user/:id PATCH route should edit the specified in the database and send an HTTP status code of 200", async () => {
         const user = await prisma.user.findUnique({
             where: {
@@ -239,11 +239,12 @@ describe.only("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
+describe("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
     test("/user/password PATCH route updated the password of a user in the database and send an HTTP status code of 200", async () => {
         const user = await prisma.user.findUnique({
             where: { username: "quandale_dingleberry" },
         });
+
         const response = await request(app)
             .patch(`/user/password/${user.id}`)
             .send({
@@ -276,31 +277,25 @@ describe.only("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
 
 describe("INTEGRATION TESTS FOR /user/ DELETE ROUTE", () => {
     test("/user/ DELETE route should deactivate the specified user and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .delete("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { username: "quandale_dingleberry" },
-            });
+        const user = await prisma.user.findUnique({
+            where: { username: "quandale_dingleberry" },
+        });
+
+        const response = await request(app).delete(`/user/${user.id}`);
 
         expect(response.statusCode).toBe(200);
 
-        const user = await prisma.user.findUnique({
+        const found = await prisma.user.findUnique({
             where: {
                 username: "quandale_dingleberry",
             },
         });
 
-        expect(user.isActive).toEqual(false);
+        expect(found.isActive).toEqual(false);
     });
 
     test("/user/ DELETE route should send an HTTP status code of 404 when the user to be deactivated cannot be found", async () => {
-        const response = await request(app)
-            .delete("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { id: 2049 },
-            });
+        const response = await request(app).delete("/user/2049");
 
         expect(response.statusCode).toBe(404);
     });

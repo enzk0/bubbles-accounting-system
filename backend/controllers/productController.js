@@ -141,16 +141,17 @@ export async function editProduct(req, res) {
 }
 
 export async function deactivateProduct(req, res) {
-    const { requester, product } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (product.id === null || product.id === undefined || product.id < 1) {
+    if (id === null || id === undefined || id < 1) {
         return res.status(422).send({ message: "Product id is not provided." });
     }
 
     try {
         const updatedProduct = await prisma.product.update({
             where: {
-                id: product.id,
+                id: id,
             },
             data: {
                 isActive: false,

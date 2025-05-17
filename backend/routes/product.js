@@ -17,7 +17,7 @@ router.get("/all", authenticate, checkPrivilege([]), getAllProducts);
 
 router.get("/:id", authenticate, checkPrivilege([]), getProduct);
 
-router.patch("/", authenticate, checkPrivilege(["admin"]), editProduct);
+router.patch("/:id", authenticate, checkPrivilege(["admin"]), editProduct);
 
 router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateProduct);
 

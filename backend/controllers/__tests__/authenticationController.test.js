@@ -17,10 +17,11 @@ const mockResponse = () => {
     return res;
 };
 
-describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE 'login()' CONTROLLER", () => {
     test("login() should send an HTTP response of 200 and a jwt access token when the user has been successfully authenticated", async () => {
         const req = mockRequest({
-            user: { username: "user123", password: "password456" },
+            username: "user123",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -46,7 +47,8 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
 
     test("login() should send an HTTP response of 401 when the incorrect password is used to authenticate the user", async () => {
         const req = mockRequest({
-            user: { username: "user123", password: "pass123" },
+            username: "user123",
+            password: "pass123",
         });
 
         const res = mockResponse();
@@ -67,9 +69,10 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(401);
     });
 
-    test("login() should send an HTTP response of 500 when an error in the database client has occurred", async () => {
+    test("login() should send an  user: { HTTP response of 500 when an error in the database client has occurred", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();

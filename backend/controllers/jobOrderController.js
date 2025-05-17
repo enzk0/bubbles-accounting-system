@@ -257,16 +257,12 @@ export async function countJobOrders(req, res) {
         filter.customerId = customerId;
     }
 
-    const validIntervals = [
-        "daily",
-        "weekly",
-        "monthly",
-        "quarterly",
-        "yearly",
-    ];
+    const validIntervals = ["day", "week", "month", "quarter", "year"];
 
     if (!validIntervals.includes(interval)) {
-        res.status(422).send({ message: "Provided interval is not valid" });
+        return res
+            .status(422)
+            .send({ message: "Provided interval is not valid" });
     }
 
     try {
@@ -282,7 +278,7 @@ export async function countJobOrders(req, res) {
         return found;
     } catch (error) {
         console.log(error);
-        res.status(500).send({
+        return res.status(500).send({
             message: "An error has occurred with the database client",
             error: error,
         });

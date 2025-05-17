@@ -1,13 +1,9 @@
 import prisma from "../client.js";
 
 export async function createProduct(req, res) {
-    const { requester, product } = req.body;
+    const { name, price } = req.body;
 
-    if (
-        !product.name ||
-        product.price === null ||
-        product.price === undefined
-    ) {
+    if (!name || price === null || price === undefined) {
         return res
             .status(422)
             .send({ message: "Some of the required fields are empty." });
@@ -15,8 +11,8 @@ export async function createProduct(req, res) {
     try {
         const createdProduct = await prisma.product.create({
             data: {
-                name: product.name,
-                price: product.price,
+                name: name,
+                price: price,
             },
         });
 

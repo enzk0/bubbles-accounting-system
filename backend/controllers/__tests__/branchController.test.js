@@ -236,16 +236,17 @@ describe.only("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     test("editBranch() should send an HTTP status code of 200 when a branch in the database has been successfully updated/edited", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: {
+        const req = mockRequest(
+            {
                 name: "Ark Outpost",
                 address: "Ark Outpost Command Center",
             },
-        });
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -265,11 +266,12 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     });
 
     test("editBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
-        let req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: { name: "", address: "Ark Outpost Command Center" },
-        });
+        let req = mockRequest(
+            { name: "", address: "Ark Outpost Command Center" },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -277,11 +279,12 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: { name: "Ark Outpost", address: "" },
-        });
+        req = mockRequest(
+            { name: "Ark Outpost", address: "" },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         await editBranch(req, res);
 
@@ -289,14 +292,15 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     });
 
     test("editBranch() should send an HTTP status code of 500 when an error with the database client occurs or when the queried branch to be updated does not exist", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: {
+        const req = mockRequest(
+            {
                 name: "Ark Outpost",
                 address: "Ark Outpost Command Center",
             },
-        });
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -311,12 +315,9 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
+describe.only("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
     test("deactivateBranch() should send an HTTP status code of 200 when a branch in the database has been successfully deactivated", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, {}, { id: 1 }, {});
 
         const res = mockResponse();
 
@@ -337,10 +338,7 @@ describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
     });
 
     test("deactivateBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: null },
-        });
+        const req = mockRequest({}, {}, { id: 0 }, {});
 
         const res = mockResponse();
 
@@ -350,10 +348,7 @@ describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
     });
 
     test("deactivateBranch() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, {}, { id: 1 }, {});
 
         const res = mockResponse();
 

@@ -30,9 +30,10 @@ export async function createProduct(req, res) {
 }
 
 export async function getProduct(req, res) {
-    const { requester, product } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (product.id === null || product.id === undefined || product.id < 1) {
+    if (id === null || id === undefined || id < 1) {
         return res.status(422).send({
             message: "Some of the required fields are empty or invalid.",
         });
@@ -40,7 +41,9 @@ export async function getProduct(req, res) {
 
     try {
         const foundProduct = await prisma.product.findUnique({
-            where: product,
+            where: {
+                id: id,
+            },
         });
 
         if (foundProduct === null || foundProduct === undefined) {

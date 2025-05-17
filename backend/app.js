@@ -9,6 +9,8 @@ import authRoutes from "./routes/authentication.js";
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded());
+
 app.use("/api", salesRoutes);
 app.use("/user", userRoutes);
 app.use("/job-order", jobOrderRoutes);

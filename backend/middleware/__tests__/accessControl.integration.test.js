@@ -1,8 +1,9 @@
 import { test, expect, describe, vi, beforeEach, beforeAll } from "vitest";
 import { checkPrivilege } from "../accessControl";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user) => ({
     body: body,
+    user: user,
 });
 
 const mockResponse = () => {
@@ -23,9 +24,7 @@ const mockNext = () => {
 
 describe("INTEGRATION TEST SUITE FOR ACCCESS CONTROL MIDDLEWARE", () => {
     test("middleware returned from checkPrivilege() should call next() when the requesting user queried from the database has the necessary privileges", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-        });
+        let req = mockRequest({}, { id: 1 });
 
         const res = mockResponse();
 
@@ -47,9 +46,7 @@ describe("INTEGRATION TEST SUITE FOR ACCCESS CONTROL MIDDLEWARE", () => {
     });
 
     test("middleware returned from checkPrivilege() should send and HTTP response of 403 when the requesting user queried from the database does not have the necessary privileges", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-        });
+        let req = mockRequest({}, { id: 1 });
 
         const res = mockResponse();
 

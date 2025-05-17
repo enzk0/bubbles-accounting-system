@@ -62,22 +62,19 @@ export async function adminLogin(req, res) {
 }
 
 export async function login(req, res) {
-    const { user } = req.body;
+    const { username, password } = req.body;
 
     try {
         const fetchedUser = await prisma.user.findUnique({
             where: {
-                username: user.username,
+                username: username,
             },
         });
 
         const isPasswordCorrect = bcrypt.compareSync(
-            user.password,
+            password,
             fetchedUser.password
         );
-
-        console.log(user.password, fetchedUser.password, user);
-        console.log(bcrypt.compareSync(user.password, fetchedUser.password));
 
         if (!isPasswordCorrect) {
             return res.status(401).send({ message: "Password is incorrect" });

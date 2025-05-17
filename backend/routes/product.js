@@ -19,6 +19,11 @@ router.get("/:id", authenticate, checkPrivilege([]), getProduct);
 
 router.patch("/:id", authenticate, checkPrivilege(["admin"]), editProduct);
 
-router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateProduct);
+router.delete(
+    "/:id",
+    authenticate,
+    checkPrivilege(["admin"]),
+    deactivateProduct
+);
 
 export default router;

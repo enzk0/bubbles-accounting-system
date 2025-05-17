@@ -157,14 +157,9 @@ describe.only("INTEGRATION TESTS FOR /branch/:id PATCH ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /branch/ DELETE ROUTE", () => {
-    test("/branch/ DELETE route should deactivate the specified branch and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .delete("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { id: 1 },
-            });
+describe.only("INTEGRATION TESTS FOR /branch/:id DELETE ROUTE", () => {
+    test("/branch/:id DELETE route should deactivate the specified branch and send an HTTP status code of 200", async () => {
+        const response = await request(app).delete("/branch/1");
 
         expect(response.statusCode).toBe(200);
 
@@ -177,13 +172,8 @@ describe.only("INTEGRATION TESTS FOR /branch/ DELETE ROUTE", () => {
         expect(branch.isActive).toEqual(false);
     });
 
-    test("/branch/ DELETE route should send an HTTP status code of 422 when an invalid branch id is provided", async () => {
-        const response = await request(app)
-            .delete("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { id: null },
-            });
+    test("/branch/id DELETE route should send an HTTP status code of 422 when an invalid branch id is provided", async () => {
+        const response = await request(app).delete("/branch/0");
 
         expect(response.statusCode).toBe(422);
     });

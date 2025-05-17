@@ -1,34 +1,18 @@
 import express from 'express';
-import { modifyJobOrder as employeeModify } from '../controllers/employeeController.js';
-import { modifyJobOrder as adminModify } from '../controllers/adminController.js';
+import { modifyJobOrder } from '../controllers/jobOrderModificationController.js';
 import checkRole from '../auth/checkRole.js';
 
 const router = express.Router();
 
-
 router.use((req, res, next) => {
   const role = req.headers['role'];
-  
-  if (!role) {
-    return res.status(401).json({ error: 'Missing role in headers' });
-  }
-
-  req.user = { id: 1, role }; 
+  if (!role) return res.status(401).json({ error: 'Missing role in headers' });
+  req.user = { id: 1, role };
   next();
 });
 
-// Employee-only route
-router.patch(
-  '/employee/job-orders/:id',
-  checkRole('employee'),
-  employeeModify
-);
+router.patch('/employee/job-orders/:id', checkRole(['employee']), modifyJobOrder);
 
-// Admin-only route
-router.patch(
-  '/admin/job-orders/:id',
-  checkRole('admin'),
-  adminModify
-);
+router.patch('/admin/job-orders/:id', checkRole(['admin']), modifyJobOrder);
 
 export default router;

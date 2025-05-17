@@ -396,9 +396,17 @@ async function seed() {
     const job_order_employees = [
         "cinderella",
         "snow_white",
-        "dorothy",
+        "cinderella",
         "rapunzel",
         "little_mermaid",
+    ];
+
+    const job_order_dates = [
+        new Date("2025-02-06T10:24:00Z"),
+        new Date("2025-01-30T16:45:00Z"),
+        new Date("2025-04-15T08:10:00Z"),
+        new Date("2025-01-30T16:45:00Z"),
+        new Date("2025-02-05T22:30:00Z"),
     ];
 
     for (let index = 0; index < 5; index++) {
@@ -412,10 +420,17 @@ async function seed() {
             data: job_order_customers[index],
         });
 
+        let employee = await prisma.user.findUnique({
+            where: {
+                username: job_order_employees[index],
+            },
+        });
+
         let job_order = await prisma.jobOrder.create({
             data: {
                 idCode: branch.code,
                 idNumber: branch.counter,
+                createdAt: job_order_dates[index],
                 branch: {
                     connect: { id: branch.id },
                 },
@@ -423,7 +438,7 @@ async function seed() {
                     connect: { id: customer.id },
                 },
                 user: {
-                    connect: { id: 1 },
+                    connect: { id: employee.id },
                 },
             },
         });

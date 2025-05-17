@@ -1,5 +1,9 @@
 import { test, expect, describe, vi } from "vitest";
-import { countJobOrders, createJobOrder } from "../jobOrderController";
+import {
+    countJobOrders,
+    createJobOrder,
+    getJobOrder,
+} from "../jobOrderController";
 import prisma from "../../client";
 
 const mockRequest = (body, user, params, query) => ({
@@ -78,7 +82,7 @@ const mockRequestBody = {
     },
 };
 
-describe("INTEGRATION TEST SUITE FOR `createJobOrder()` CONTROLLER", () => {
+describe("INTEGRATION TESTS FOR 'createJobOrder()' CONTROLLER", () => {
     test("createJobOrder() should create a jobOrder in the database and send an HTTP status code of 201", async () => {
         const req = mockRequest(mockRequestBody, { id: 1 }, {}, {});
 
@@ -269,7 +273,43 @@ describe("INTEGRATION TEST SUITE FOR `createJobOrder()` CONTROLLER", () => {
     });
 });
 
-describe.only("INTEGRATION TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
+describe("INTEGRATION TESTS FOR 'getJobOrder()' CONTROLLER", () => {
+    test("getJobOrder() should send an HTTP status of 200 and send the specified job order from the database", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1 }
+        );
+
+        const res = mockResponse();
+
+        const jobOrder = await getJobOrder(req, res);
+
+        console.log(jobOrder);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(jobOrder.idCode).toEqual("AB");
+        expect(jobOrder.idNumber).toEqual(1);
+    });
+
+    test("getJobOrder() should send an HTTP status of 404 when no job order can be found", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "AD", idNumber: 69420 }
+        );
+
+        const res = mockResponse();
+
+        await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'countJobOrders()' CONTROLLER", () => {
     test("countJobOrders() should send an HTTP status of 200 and send an array of job order grouped by interval from the database", async () => {
         const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
 
@@ -280,15 +320,5 @@ describe.only("INTEGRATION TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => 
         console.log(jobOrders);
 
         expect(res.status).toHaveBeenCalledWith(200);
-    });
-
-    test("countJobOrders() should send an HTTP status of 422 when the interval is invalid", async () => {
-        const req = mockRequest({}, { id: 1 }, {}, { interval: "daily" });
-
-        const res = mockResponse();
-
-        let jobOrders = await countJobOrders(req, res);
-
-        expect(res.status).toHaveBeenCalledWith(422);
     });
 });

@@ -133,3 +133,45 @@ export async function createJobOrder(req, res) {
         });
     }
 }
+
+export async function getJobOrder(req, res) {
+    const { idCode, idNumber: rawIdNumber } = req.query;
+    const idNumber = parseInt(rawIdNumber);
+
+    if (!idCode || !idNumber) {
+        return res
+            .status(422)
+            .send({ message: "idCode and idNumber provided is invalid" });
+    }
+
+    try {
+        const found = await prisma.jobOrder.findUnique({
+            where: {
+                idCode_idNumber: {
+                    idCode: idCode,
+                    idNumber: idNumber,
+                },
+            },
+            include: {
+                branch: true,
+                customer: true,
+                user: true,
+                jobOrderItems: true,
+            },
+        });
+
+        if (found === null || found === undefined) {
+            return res
+                .status(404)
+                .send({ message: "Job Order could not be found" });
+        }
+
+        return res.status(200).json(found);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}

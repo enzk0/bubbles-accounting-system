@@ -65,36 +65,39 @@ export async function deactivateUser(req, res) {
 }
 
 export async function editUser(req, res) {
-    const { user, edit } = req.body;
+    const { id: rawId } = req.params;
+    const { username, firstName, lastName, roleId, branchId } = req.body;
 
-    if (!edit.username || !edit.firstName || !edit.lastName) {
+    const id = parseInt(rawId);
+
+    if (!username || !firstName || !lastName) {
         return res.status(422).send({
             message: "Update values for certain user fields are invalid",
         });
     }
 
     try {
-        const { username, firstName, lastName, ...userRelations } = edit;
-
-        if (userRelations.roleId && userRelations.branchId) {
+        if (roleId && branchId) {
             await prisma.user.update({
-                where: user,
+                where: { id: id },
                 data: {
                     role: {
-                        connect: { id: userRelations.roleId },
+                        connect: { id: roleId },
                     },
                     branch: {
-                        connect: { id: userRelations.branchId },
+                        connect: { id: branchId },
                     },
                 },
             });
         }
 
-        const { branchId, roleId, ...userInfo } = edit;
-
         const updated = await prisma.user.update({
-            where: user,
-            data: userInfo,
+            where: { id: id },
+            data: {
+                username: username,
+                firstName: firstName,
+                lastName: lastName,
+            },
         });
 
         res.status(200).send({
@@ -102,6 +105,7 @@ export async function editUser(req, res) {
         });
         return updated;
     } catch (error) {
+        console.log(error);
         if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
             return res.status(500).send({
                 message: "An error with the database client has occurred",

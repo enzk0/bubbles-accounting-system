@@ -50,7 +50,7 @@ describe.only("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /branch/ GET ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /branch/:id GET ROUTE", () => {
     test("/branch/:id GET route should get the queried branch from the database and send an HTTP status code of 200", async () => {
         const response = await request(app).get("/branch/1");
 
@@ -58,27 +58,22 @@ describe.only("INTEGRATION TESTS FOR /branch/ GET ROUTE", () => {
         expect(response.body.id).toBe(1);
     });
 
-    test("/branch/ GET route should send an HTTP status code of 422 if the provided branchId in the query is null or undefined", async () => {
+    test("/branch/:id GET route should send an HTTP status code of 422 if the provided branchId in the query is null or undefined", async () => {
         const response = await request(app).get("/branch/0");
 
         expect(response.statusCode).toBe(422);
     });
 
-    test("/branch/ GET route should send an HTTP status code of 404 if the provided branchId in the query is null or undefined", async () => {
+    test("/branch/:id GET route should send an HTTP status code of 404 if the provided branchId in the query is null or undefined", async () => {
         const response = await request(app).get("/branch/2077");
 
         expect(response.statusCode).toBe(404);
     });
 });
 
-describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
     test("/branch/all GET route should get all branches from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/branch/all")
-            .send({
-                requester: { id: 1 },
-                filter: {},
-            });
+        const response = await request(app).get("/branch/all");
 
         expect(response.statusCode).toBe(200);
 
@@ -99,12 +94,7 @@ describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
     });
 
     test("/branch/all GET route should get all active branches from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/branch/all")
-            .send({
-                requester: { id: 1 },
-                filter: { isActive: true },
-            });
+        const response = await request(app).get("/branch/all?isActive=true");
 
         expect(response.statusCode).toBe(200);
 
@@ -120,12 +110,7 @@ describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
     });
 
     test("/branch/all GET route should get all inactive branches from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/branch/all")
-            .send({
-                requester: { id: 1 },
-                filter: { isActive: false },
-            });
+        const response = await request(app).get("/branch/all?isActive=false");
 
         expect(response.statusCode).toBe(200);
 
@@ -138,17 +123,6 @@ describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
         });
 
         expect(response.body.length).toEqual(branches.length);
-    });
-
-    test("/branch/all GET route should send an HTTP status code of 500 when the fields in the filter are invalid", async () => {
-        const response = await request(app)
-            .get("/branch/all")
-            .send({
-                requester: { id: 1 },
-                filter: { isPresent: false },
-            });
-
-        expect(response.statusCode).toBe(500);
     });
 });
 

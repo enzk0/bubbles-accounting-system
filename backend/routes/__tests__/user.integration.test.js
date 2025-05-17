@@ -77,12 +77,7 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
 
 describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
     test("/user/ GET route should fetch a user in the database with the specified user id and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { id: 1 },
-            });
+        const response = await request(app).get("/user/1");
 
         expect(response.statusCode).toBe(200);
 
@@ -99,23 +94,13 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
     });
 
     test("/user/ GET route should send an HTTP status code of 404 when the queried user does not exist or cannot be found", async () => {
-        const response = await request(app)
-            .get("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { id: 1999 },
-            });
+        const response = await request(app).get("/user/999");
 
         expect(response.statusCode).toBe(404);
     });
 
     test("/user/ GET route should send an HTTP status code of 422 when the user id used in the query is invalid", async () => {
-        const response = await request(app)
-            .get("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { id: null },
-            });
+        const response = await request(app).get("/user/asdgkljasd");
 
         expect(response.statusCode).toBe(422);
     });

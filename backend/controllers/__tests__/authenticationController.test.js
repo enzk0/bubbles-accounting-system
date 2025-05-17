@@ -88,10 +88,11 @@ describe.only("UNIT TEST SUITE 'login()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
+describe.only("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
     test("adminLogin() should send an HTTP response of 404 when a user with the specified username cannot be found", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -105,7 +106,8 @@ describe("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
 
     test("adminLogin() should send an HTTP response of 403 when logging in with a deactivated user", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -129,7 +131,8 @@ describe("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
 
     test("adminLogin() should send an HTTP status code of 403 when a non-admin account is used to login", async () => {
         const req = mockRequest({
-            user: { username: "user123", password: "password456" },
+            username: "user123",
+            password: "password456",
         });
 
         const res = mockResponse();

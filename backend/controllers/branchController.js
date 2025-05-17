@@ -43,18 +43,19 @@ export async function createBranch(req, res) {
 }
 
 export async function getBranch(req, res) {
-    const { requester, branch } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
     try {
-        if (branch.id === null || branch.id === undefined || branch.id < 1) {
+        if (id === null || id === undefined || id < 1) {
             return res
                 .status(422)
-                .send({ message: "A branchId was not provided" });
+                .send({ message: "A valid branchId was not provided" });
         }
 
         const foundBranch = await prisma.branch.findUnique({
             where: {
-                id: branch.id,
+                id: id,
             },
         });
 

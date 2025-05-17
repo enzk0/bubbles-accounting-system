@@ -1,5 +1,5 @@
 import { test, expect, describe, vi } from "vitest";
-import { createJobOrder } from "../jobOrderController";
+import { createJobOrder, getJobOrder } from "../jobOrderController";
 import { prismaMock } from "../../singleton";
 
 const mockRequest = (body, user, params, query) => ({
@@ -208,6 +208,96 @@ describe("UNIT TEST SUITE FOR 'createJobOrder()' CONTROLLER", () => {
         });
 
         await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'getJobOrder' CONTROLLER", () => {
+    test("getJobOrder() should send an HTTP status of 200 and send the specified job order", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findUnique.mockResolvedValue({
+            idCode: "AB",
+            idNumber: 1234,
+
+            createdAt: new Date(),
+            updatedAt: new Date(),
+
+            isPaid: false,
+            isClaimed: false,
+            isHidden: false,
+        });
+
+        const jobOrder = await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("getJobOrder() should send an HTTP status of 404 when no job order can be found", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findUnique.mockResolvedValue(null);
+
+        await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("getJobOrder() should send an HTTP status of 422 when idCode or idNumber is invalid", async () => {
+        let req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        let jobOrder = await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({}, { id: 1 }, {}, { idCode: "AB", idNumber: null });
+        jobOrder = await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({}, { id: 1 }, {}, { idCode: "", idNumber: null });
+        jobOrder = await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("getJobOrder() should send an HTTP status of 500 and send the specified job order", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findUnique.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await getJobOrder(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
     });

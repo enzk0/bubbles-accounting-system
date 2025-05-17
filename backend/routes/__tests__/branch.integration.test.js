@@ -15,7 +15,7 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe.only("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
+describe("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
     test("/branch/ POST route should create a branch in the database and send an HTTP status code of 200 along with a message", async () => {
         const response = await request(app).post("/branch/").send({
             code: "LA",
@@ -50,7 +50,7 @@ describe.only("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /branch/:id GET ROUTE", () => {
+describe("INTEGRATION TESTS FOR /branch/:id GET ROUTE", () => {
     test("/branch/:id GET route should get the queried branch from the database and send an HTTP status code of 200", async () => {
         const response = await request(app).get("/branch/1");
 
@@ -71,7 +71,7 @@ describe.only("INTEGRATION TESTS FOR /branch/:id GET ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
+describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
     test("/branch/all GET route should get all branches from the database and send an HTTP status code of 200", async () => {
         const response = await request(app).get("/branch/all");
 
@@ -126,7 +126,7 @@ describe.only("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /branch/:id PATCH ROUTE", () => {
+describe("INTEGRATION TESTS FOR /branch/:id PATCH ROUTE", () => {
     test("/branch/:id PATCH route should edit the specified branch and send an HTTP status code of 200", async () => {
         const response = await request(app).patch("/branch/1").send({
             name: "Ambrosia",
@@ -157,7 +157,7 @@ describe.only("INTEGRATION TESTS FOR /branch/:id PATCH ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /branch/:id DELETE ROUTE", () => {
+describe("INTEGRATION TESTS FOR /branch/:id DELETE ROUTE", () => {
     test("/branch/:id DELETE route should deactivate the specified branch and send an HTTP status code of 200", async () => {
         const response = await request(app).delete("/branch/1");
 

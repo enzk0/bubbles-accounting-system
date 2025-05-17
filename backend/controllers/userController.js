@@ -171,7 +171,7 @@ export async function getUser(req, res) {
 
     try {
         const found = await prisma.user.findUnique({
-            where: id,
+            where: { id: id },
         });
 
         if (!found || found === null) {
@@ -183,6 +183,7 @@ export async function getUser(req, res) {
         res.json(found);
         return found;
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             message: "An error with the database client has occurred",
             error: error,

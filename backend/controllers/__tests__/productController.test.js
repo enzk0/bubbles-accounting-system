@@ -26,7 +26,7 @@ const mockResponse = () => {
     return res;
 };
 
-describe.only("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     test("createProduct() should create a product in the database and send a HTTP status code of 201", async () => {
         const req = mockRequest(
             {
@@ -121,7 +121,7 @@ describe.only("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     });
 });
 
-describe.only("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     test("getProduct() should get the queried product from the database and send a HTTP status code of 200", async () => {
         const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
@@ -186,7 +186,7 @@ describe.only("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 });
 
-describe.only("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     test("getAllProducts() should get all products from the database and send a HTTP status code of 200", async () => {
         const req = mockRequest({}, { id: 1 }, {}, {});
 
@@ -245,7 +245,7 @@ describe.only("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     });
 });
 
-describe.only("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
     test("editProduct() should update a product in the database and send a HTTP status code of 200", async () => {
         const req = mockRequest(
             {
@@ -342,10 +342,7 @@ describe.only("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
     test("deactivateProduct() should update a product in the database and send a HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 
@@ -363,10 +360,7 @@ describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
     });
 
     test("deactivateProduct() should send an HTTP status code of 422 if id is null, undefined, or less than 1", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: null },
-        });
+        let req = mockRequest({}, { id: 1 }, { id: -1 }, {});
 
         const res = mockResponse();
 
@@ -374,19 +368,13 @@ describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: undefined },
-        });
+        req = mockRequest({}, { id: 1 }, { id: undefined }, {});
 
         await deactivateProduct(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: null },
-        });
+        req = mockRequest({}, { id: 1 }, { id: null }, {});
 
         await deactivateProduct(req, res);
 
@@ -394,10 +382,7 @@ describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
     });
 
     test("deactivateProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 

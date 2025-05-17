@@ -195,7 +195,7 @@ export async function getUser(req, res) {
 }
 
 export async function getAllUsers(req, res) {
-    const { isActive, branchId } = req.query;
+    const { isActive, branchId, roleId } = req.query;
 
     let filter = {};
 
@@ -207,10 +207,18 @@ export async function getAllUsers(req, res) {
         filter.branchId = parseInt(branchId);
     }
 
+    if (roleId !== undefined && Number(roleId) !== NaN) {
+        filter.roleId = parseInt(roleId);
+    }
+
+    console.log(filter);
+
     try {
         const found = await prisma.user.findMany({
             where: filter,
         });
+
+        console.log(found);
 
         if (found.length === 0) {
             res.status(404).send({

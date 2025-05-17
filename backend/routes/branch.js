@@ -5,9 +5,9 @@ import {
     editBranch,
     getAllBranches,
     getBranch,
-} from "../controllers/branchController";
-import { authenticate } from "../middleware/auth";
-import { checkPrivilege } from "../middleware/accessControl";
+} from "../controllers/branchController.js";
+import { authenticate } from "../middleware/auth.js";
+import { checkPrivilege } from "../middleware/accessControl.js";
 
 const router = express.Router();
 

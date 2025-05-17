@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../client";
+import prisma from "../client.js";
 
 export async function createBranch(req, res) {
     const { requester, branch } = req.body;
@@ -148,11 +148,9 @@ export async function deactivateBranch(req, res) {
         return updatedBranch;
     } catch (error) {
         console.log(error);
-        return res
-            .status(500)
-            .send({
-                message: "An error has occured with the database client",
-                error: error,
-            });
+        return res.status(500).send({
+            message: "An error has occured with the database client",
+            error: error,
+        });
     }
 }

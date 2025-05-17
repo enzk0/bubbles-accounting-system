@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import prisma from "../client";
+import prisma from "../client.js";
 import bcrypt from "bcrypt";
 import "dotenv/config";
 

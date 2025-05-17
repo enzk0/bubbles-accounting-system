@@ -11,8 +11,8 @@ import {
 } from "../controllers/getJobOrder.js";
 import { modifyJobOrder as employeeModify } from "../controllers/employeeController.js";
 import { modifyJobOrder as adminModify } from "../controllers/adminController.js";
-import { authenticate } from "../middleware/auth";
-import { checkPrivilege } from "../middleware/accessControl";
+import { authenticate } from "../middleware/auth.js";
+import { checkPrivilege } from "../middleware/accessControl.js";
 import { createJobOrder } from "../controllers/jobOrderController.js";
 const router = express.Router();
 
@@ -71,4 +71,3 @@ router.patch("/admin/job-orders/:id", async (req, res) => {
 });
 
 export default router;
-

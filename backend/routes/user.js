@@ -14,9 +14,9 @@ const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege(["admin"]), createUser);
 
-router.get("/", authenticate, checkPrivilege([]), getUser);
-
 router.get("/all", authenticate, checkPrivilege(["admin"]), getAllUsers);
+
+router.get("/:id", authenticate, checkPrivilege([]), getUser);
 
 router.patch("/", authenticate, checkPrivilege(["admin"]), editUser);
 

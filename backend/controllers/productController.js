@@ -1,4 +1,4 @@
-import prisma from "../client";
+import prisma from "../client.js";
 
 export async function createProduct(req, res) {
     const { requester, product } = req.body;

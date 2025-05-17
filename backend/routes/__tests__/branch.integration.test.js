@@ -15,14 +15,13 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
     test("/branch/ POST route should create a branch in the database and send an HTTP status code of 200 along with a message", async () => {
-        const response = await request(app)
-            .post("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { code: "LA", name: "Lala Land", address: "Lala Land" },
-            });
+        const response = await request(app).post("/branch/").send({
+            code: "LA",
+            name: "Lala Land",
+            address: "Lala Land",
+        });
 
         console.log(response.body);
 
@@ -30,12 +29,11 @@ describe("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
     });
 
     test("/branch/ POST route should send an HTTP status code of 500 and send an error message when attempting to create a non-unique branch ", async () => {
-        const response = await request(app)
-            .post("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { code: "LA", name: "Lala Land", address: "Lala Land" },
-            });
+        const response = await request(app).post("/branch/").send({
+            code: "LA",
+            name: "Lala Land",
+            address: "Lala Land",
+        });
 
         expect(response.statusCode).toBe(500);
     });

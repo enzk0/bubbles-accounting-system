@@ -2,8 +2,9 @@ import { test, expect, describe, vi, beforeEach, beforeAll } from "vitest";
 import { prismaMock } from "../../singleton";
 import { checkPrivilege } from "../accessControl";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user) => ({
     body: body,
+    user: user,
 });
 
 const mockResponse = () => {
@@ -24,9 +25,7 @@ const mockNext = () => {
 
 describe("UNIT TEST SUITE FOR `checkPrivilege()` MIDDLEWARE", () => {
     test("checkPrivilege() should call next() when the user has specified privileges", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 });
 
         const res = mockResponse();
 
@@ -70,9 +69,7 @@ describe("UNIT TEST SUITE FOR `checkPrivilege()` MIDDLEWARE", () => {
     });
 
     test("checkPrivilege() should send an HTTP status code of 403 when the user does not have the specified privileges", async () => {
-        const req = mockRequest({
-            requester: { id: 2 },
-        });
+        const req = mockRequest({}, { id: 2 });
 
         const res = mockResponse();
 
@@ -93,9 +90,7 @@ describe("UNIT TEST SUITE FOR `checkPrivilege()` MIDDLEWARE", () => {
     });
 
     test("checkPrivilege() should send an HTTP status code of 404 when the user does not exist in the database", async () => {
-        const req = mockRequest({
-            requester: { id: 2 },
-        });
+        const req = mockRequest({}, { id: 2 });
 
         const res = mockResponse();
 
@@ -110,9 +105,7 @@ describe("UNIT TEST SUITE FOR `checkPrivilege()` MIDDLEWARE", () => {
     });
 
     test("checkPrivilege() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
-        const req = mockRequest({
-            requester: { id: 2 },
-        });
+        const req = mockRequest({}, { id: 2 });
 
         const res = mockResponse();
 

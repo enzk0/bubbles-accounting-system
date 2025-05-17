@@ -183,25 +183,38 @@ export async function getAllJobOrders(req, res) {
         branchId: rawBranchId,
         userId: rawUserId,
         customerId: rawCustomerId,
+        isPaid,
+        isClaimed,
+        isHidden,
     } = req.query;
-
-    const branchId = parseInt(rawBranchId);
-    const userId = parseInt(rawUserId);
-    const customerId = parseInt(rawCustomerId);
 
     let filter = {};
 
-    if (branchId !== undefined && branchId !== NaN) {
-        filter.branchId = branchId;
+    if (rawBranchId !== undefined && Number(rawBranchId) !== NaN) {
+        filter.branchId = parseInt(rawBranchId);
     }
 
-    if (userId !== undefined && userId !== NaN) {
-        filter.userId = userId;
+    if (rawUserId !== undefined && Number(rawUserId) !== NaN) {
+        filter.userId = parseInt(rawUserId);
     }
 
-    if (customerId !== undefined && customerId !== NaN) {
-        filter.customerId = customerId;
+    if (rawCustomerId !== undefined && Number(rawCustomerId) !== NaN) {
+        filter.customerId = parseInt(rawCustomerId);
     }
+
+    if (isPaid !== undefined) {
+        filter.isPaid = isPaid === "true";
+    }
+
+    if (isClaimed !== undefined) {
+        filter.isClaimed = isClaimed === "true";
+    }
+
+    if (isHidden !== undefined) {
+        filter.isHidden = isHidden === "true";
+    }
+
+    console.log(filter);
 
     try {
         const found = await prisma.jobOrder.findMany({
@@ -239,23 +252,21 @@ export async function countJobOrders(req, res) {
         customerId: rawCustomerId,
     } = req.query;
 
-    const branchId = parseInt(rawBranchId);
-    const userId = parseInt(rawUserId);
-    const customerId = parseInt(rawCustomerId);
-
     let filter = {};
 
-    if (branchId !== undefined && branchId !== NaN) {
-        filter.branchId = branchId;
+    if (rawBranchId !== undefined && Number(rawBranchId) !== NaN) {
+        filter.branchId = parseInt(rawBranchId);
     }
 
-    if (userId !== undefined && userId !== NaN) {
-        filter.userId = userId;
+    if (rawUserId !== undefined && Number(rawUserId) !== NaN) {
+        filter.userId = parseInt(rawUserId);
     }
 
-    if (customerId !== undefined && customerId !== NaN) {
-        filter.customerId = customerId;
+    if (rawCustomerId !== undefined && Number(rawCustomerId) !== NaN) {
+        filter.customerId = parseInt(rawCustomerId);
     }
+
+    console.log(filter);
 
     const validIntervals = ["day", "week", "month", "quarter", "year"];
 

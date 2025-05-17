@@ -1,4 +1,5 @@
-import prisma from "../client.js";
+import prisma, { custom } from "../client.js";
+import { PrismaClient } from "@prisma/client";
 
 async function incrementBranchCounter(branchId) {
     await prisma.branch.update({
@@ -217,6 +218,64 @@ export async function getAllJobOrders(req, res) {
             return res
                 .status(404)
                 .send({ message: "No job orders could be found" });
+        }
+
+        res.status(200).json(found);
+        return found;
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}
+
+export async function countJobOrders(req, res) {
+    const {
+        interval,
+        branchId: rawBranchId,
+        userId: rawUserId,
+        customerId: rawCustomerId,
+    } = req.query;
+
+    const branchId = parseInt(rawBranchId);
+    const userId = parseInt(rawUserId);
+    const customerId = parseInt(rawCustomerId);
+
+    let filter = {};
+
+    if (branchId !== undefined && branchId !== NaN) {
+        filter.branchId = branchId;
+    }
+
+    if (userId !== undefined && userId !== NaN) {
+        filter.userId = userId;
+    }
+
+    if (customerId !== undefined && customerId !== NaN) {
+        filter.customerId = customerId;
+    }
+
+    const validIntervals = [
+        "daily",
+        "weekly",
+        "monthly",
+        "quarterly",
+        "yearly",
+    ];
+
+    if (!validIntervals.includes(interval)) {
+        res.status(422).send({ message: "Provided interval is not valid" });
+    }
+
+    try {
+        const found = await custom.jobOrder.groupByDate(interval, filter);
+
+        if (found.length === 0 || found === null || found === undefined) {
+            return res
+                .status(404)
+                .send({ message: "No job orders can be grouped/summarized" });
         }
 
         res.status(200).json(found);

@@ -2,6 +2,7 @@ import { test, expect, describe, vi } from "vitest";
 import {
     countJobOrders,
     createJobOrder,
+    getAllJobOrders,
     getJobOrder,
 } from "../jobOrderController";
 import prisma from "../../client";
@@ -306,6 +307,98 @@ describe("INTEGRATION TESTS FOR 'getJobOrder()' CONTROLLER", () => {
         await getJobOrder(req, res);
 
         expect(res.status).toHaveBeenCalledWith(404);
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            expect(jobOrder).toHaveProperty("idCode");
+            expect(jobOrder).toHaveProperty("idNumber");
+            expect(jobOrder).toHaveProperty("createdAt");
+            expect(jobOrder).toHaveProperty("updatedAt");
+            expect(jobOrder).toHaveProperty("isPaid");
+            expect(jobOrder).toHaveProperty("isClaimed");
+            expect(jobOrder).toHaveProperty("isHidden");
+        });
+    });
+
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders with branchId of 1 from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { branchId: "1" });
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            expect(jobOrder).toHaveProperty("idCode");
+            expect(jobOrder).toHaveProperty("idNumber");
+            expect(jobOrder).toHaveProperty("createdAt");
+            expect(jobOrder).toHaveProperty("updatedAt");
+            expect(jobOrder).toHaveProperty("isPaid");
+            expect(jobOrder).toHaveProperty("isClaimed");
+            expect(jobOrder).toHaveProperty("isHidden");
+            expect(jobOrder.branchId).toEqual(1);
+        });
+    });
+
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders with userId of 1 from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { userId: "1" });
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            expect(jobOrder).toHaveProperty("idCode");
+            expect(jobOrder).toHaveProperty("idNumber");
+            expect(jobOrder).toHaveProperty("createdAt");
+            expect(jobOrder).toHaveProperty("updatedAt");
+            expect(jobOrder).toHaveProperty("isPaid");
+            expect(jobOrder).toHaveProperty("isClaimed");
+            expect(jobOrder).toHaveProperty("isHidden");
+            expect(jobOrder.userId).toEqual(1);
+        });
+    });
+
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders where isPaid, isClaimed, and isHidden is false from the database", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { isPaid: "false", isClaimed: "false", isHidden: "false" }
+        );
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            expect(jobOrder).toHaveProperty("idCode");
+            expect(jobOrder).toHaveProperty("idNumber");
+            expect(jobOrder).toHaveProperty("createdAt");
+            expect(jobOrder).toHaveProperty("updatedAt");
+            expect(jobOrder).toHaveProperty("isPaid");
+            expect(jobOrder).toHaveProperty("isClaimed");
+            expect(jobOrder).toHaveProperty("isHidden");
+            expect(jobOrder.isPaid).toEqual(false);
+            expect(jobOrder.isClaimed).toEqual(false);
+            expect(jobOrder.isHidden).toEqual(false);
+        });
     });
 });
 

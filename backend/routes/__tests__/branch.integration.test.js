@@ -50,37 +50,22 @@ describe.only("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /branch/ GET ROUTE", () => {
-    test("/branch/ GET route should get the queried branch from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { id: 1 },
-            });
+describe.only("INTEGRATION TESTS FOR /branch/ GET ROUTE", () => {
+    test("/branch/:id GET route should get the queried branch from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/branch/1");
 
         expect(response.statusCode).toBe(200);
         expect(response.body.id).toBe(1);
     });
 
     test("/branch/ GET route should send an HTTP status code of 422 if the provided branchId in the query is null or undefined", async () => {
-        const response = await request(app)
-            .get("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { id: null },
-            });
+        const response = await request(app).get("/branch/0");
 
         expect(response.statusCode).toBe(422);
     });
 
     test("/branch/ GET route should send an HTTP status code of 404 if the provided branchId in the query is null or undefined", async () => {
-        const response = await request(app)
-            .get("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { id: 2077 },
-            });
+        const response = await request(app).get("/branch/2077");
 
         expect(response.statusCode).toBe(404);
     });

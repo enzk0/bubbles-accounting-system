@@ -96,7 +96,7 @@ describe("UNIT test for 'countJobOrderByBranch()' controller", () => {
     await countJobOrderByBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "Interval must be day, week, month, or year." });
+    expect(res.json).toHaveBeenCalledWith({ error: "Interval must be day, week, month, or year and BranchID must be an integer." });
   });
 
 test("countJobOrderByBranch() should return 400 response for wrong Branch ID", async () => {
@@ -106,6 +106,6 @@ test("countJobOrderByBranch() should return 400 response for wrong Branch ID", a
     await countJobOrderByBranch(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ error: "Branch ID must be a number." });
+    expect(res.json).toHaveBeenCalledWith({ error: "Branch ID must be an integer." });
   });  
 })

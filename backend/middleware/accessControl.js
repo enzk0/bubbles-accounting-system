@@ -17,7 +17,7 @@ export function checkPrivilege(privileges) {
             });
 
             if (!user) {
-                return res.status(404);
+                return res.status(404).send({ message: "User not found" });
             }
 
             const hasPrivilege = privileges.every((required) =>
@@ -27,13 +27,18 @@ export function checkPrivilege(privileges) {
             );
 
             if (!hasPrivilege) {
-                return res.status(403);
+                return res.status(403).send({
+                    message: "User does not have required privileges",
+                });
             }
 
             next();
         } catch (error) {
             console.log(error);
-            return res.status(500);
+            return res.status(500).send({
+                message: "An error has occurred with the database client",
+                error: error,
+            });
         }
     };
 }

@@ -20,7 +20,9 @@ export async function createProduct(req, res) {
             },
         });
 
-        res.status(201);
+        res.status(201).send({
+            message: "Product has been sucessfully created",
+        });
         return createdProduct;
     } catch (error) {
         console.log(error);
@@ -42,9 +44,7 @@ export async function getProduct(req, res) {
 
     try {
         const foundProduct = await prisma.product.findUnique({
-            where: {
-                id: product.id,
-            },
+            where: product,
         });
 
         if (foundProduct === null || foundProduct === undefined) {
@@ -65,43 +65,13 @@ export async function getProduct(req, res) {
     }
 }
 
-export async function getActiveProducts(req, res) {
-    const { requester } = req.body;
+export async function getAllProducts(req, res) {
+    const { requester, filter } = req.body;
 
     try {
         const foundProducts = await prisma.product.findMany({
-            where: {
-                isActive: true,
-            },
+            where: filter,
         });
-
-        if (
-            foundProducts === null ||
-            foundProducts === undefined ||
-            foundProducts.length === 0
-        ) {
-            return res
-                .status(404)
-                .send({ message: "No active products could not be found" });
-        }
-
-        res.status(200);
-        res.json(foundProducts);
-        return foundProducts;
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({
-            message: "An error with the database client has occurred.",
-            error: error,
-        });
-    }
-}
-
-export async function getAllProducts(req, res) {
-    const { requester } = req.body;
-
-    try {
-        const foundProducts = await prisma.product.findMany();
 
         if (
             foundProducts === null ||
@@ -154,7 +124,9 @@ export async function editProduct(req, res) {
             },
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: "Product has been sucessfully updated",
+        });
         return updatedProduct;
     } catch (error) {
         console.log(error);
@@ -182,7 +154,9 @@ export async function deactivateProduct(req, res) {
             },
         });
 
-        res.status(200);
+        res.status(200).send({
+            message: "Product has been sucessfully deactivated",
+        });
         return updatedProduct;
     } catch (error) {
         console.log(error);

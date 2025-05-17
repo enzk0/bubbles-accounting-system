@@ -192,7 +192,18 @@ export async function getUser(req, res) {
 }
 
 export async function getAllUsers(req, res) {
-    const { filter } = req.body;
+    const { isActive, branchId } = req.query;
+
+    let filter = {};
+
+    if (isActive !== undefined) {
+        filter.isActive = isActive === "true";
+    }
+
+    if (branchId !== undefined && Number(branchId) !== NaN) {
+        filter.branchId = parseInt(branchId);
+    }
+
     try {
         const found = await prisma.user.findMany({
             where: filter,
@@ -212,6 +223,7 @@ export async function getAllUsers(req, res) {
         res.json(found);
         return found;
     } catch (error) {
+        console.log(error);
         return res.status(500).send({
             message: "An error has occurred with the database client",
             error: error,

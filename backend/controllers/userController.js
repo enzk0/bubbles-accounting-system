@@ -122,18 +122,21 @@ export async function editUser(req, res) {
 }
 
 export async function editPassword(req, res) {
-    const { user, newPassword } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (!(!user.id || !user.username) || !newPassword) {
+    const { password } = req.body;
+
+    if (!id || !password) {
         return res.status(422).send({
             message: "The  new password fields are invalid",
         });
     }
 
     try {
-        const hash = bcrypt.hashSync(newPassword, saltRounds);
+        const hash = bcrypt.hashSync(password, saltRounds);
         const updated = await prisma.user.update({
-            where: user,
+            where: { id: id },
             data: {
                 password: hash,
             },

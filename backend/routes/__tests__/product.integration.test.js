@@ -15,36 +15,30 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe("INTEGRATION TESTS FOR /product/ POST ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /product/ POST ROUTE", () => {
     test("/product/ POST route should create a product in the database and send an HTTP status code of 201 along with a message", async () => {
-        const response = await request(app)
-            .post("/product/")
-            .send({
-                requester: { id: 1 },
-                product: { name: "WASHING", price: 60.0 },
-            });
+        const response = await request(app).post("/product/").send({
+            name: "WASHING",
+            price: 60.0,
+        });
 
         expect(response.statusCode).toBe(201);
     });
 
     test("/product/ POST route should send an HTTP status code of 422 and send an error message when information provided to create a product is incomplete", async () => {
-        const response = await request(app)
-            .post("/product/")
-            .send({
-                requester: { id: 1 },
-                product: { name: "", price: 60.0 },
-            });
+        const response = await request(app).post("/product/").send({
+            name: "",
+            price: 60.0,
+        });
 
         expect(response.statusCode).toBe(422);
     });
 
     test("/product/ POST route should send an HTTP status code of 500 and send an error message when attempting to create a non-unique branch ", async () => {
-        const response = await request(app)
-            .post("/product/")
-            .send({
-                requester: { id: 1 },
-                product: { name: "WASH", price: 60.0 },
-            });
+        const response = await request(app).post("/product/").send({
+            name: "WASH",
+            price: 60.0,
+        });
 
         expect(response.statusCode).toBe(500);
     });

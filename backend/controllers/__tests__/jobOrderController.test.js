@@ -362,7 +362,7 @@ describe("UNIT TEST SUITE FOR 'getAllJobOrders()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
     test("countJobOrders() should send an HTTP status of 200 and send an array of all job orders", async () => {
-        const req = mockRequest({}, { id: 1 }, {}, { interval: "daily" });
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
 
         const res = mockResponse();
 
@@ -386,7 +386,7 @@ describe("UNIT TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
     });
 
     test("countJobOrders() should send an HTTP status of 404 when no job order can be grouped", async () => {
-        const req = mockRequest({}, { id: 1 }, {}, { interval: "daily" });
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
 
         const res = mockResponse();
 
@@ -410,7 +410,7 @@ describe("UNIT TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
     });
 
     test("countJobOrders() should send an HTTP status of 500 when an error occurs", async () => {
-        const req = mockRequest({}, { id: 1 }, {}, { interval: "deliciously" });
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
 
         const res = mockResponse();
 

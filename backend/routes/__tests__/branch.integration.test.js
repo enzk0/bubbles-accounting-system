@@ -126,8 +126,8 @@ describe.only("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TESTS FOR /branch/ PATCH ROUTE", () => {
-    test("/branch/ PATCH route should edit the specified branch and send an HTTP status code of 200", async () => {
+describe.only("INTEGRATION TESTS FOR /branch/:id PATCH ROUTE", () => {
+    test("/branch/:id PATCH route should edit the specified branch and send an HTTP status code of 200", async () => {
         const response = await request(app).patch("/branch/1").send({
             name: "Ambrosia",
             address: "Somewhere City",
@@ -147,7 +147,7 @@ describe.only("INTEGRATION TESTS FOR /branch/ PATCH ROUTE", () => {
         expect(branch.address).toEqual("Somewhere City");
     });
 
-    test("/branch/ PATCH route should send an HTTP status code of 422 when some the fields are either invalid or empty", async () => {
+    test("/branch/:id PATCH route should send an HTTP status code of 422 when some the fields are either invalid or empty", async () => {
         const response = await request(app).patch("/branch/1").send({
             name: "Ambrosia",
             address: "",
@@ -157,7 +157,7 @@ describe.only("INTEGRATION TESTS FOR /branch/ PATCH ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /branch/ DELETE ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /branch/ DELETE ROUTE", () => {
     test("/branch/ DELETE route should deactivate the specified branch and send an HTTP status code of 200", async () => {
         const response = await request(app)
             .delete("/branch/")

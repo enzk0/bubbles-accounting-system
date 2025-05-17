@@ -15,7 +15,7 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
     test("/user/ POST route should create a user in the database and send an HTTP status code of 201", async () => {
         const response = await request(app)
             .post("/user/")
@@ -187,24 +187,26 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/ PATCH ROUTE", () => {
-    test("/user/ PATCH route should edit the specified in the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .patch("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { username: "quandale_dingle" },
-                edit: {
-                    username: "quandale_dingleberry",
-                    firstName: "Quandale",
-                    lastName: "Dingleberry",
-                    roleId: 1,
-                    branchId: 2,
-                },
-            });
+describe.only("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
+    test("/user/:id PATCH route should edit the specified in the database and send an HTTP status code of 200", async () => {
+        const user = await prisma.user.findUnique({
+            where: {
+                username: "quandale_dingle",
+            },
+        });
+
+        console.log(user);
+
+        const response = await request(app).patch(`/user/${user.id}`).send({
+            username: "quandale_dingleberry",
+            firstName: "Quandale",
+            lastName: "Dingleberry",
+            roleId: 1,
+            branchId: 2,
+        });
 
         const updated = await prisma.user.findUnique({
-            where: { username: "quandale_dingleberry" },
+            where: { id: user.id },
         });
 
         expect(response.statusCode).toBe(200);
@@ -216,60 +218,45 @@ describe("INTEGRATION TESTS FOR /user/ PATCH ROUTE", () => {
         expect(updated.branchId).toEqual(2);
     });
 
-    test("/user/ PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
-        const response = await request(app)
-            .patch("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { id: 2050 },
-                edit: {
-                    username: "anachiro",
-                    firstName: "Anachiro",
-                    lastName: "Grimms",
-                },
-            });
+    test("/user/:id PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
+        const response = await request(app).patch("/user/2077").send({
+            username: "anachiro",
+            firstName: "Anachiro",
+            lastName: "Grimms",
+        });
 
         expect(response.statusCode).toBe(404);
     });
 
-    test("/user/ PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
-        const response = await request(app)
-            .patch("/user/")
-            .send({
-                requester: { id: 1 },
-                user: { id: 1 },
-                edit: {
-                    username: "",
-                    firstName: null,
-                    lastName: undefined,
-                },
-            });
+    test("/user/:id PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
+        const response = await request(app).patch("/user/1").send({
+            username: "",
+            firstName: null,
+            lastName: undefined,
+        });
 
         expect(response.statusCode).toBe(422);
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
     test("/user/password PATCH route updated the password of a user in the database and send an HTTP status code of 200", async () => {
+        const user = await prisma.user.findUnique({
+            where: { username: "quandale_dingleberry" },
+        });
         const response = await request(app)
-            .patch("/user/password")
+            .patch(`/user/password/${user.id}`)
             .send({
-                requester: { id: 1 },
-                user: { username: "quandale_dingleberry" },
-                newPassword: "pass456",
+                password: "pass456",
             });
 
         expect(response.statusCode).toBe(200);
     });
 
     test("/user/password PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
-        const response = await request(app)
-            .patch("/user/password")
-            .send({
-                requester: { id: 1 },
-                user: { id: 2050 },
-                newPassword: "pass456",
-            });
+        const response = await request(app).patch("/user/password/2050").send({
+            password: "pass456",
+        });
 
         expect(response.statusCode).toBe(404);
     });

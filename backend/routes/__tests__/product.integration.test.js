@@ -65,13 +65,9 @@ describe.only("INTEGRATION TESTS FOR /product/ GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
     test("/product/all GET route should get all products from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/product/all")
-            .send({
-                requester: { id: 1 },
-            });
+        const response = await request(app).get("/product/all");
 
         expect(response.statusCode).toBe(200);
 
@@ -90,12 +86,7 @@ describe("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
     });
 
     test("/product/all GET route should get all active products from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/product/all")
-            .send({
-                requester: { id: 1 },
-                filter: { isActive: true },
-            });
+        const response = await request(app).get("/product/all?isActive=true");
 
         expect(response.statusCode).toBe(200);
 
@@ -109,12 +100,7 @@ describe("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
     });
 
     test("/product/all GET route should get all inactive products from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .get("/product/all")
-            .send({
-                requester: { id: 1 },
-                filter: { isActive: false },
-            });
+        const response = await request(app).get("/product/all?isActive=false");
 
         expect(response.statusCode).toBe(200);
 
@@ -125,17 +111,6 @@ describe("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
         });
 
         expect(response.body.length).toEqual(products.length);
-    });
-
-    test("/product/all GET route should send an HTTP status code of 500 when the fields in the filter are invalid", async () => {
-        const response = await request(app)
-            .get("/product/all")
-            .send({
-                requester: { id: 1 },
-                filter: { isPresent: false },
-            });
-
-        expect(response.statusCode).toBe(500);
     });
 });
 

@@ -126,15 +126,12 @@ describe.only("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /branch/ PATCH ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /branch/ PATCH ROUTE", () => {
     test("/branch/ PATCH route should edit the specified branch and send an HTTP status code of 200", async () => {
-        const response = await request(app)
-            .patch("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { id: 1 },
-                edit: { name: "Ambrosia", address: "Somewhere City" },
-            });
+        const response = await request(app).patch("/branch/1").send({
+            name: "Ambrosia",
+            address: "Somewhere City",
+        });
 
         expect(response.statusCode).toBe(200);
 
@@ -151,13 +148,10 @@ describe("INTEGRATION TESTS FOR /branch/ PATCH ROUTE", () => {
     });
 
     test("/branch/ PATCH route should send an HTTP status code of 422 when some the fields are either invalid or empty", async () => {
-        const response = await request(app)
-            .patch("/branch/")
-            .send({
-                requester: { id: 1 },
-                branch: { id: 1 },
-                edit: { name: "Ambrosia", address: "" },
-            });
+        const response = await request(app).patch("/branch/1").send({
+            name: "Ambrosia",
+            address: "",
+        });
 
         expect(response.statusCode).toBe(422);
     });

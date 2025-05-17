@@ -101,18 +101,16 @@ export async function getAllProducts(req, res) {
 }
 
 export async function editProduct(req, res) {
-    const { requester, product, edit } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (product.id === null || product.id === undefined || product.id < 1) {
+    const { name, price } = req.body;
+
+    if (id === null || id === undefined || id < 1) {
         return res.status(422).send({ message: "Product id is not provided." });
     }
 
-    if (
-        !edit.name ||
-        edit.price < 0 ||
-        edit.price === null ||
-        edit.price === undefined
-    ) {
+    if (!name || price < 0 || price === null || price === undefined) {
         return res
             .status(422)
             .send({ message: "Some of the required fields are empty." });
@@ -121,11 +119,11 @@ export async function editProduct(req, res) {
     try {
         const updatedProduct = await prisma.product.update({
             where: {
-                id: product.id,
+                id: id,
             },
             data: {
-                name: edit.name,
-                price: edit.price,
+                name: name,
+                price: price,
             },
         });
 

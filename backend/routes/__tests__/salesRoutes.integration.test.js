@@ -3,7 +3,6 @@ import request from 'supertest';
 import express from 'express';
 import salesRoutes from '../salesRoutes.js';
 
-// ✅ Mock before importing modules that depend on it
 vi.mock('../../controllers/jobOrderModificationController.js', () => ({
   modifyJobOrder: vi.fn(),
 }));
@@ -22,7 +21,6 @@ vi.mock('../../middleware/checkRole.js', async () => {
     };
 });
 
-// ✅ Import after mocking
 import { modifyJobOrder } from '../../controllers/jobOrderModificationController.js';
 
 const app = express();

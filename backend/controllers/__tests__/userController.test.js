@@ -370,9 +370,9 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
         const req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2, password: "password123" },
-                newPassword: "newpassword",
+                password: "newpassword",
             },
+            { id: "2" },
             {}
         );
 
@@ -390,16 +390,16 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
         const updated = await editPassword(req, res);
 
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(bcrypt.compareSync(req.body.newPassword, updated.password));
+        expect(bcrypt.compareSync(req.body.password, updated.password));
     });
 
     test("editPassword() should send a HTTP response code of 500 when the user to be updated cannot be found", async () => {
         let req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2, password: "password123" },
-                newPassword: "newpassword",
+                password: "newpassword",
             },
+            { id: "2" },
             {}
         );
 
@@ -419,9 +419,9 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
         let req = mockRequest(
             { id: 1 },
             {
-                user: { id: 2 },
-                newPassword: "",
+                password: "",
             },
+            { id: "2" },
             {}
         );
 
@@ -434,9 +434,9 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
         req = mockRequest(
             { id: 1 },
             {
-                user: { id: null },
-                newPassword: "newPassword",
+                password: "newPassword",
             },
+            { id: null },
             {}
         );
 
@@ -447,9 +447,9 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
         req = mockRequest(
             { id: 1 },
             {
-                user: { id: null },
-                newPassword: "",
+                password: "",
             },
+            { id: null },
             {}
         );
 
@@ -519,7 +519,7 @@ describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
 
 describe("UNIT TEST SUITE FOR 'getAllUsers()' CONTROLLER", () => {
     test("getAllUsers() should send a HTTP response of code 200 when it can send a response containing an array of all users", async () => {
-        let req = mockRequest({ id: 1 }, {}, {});
+        let req = mockRequest({ id: 1 }, {}, {}, {});
 
         const res = mockResponse();
 

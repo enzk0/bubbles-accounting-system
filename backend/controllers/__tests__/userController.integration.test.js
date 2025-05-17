@@ -61,10 +61,14 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
     });
 
     test("editPassword() should change the password of a User in the database", async () => {
-        const req = mockRequest({
-            user: { id: 11 },
-            newPassword: "pass456",
-        });
+        const req = mockRequest(
+            {
+                password: "pass456",
+            },
+            {},
+            { id: "11" },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -74,8 +78,8 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
 
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof updated).toBe("object");
-        expect(updated.id).toBe(req.body.user.id);
-        expect(bcrypt.compareSync(req.body.newPassword, updated.password)).toBe(
+        expect(updated.id).toBe(parseInt(req.params.id));
+        expect(bcrypt.compareSync(req.body.password, updated.password)).toBe(
             true
         );
 

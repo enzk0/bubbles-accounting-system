@@ -5,7 +5,7 @@ export function checkPrivilege(privileges) {
         try {
             const user = await prisma.user.findUnique({
                 where: {
-                    id: req.body.requester.id,
+                    id: req.user.id,
                 },
                 include: {
                     role: {

@@ -1,5 +1,9 @@
 import { test, expect, describe, vi } from "vitest";
-import { createJobOrder, getJobOrder } from "../jobOrderController";
+import {
+    createJobOrder,
+    getAllJobOrders,
+    getJobOrder,
+} from "../jobOrderController";
 import { prismaMock } from "../../singleton";
 
 const mockRequest = (body, user, params, query) => ({
@@ -213,7 +217,7 @@ describe("UNIT TEST SUITE FOR 'createJobOrder()' CONTROLLER", () => {
     });
 });
 
-describe("UNIT TEST SUITE FOR 'getJobOrder' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'getJobOrder()' CONTROLLER", () => {
     test("getJobOrder() should send an HTTP status of 200 and send the specified job order", async () => {
         const req = mockRequest(
             {},
@@ -298,6 +302,58 @@ describe("UNIT TEST SUITE FOR 'getJobOrder' CONTROLLER", () => {
         });
 
         await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'getAllJobOrders()' CONTROLLER", () => {
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findMany.mockResolvedValue([
+            {
+                idCode: "AB",
+                idNumber: 1234,
+
+                createdAt: new Date(),
+                updatedAt: new Date(),
+
+                isPaid: false,
+                isClaimed: false,
+                isHidden: false,
+            },
+        ]);
+
+        const jobOrder = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("getAllJobOrders() should send an HTTP status of 404 when no job order can be found", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findMany.mockResolvedValue([]);
+
+        const jobOrder = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("getJobOrder() should send an HTTP status of 500 and send the specified job order", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findMany.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await getAllJobOrders(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
     });

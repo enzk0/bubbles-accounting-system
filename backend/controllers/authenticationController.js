@@ -33,11 +33,11 @@ export async function employeeLogin(req, res) {
 }
 
 export async function adminLogin(req, res) {
-    const { user } = req.body;
+    const { username } = req.body;
 
     const fetchedUser = await prisma.user.findUnique({
         where: {
-            username: user.username,
+            username: username,
         },
     });
 

@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege(["admin"]), createProduct);
 
-router.get("/", authenticate, checkPrivilege([]), getProduct);
+router.get("/:id", authenticate, checkPrivilege([]), getProduct);
 
 router.get("/all", authenticate, checkPrivilege([]), getAllProducts);
 

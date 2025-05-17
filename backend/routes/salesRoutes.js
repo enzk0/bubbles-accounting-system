@@ -1,6 +1,6 @@
 import express from 'express';
 import { modifyJobOrder } from '../controllers/jobOrderModificationController.js';
-import checkRole from '../auth/checkRole.js';
+import checkRole from '../middleware/checkRole.js';
 
 const router = express.Router();
 

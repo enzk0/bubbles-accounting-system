@@ -25,7 +25,7 @@ const mockResponse = () => {
     return res;
 };
 
-describe.only("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
     test("createBranch() should send an HTTP status code of 201 when a branch has been successfully created", async () => {
         const req = mockRequest({
             code: "OT",
@@ -114,7 +114,7 @@ describe.only("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
     });
 });
 
-describe.only("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     test("getBranch() should send an HTTP status code of 200 when the queried branch has been successfully read from the database", async () => {
         const req = mockRequest({}, { id: 1 }, { id: "1" }, {});
 
@@ -174,7 +174,7 @@ describe.only("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 });
 
-describe.only("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     test("getAllBranches() should send an HTTP status code of 200 when all branches been successfully read from the database", async () => {
         const req = mockRequest({}, { id: 1 }, {}, {});
 
@@ -236,7 +236,7 @@ describe.only("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     });
 });
 
-describe.only("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     test("editBranch() should send an HTTP status code of 200 when a branch in the database has been successfully updated/edited", async () => {
         const req = mockRequest(
             {
@@ -315,7 +315,7 @@ describe.only("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     });
 });
 
-describe.only("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
+describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
     test("deactivateBranch() should send an HTTP status code of 200 when a branch in the database has been successfully deactivated", async () => {
         const req = mockRequest({}, {}, { id: 1 }, {});
 

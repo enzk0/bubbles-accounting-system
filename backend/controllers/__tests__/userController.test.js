@@ -10,10 +10,11 @@ import {
 import { prismaMock } from "../../singleton";
 import bcrypt from "bcrypt";
 
-const mockRequest = (user, body, params) => ({
+const mockRequest = (user, body, params, query) => ({
     user: user,
     body: body,
     params: params,
+    query: query,
 });
 
 const mockResponse = () => {
@@ -490,7 +491,7 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
     test("getUser() should send a HTTP response code of 200 and a json response of a user when a user is found from the database", async () => {
-        let req = mockRequest({ id: 1 }, {}, { id: 2 });
+        let req = mockRequest({ id: 1 }, {}, { id: "2" });
 
         const res = mockResponse();
 
@@ -518,7 +519,7 @@ describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
     });
 
     test("getUser() should send a HTTP response code of 404 when a user cannot be found in the database", async () => {
-        let req = mockRequest({ id: 1 }, {}, { id: 2 });
+        let req = mockRequest({ id: 1 }, {}, { id: "2" });
 
         const res = mockResponse();
 
@@ -531,7 +532,7 @@ describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
     });
 
     test("getUser() should send a HTTP response code of 500 when an error occurs with database client", async () => {
-        let req = mockRequest({ id: 1 }, {}, { id: 2 });
+        let req = mockRequest({ id: 1 }, {}, { id: "2" });
 
         const res = mockResponse();
 
@@ -548,9 +549,7 @@ describe("UNIT TEST SUITE FOR 'getUser()' CONTROLLER", async () => {
 
 describe("UNIT TEST SUITE FOR 'getAllUsers()' CONTROLLER", () => {
     test("getAllUsers() should send a HTTP response of code 200 when it can send a response containing an array of all users", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-        });
+        let req = mockRequest({ id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -596,9 +595,7 @@ describe("UNIT TEST SUITE FOR 'getAllUsers()' CONTROLLER", () => {
     });
 
     test("getAllUsers() should send a HTTP response code of 404 when no users can be found and should also send a json where users is an empty array", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-        });
+        let req = mockRequest({ id: 1 }, {}, {}, {});
 
         let res = mockResponse();
 
@@ -616,9 +613,7 @@ describe("UNIT TEST SUITE FOR 'getAllUsers()' CONTROLLER", () => {
     });
 
     test("getAllUsers() should send a HTTP response code of 500 when an error occurs with the database client", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-        });
+        let req = mockRequest({ id: 1 }, {}, {}, {});
 
         let res = mockResponse();
 

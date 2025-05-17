@@ -32,11 +32,12 @@ export async function createUser(req, res) {
 }
 
 export async function deactivateUser(req, res) {
-    const { user } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
     try {
         const updatedUser = await prisma.user.update({
-            where: user,
+            where: { id: id },
             data: {
                 isActive: false,
             },
@@ -47,6 +48,7 @@ export async function deactivateUser(req, res) {
         });
         return updatedUser;
     } catch (error) {
+        console.log(error);
         if (!(error instanceof Prisma.PrismaClientKnownRequestError)) {
             return res.status(500).send({
                 message: "An error with the database client has occurred",
@@ -156,15 +158,16 @@ export async function editPassword(req, res) {
 }
 
 export async function getUser(req, res) {
-    const { user } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (!user.id) {
+    if (!id) {
         res.status(422).send({ message: "User id provided is invalid" });
     }
 
     try {
         const found = await prisma.user.findUnique({
-            where: user,
+            where: id,
         });
 
         if (!found || found === null) {

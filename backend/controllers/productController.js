@@ -65,7 +65,13 @@ export async function getProduct(req, res) {
 }
 
 export async function getAllProducts(req, res) {
-    const { requester, filter } = req.body;
+    const { isActive } = req.query;
+
+    let filter = {};
+
+    if (isActive !== undefined) {
+        filter.isActive = isActive === "true";
+    }
 
     try {
         const foundProducts = await prisma.product.findMany({

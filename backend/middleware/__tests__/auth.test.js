@@ -46,12 +46,11 @@ describe("UNIT TEST SUITE FOR 'authenticate()' MIDDLEWARE", () => {
 
         const next = mockNext();
 
-        const body = await authenticate(req, res, next);
+        const user = await authenticate(req, res, next);
 
         expect(next).toHaveBeenCalled();
-        expect(body).toHaveProperty("requester");
-        expect(body.requester).toHaveProperty("id");
-        expect(body.requester.id).toEqual(1);
+        expect(user).toHaveProperty("id");
+        expect(user.id).toEqual(1);
     });
 
     test("authenticate() should send a HTTP status code of 401 if no access token is provided in the authorization header", async () => {

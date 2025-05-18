@@ -1,14 +1,14 @@
 import jwt from "jsonwebtoken";
-import prisma from "../client";
+import prisma from "../client.js";
 import bcrypt from "bcrypt";
 import "dotenv/config";
 
 export async function employeeLogin(req, res) {
-    const { user } = req.body;
+    const { username } = req.body;
 
     const fetchedUser = await prisma.user.findUnique({
         where: {
-            username: user.username,
+            username: username,
         },
     });
 
@@ -33,11 +33,11 @@ export async function employeeLogin(req, res) {
 }
 
 export async function adminLogin(req, res) {
-    const { user } = req.body;
+    const { username } = req.body;
 
     const fetchedUser = await prisma.user.findUnique({
         where: {
-            username: user.username,
+            username: username,
         },
     });
 
@@ -62,22 +62,19 @@ export async function adminLogin(req, res) {
 }
 
 export async function login(req, res) {
-    const { user } = req.body;
+    const { username, password } = req.body;
 
     try {
         const fetchedUser = await prisma.user.findUnique({
             where: {
-                username: user.username,
+                username: username,
             },
         });
 
         const isPasswordCorrect = bcrypt.compareSync(
-            user.password,
+            password,
             fetchedUser.password
         );
-
-        console.log(user.password, fetchedUser.password, user);
-        console.log(bcrypt.compareSync(user.password, fetchedUser.password));
 
         if (!isPasswordCorrect) {
             return res.status(401).send({ message: "Password is incorrect" });

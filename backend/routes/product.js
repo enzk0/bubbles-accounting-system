@@ -1,24 +1,29 @@
 import express from "express";
-import { authenticate } from "../middleware/auth";
-import { checkPrivilege } from "../middleware/accessControl";
+import { authenticate } from "../middleware/auth.js";
+import { checkPrivilege } from "../middleware/accessControl.js";
 import {
     createProduct,
     deactivateProduct,
     editProduct,
     getAllProducts,
     getProduct,
-} from "../controllers/productController";
+} from "../controllers/productController.js";
 
 const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege(["admin"]), createProduct);
 
-router.get("/", authenticate, checkPrivilege([]), getProduct);
-
 router.get("/all", authenticate, checkPrivilege([]), getAllProducts);
 
-router.patch("/", authenticate, checkPrivilege(["admin"]), editProduct);
+router.get("/:id", authenticate, checkPrivilege([]), getProduct);
 
-router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateProduct);
+router.patch("/:id", authenticate, checkPrivilege(["admin"]), editProduct);
+
+router.delete(
+    "/:id",
+    authenticate,
+    checkPrivilege(["admin"]),
+    deactivateProduct
+);
 
 export default router;

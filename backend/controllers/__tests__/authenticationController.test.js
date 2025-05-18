@@ -20,7 +20,8 @@ const mockResponse = () => {
 describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
     test("login() should send an HTTP response of 200 and a jwt access token when the user has been successfully authenticated", async () => {
         const req = mockRequest({
-            user: { username: "user123", password: "password456" },
+            username: "user123",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -46,7 +47,8 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
 
     test("login() should send an HTTP response of 401 when the incorrect password is used to authenticate the user", async () => {
         const req = mockRequest({
-            user: { username: "user123", password: "pass123" },
+            username: "user123",
+            password: "pass123",
         });
 
         const res = mockResponse();
@@ -67,9 +69,10 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(401);
     });
 
-    test("login() should send an HTTP response of 500 when an error in the database client has occurred", async () => {
+    test("login() should send an  user: { HTTP response of 500 when an error in the database client has occurred", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -88,7 +91,8 @@ describe("UNIT TEST SUITE 'login()' CONTROLLER", () => {
 describe("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
     test("adminLogin() should send an HTTP response of 404 when a user with the specified username cannot be found", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -102,7 +106,8 @@ describe("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
 
     test("adminLogin() should send an HTTP response of 403 when logging in with a deactivated user", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -126,7 +131,8 @@ describe("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
 
     test("adminLogin() should send an HTTP status code of 403 when a non-admin account is used to login", async () => {
         const req = mockRequest({
-            user: { username: "user123", password: "password456" },
+            username: "user123",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -151,7 +157,8 @@ describe("UNIT TESTS FOR 'adminLogin() CONTROLLER'", () => {
 describe("UNIT TESTS FOR 'employeeLogin() CONTROLLER'", () => {
     test("employeeLogin() should send an HTTP response of 404 when a user with the specified username cannot be found", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -165,7 +172,8 @@ describe("UNIT TESTS FOR 'employeeLogin() CONTROLLER'", () => {
 
     test("employeeLogin() should send an HTTP response of 403 when logging in with a deactivated user", async () => {
         const req = mockRequest({
-            user: { username: "use27", password: "password456" },
+            username: "use27",
+            password: "password456",
         });
 
         const res = mockResponse();
@@ -189,7 +197,8 @@ describe("UNIT TESTS FOR 'employeeLogin() CONTROLLER'", () => {
 
     test("employeeLogin() should send an HTTP status code of 403 when a non-employee account is used to login", async () => {
         const req = mockRequest({
-            user: { username: "user123", password: "password456" },
+            username: "user123",
+            password: "password456",
         });
 
         const res = mockResponse();

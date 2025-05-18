@@ -5,20 +5,25 @@ import {
     editBranch,
     getAllBranches,
     getBranch,
-} from "../controllers/branchController";
-import { authenticate } from "../middleware/auth";
-import { checkPrivilege } from "../middleware/accessControl";
+} from "../controllers/branchController.js";
+import { authenticate } from "../middleware/auth.js";
+import { checkPrivilege } from "../middleware/accessControl.js";
 
 const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege(["admin"]), createBranch);
 
-router.get("/", authenticate, checkPrivilege([]), getBranch);
-
 router.get("/all", authenticate, checkPrivilege(["admin"]), getAllBranches);
 
-router.patch("/", authenticate, checkPrivilege(["admin"]), editBranch);
+router.get("/:id", authenticate, checkPrivilege([]), getBranch);
 
-router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateBranch);
+router.patch("/:id", authenticate, checkPrivilege(["admin"]), editBranch);
+
+router.delete(
+    "/:id",
+    authenticate,
+    checkPrivilege(["admin"]),
+    deactivateBranch
+);
 
 export default router;

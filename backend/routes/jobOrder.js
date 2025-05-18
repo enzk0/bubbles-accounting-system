@@ -1,46 +1,21 @@
 import express from "express";
-import bodyParser from "body-parser";
+import { authenticate } from "../middleware/auth.js";
+import { checkPrivilege } from "../middleware/accessControl.js";
 import {
-    countJobOrder,
-    countJobOrderByBranch,
-} from "../controllers/countJobOrder.js";
-import {
-    getAllJobOrder,
-    getAllJobOrderByBranch,
-    getJobOrderByIdController,
-} from "../controllers/getJobOrder.js";
-import { modifyJobOrder as employeeModify } from "../controllers/employeeController.js";
-import { modifyJobOrder as adminModify } from "../controllers/adminController.js";
-import { authenticate } from "../middleware/auth";
-import { checkPrivilege } from "../middleware/accessControl";
-import { createJobOrder } from "../controllers/jobOrderController.js";
+    countJobOrders,
+    createJobOrder,
+    getAllJobOrders,
+    getJobOrder,
+} from "../controllers/jobOrderController.js";
 const router = express.Router();
-
-router.use(bodyParser.urlencoded({ extended: true }));
 
 router.post("/", authenticate, checkPrivilege([]), createJobOrder);
 
-//summarizes job orders depending on interval
-router.get("/count", authenticate, checkPrivilege(["admin"]), countJobOrder);
+router.get("/all", authenticate, checkPrivilege([]), getAllJobOrders);
 
-//needs params
-router.get(
-    "/count-by-branch",
-    authenticate,
-    checkPrivilege(["admin"]),
-    countJobOrderByBranch
-);
+router.get("/", authenticate, checkPrivilege([]), getJobOrder);
 
-//gets all job orders
-router.get("/get", authenticate, checkPrivilege(["admin"]), getAllJobOrder);
-
-//gets all job orders depending on branch
-router.get(
-    "/get-by-branch",
-    authenticate,
-    checkPrivilege([]),
-    getAllJobOrderByBranch
-);
+router.get("/count", authenticate, checkPrivilege(["admin"]), countJobOrders);
 
 router.patch("/employee/job-orders/:id", async (req, res) => {
     try {
@@ -71,4 +46,3 @@ router.patch("/admin/job-orders/:id", async (req, res) => {
 });
 
 export default router;
-

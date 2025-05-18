@@ -1,13 +1,9 @@
-import prisma from "../client";
+import prisma from "../client.js";
 
 export async function createProduct(req, res) {
-    const { requester, product } = req.body;
+    const { name, price } = req.body;
 
-    if (
-        !product.name ||
-        product.price === null ||
-        product.price === undefined
-    ) {
+    if (!name || price === null || price === undefined) {
         return res
             .status(422)
             .send({ message: "Some of the required fields are empty." });
@@ -15,8 +11,8 @@ export async function createProduct(req, res) {
     try {
         const createdProduct = await prisma.product.create({
             data: {
-                name: product.name,
-                price: product.price,
+                name: name,
+                price: price,
             },
         });
 
@@ -34,9 +30,10 @@ export async function createProduct(req, res) {
 }
 
 export async function getProduct(req, res) {
-    const { requester, product } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (product.id === null || product.id === undefined || product.id < 1) {
+    if (id === null || id === undefined || id < 1) {
         return res.status(422).send({
             message: "Some of the required fields are empty or invalid.",
         });
@@ -44,7 +41,9 @@ export async function getProduct(req, res) {
 
     try {
         const foundProduct = await prisma.product.findUnique({
-            where: product,
+            where: {
+                id: id,
+            },
         });
 
         if (foundProduct === null || foundProduct === undefined) {
@@ -66,7 +65,13 @@ export async function getProduct(req, res) {
 }
 
 export async function getAllProducts(req, res) {
-    const { requester, filter } = req.body;
+    const { isActive } = req.query;
+
+    let filter = {};
+
+    if (isActive !== undefined) {
+        filter.isActive = isActive === "true";
+    }
 
     try {
         const foundProducts = await prisma.product.findMany({
@@ -96,18 +101,16 @@ export async function getAllProducts(req, res) {
 }
 
 export async function editProduct(req, res) {
-    const { requester, product, edit } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (product.id === null || product.id === undefined || product.id < 1) {
+    const { name, price } = req.body;
+
+    if (id === null || id === undefined || id < 1) {
         return res.status(422).send({ message: "Product id is not provided." });
     }
 
-    if (
-        !edit.name ||
-        edit.price < 0 ||
-        edit.price === null ||
-        edit.price === undefined
-    ) {
+    if (!name || price < 0 || price === null || price === undefined) {
         return res
             .status(422)
             .send({ message: "Some of the required fields are empty." });
@@ -116,11 +119,11 @@ export async function editProduct(req, res) {
     try {
         const updatedProduct = await prisma.product.update({
             where: {
-                id: product.id,
+                id: id,
             },
             data: {
-                name: edit.name,
-                price: edit.price,
+                name: name,
+                price: price,
             },
         });
 
@@ -138,16 +141,17 @@ export async function editProduct(req, res) {
 }
 
 export async function deactivateProduct(req, res) {
-    const { requester, product } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (product.id === null || product.id === undefined || product.id < 1) {
+    if (id === null || id === undefined || id < 1) {
         return res.status(422).send({ message: "Product id is not provided." });
     }
 
     try {
         const updatedProduct = await prisma.product.update({
             where: {
-                id: product.id,
+                id: id,
             },
             data: {
                 isActive: false,

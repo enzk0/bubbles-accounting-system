@@ -14,19 +14,19 @@ const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege(["admin"]), createUser);
 
-router.get("/", authenticate, checkPrivilege([]), getUser);
-
 router.get("/all", authenticate, checkPrivilege(["admin"]), getAllUsers);
 
-router.patch("/", authenticate, checkPrivilege(["admin"]), editUser);
+router.get("/:id", authenticate, checkPrivilege([]), getUser);
 
 router.patch(
-    "/password",
+    "/password/:id",
     authenticate,
     checkPrivilege(["admin"]),
     editPassword
 );
 
-router.delete("/", authenticate, checkPrivilege(["admin"]), deactivateUser);
+router.patch("/:id", authenticate, checkPrivilege(["admin"]), editUser);
+
+router.delete("/:id", authenticate, checkPrivilege(["admin"]), deactivateUser);
 
 export default router;

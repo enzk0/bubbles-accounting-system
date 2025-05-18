@@ -8,8 +8,11 @@ import {
 } from "../branchController";
 import { prismaMock } from "../../singleton";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user, params, query) => ({
     body: body,
+    user: user,
+    params: params,
+    query: query,
 });
 
 const mockResponse = () => {
@@ -25,8 +28,9 @@ const mockResponse = () => {
 describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
     test("createBranch() should send an HTTP status code of 201 when a branch has been successfully created", async () => {
         const req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "OT", name: "Outpost", address: "Ark Outpost" },
+            code: "OT",
+            name: "Outpost",
+            address: "Ark Outpost",
         });
 
         const res = mockResponse();
@@ -48,8 +52,9 @@ describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
 
     test("createBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
         let req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "", name: "", address: "" },
+            code: "",
+            name: "",
+            address: "",
         });
 
         const res = mockResponse();
@@ -59,8 +64,9 @@ describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(422);
 
         req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "", name: "Outpost", address: "Ark Outpost" },
+            code: "",
+            name: "Outpost",
+            address: "Ark Outpost",
         });
 
         await createBranch(req, res);
@@ -68,8 +74,9 @@ describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(422);
 
         req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "OT", name: "", address: "Ark Outpost" },
+            code: "OT",
+            name: "",
+            address: "Ark Outpost",
         });
 
         await createBranch(req, res);
@@ -77,8 +84,9 @@ describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(422);
 
         req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "OT", name: "Outpost", address: "" },
+            code: "OT",
+            name: "Outpost",
+            address: "",
         });
 
         await createBranch(req, res);
@@ -88,8 +96,9 @@ describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
 
     test("createBranch() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
         const req = mockRequest({
-            requester: { id: 1 },
-            branch: { code: "OT", name: "Outpost", address: "Ark Outpost" },
+            code: "OT",
+            name: "Outpost",
+            address: "Ark Outpost",
         });
 
         const res = mockResponse();
@@ -107,10 +116,7 @@ describe("UNIT TEST SUITE FOR 'createBranch()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     test("getBranch() should send an HTTP status code of 200 when the queried branch has been successfully read from the database", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: "1" }, {});
 
         const res = mockResponse();
 
@@ -131,10 +137,7 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 
     test("getBranch() should send an HTTP status code of 404 when the queried branch does not exist", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 21 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: "21" }, {});
 
         const res = mockResponse();
 
@@ -146,10 +149,7 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 
     test("getBranch() should send an HTTP status code of 422 when no fields for identification have been provided", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: null },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 0 }, {});
 
         const res = mockResponse();
 
@@ -159,10 +159,7 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
     });
 
     test("getBranch() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: "1" }, {});
 
         const res = mockResponse();
 
@@ -179,10 +176,7 @@ describe("UNIT TEST SUITE FOR 'getBranch()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     test("getAllBranches() should send an HTTP status code of 200 when all branches been successfully read from the database", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            filter: {},
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -214,9 +208,7 @@ describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     });
 
     test("getAllBranches() should send an HTTP status code of 404 when there are no branches in the database", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -229,9 +221,7 @@ describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
     });
 
     test("getAllBranches() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -248,14 +238,15 @@ describe("UNIT TEST SUITE FOR 'getAllBranches()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     test("editBranch() should send an HTTP status code of 200 when a branch in the database has been successfully updated/edited", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: {
+        const req = mockRequest(
+            {
                 name: "Ark Outpost",
                 address: "Ark Outpost Command Center",
             },
-        });
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -275,11 +266,12 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     });
 
     test("editBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
-        let req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: { name: "", address: "Ark Outpost Command Center" },
-        });
+        let req = mockRequest(
+            { name: "", address: "Ark Outpost Command Center" },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -287,11 +279,12 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: { name: "Ark Outpost", address: "" },
-        });
+        req = mockRequest(
+            { name: "Ark Outpost", address: "" },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         await editBranch(req, res);
 
@@ -299,14 +292,15 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
     });
 
     test("editBranch() should send an HTTP status code of 500 when an error with the database client occurs or when the queried branch to be updated does not exist", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-            edit: {
+        const req = mockRequest(
+            {
                 name: "Ark Outpost",
                 address: "Ark Outpost Command Center",
             },
-        });
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -323,10 +317,7 @@ describe("UNIT TEST SUITE FOR 'editBranch()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
     test("deactivateBranch() should send an HTTP status code of 200 when a branch in the database has been successfully deactivated", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, {}, { id: 1 }, {});
 
         const res = mockResponse();
 
@@ -347,10 +338,7 @@ describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
     });
 
     test("deactivateBranch() should send an HTTP status code of 422 when some or all fields are empty", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: null },
-        });
+        const req = mockRequest({}, {}, { id: 0 }, {});
 
         const res = mockResponse();
 
@@ -360,10 +348,7 @@ describe("UNIT TEST SUITE FOR 'deactivateBranch()' CONTROLLER", () => {
     });
 
     test("deactivateBranch() should send an HTTP status code of 500 when an error with the database client occurs", async () => {
-        const req = mockRequest({
-            requeseter: { id: 1 },
-            branch: { id: 1 },
-        });
+        const req = mockRequest({}, {}, { id: 1 }, {});
 
         const res = mockResponse();
 

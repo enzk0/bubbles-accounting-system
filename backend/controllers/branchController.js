@@ -1,10 +1,11 @@
 import { Prisma } from "@prisma/client";
-import prisma from "../client";
+import prisma from "../client.js";
+import { raw } from "express";
 
 export async function createBranch(req, res) {
-    const { requester, branch } = req.body;
+    const { code, name, address } = req.body;
 
-    if (!branch.code || !branch.name || !branch.address) {
+    if (!code || !name || !address) {
         return res.status(422).send({
             message:
                 "The information provided to create a branch is incomplete",
@@ -13,7 +14,11 @@ export async function createBranch(req, res) {
 
     try {
         const newBranch = await prisma.branch.create({
-            data: branch,
+            data: {
+                code: code,
+                name: name,
+                address: address,
+            },
         });
 
         res.status(201).send({
@@ -39,18 +44,19 @@ export async function createBranch(req, res) {
 }
 
 export async function getBranch(req, res) {
-    const { requester, branch } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
     try {
-        if (branch.id === null || branch.id === undefined || branch.id < 1) {
+        if (id === null || id === undefined || id < 1) {
             return res
                 .status(422)
-                .send({ message: "A branchId was not provided" });
+                .send({ message: "A valid branchId was not provided" });
         }
 
         const foundBranch = await prisma.branch.findUnique({
             where: {
-                id: branch.id,
+                id: id,
             },
         });
 
@@ -68,7 +74,13 @@ export async function getBranch(req, res) {
 }
 
 export async function getAllBranches(req, res) {
-    const { requester, filter } = req.body;
+    const { isActive } = req.query;
+
+    let filter = {};
+
+    if (isActive !== undefined) {
+        filter.isActive = isActive === "true";
+    }
 
     try {
         const foundBranches = await prisma.branch.findMany({ where: filter });
@@ -93,9 +105,12 @@ export async function getAllBranches(req, res) {
 }
 
 export async function editBranch(req, res) {
-    const { requester, branch, edit } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (!edit.name || !edit.address) {
+    const { name, address } = req.body;
+
+    if (!name || !address) {
         return res
             .status(422)
             .send({ message: "Branch new name or new address is not valid" });
@@ -104,13 +119,16 @@ export async function editBranch(req, res) {
     try {
         const editedBranch = await prisma.branch.update({
             where: {
-                id: branch.id,
+                id: id,
             },
-            data: edit,
+            data: {
+                name: name,
+                address: address,
+            },
         });
 
         res.status(200).send({
-            message: `Branch with id of ${branch.id} has been successfully updated`,
+            message: `Branch with id of ${editedBranch.id} has been successfully updated`,
         });
         return editedBranch;
     } catch (error) {
@@ -123,9 +141,10 @@ export async function editBranch(req, res) {
 }
 
 export async function deactivateBranch(req, res) {
-    const { requester, branch } = req.body;
+    const { id: rawId } = req.params;
+    const id = parseInt(rawId);
 
-    if (branch.id === null || branch.id == undefined || branch.id < 1) {
+    if (id === null || id == undefined || id < 1) {
         return res.status(422).send({
             message:
                 "Branch id provided is invalid because it is null, undefined, or < 1",
@@ -135,7 +154,7 @@ export async function deactivateBranch(req, res) {
     try {
         const updatedBranch = prisma.branch.update({
             where: {
-                id: branch.id,
+                id: id,
             },
             data: {
                 isActive: false,
@@ -143,16 +162,14 @@ export async function deactivateBranch(req, res) {
         });
 
         res.status(200).send({
-            message: `Branch with id of ${branch.id} has been successfully deactivated`,
+            message: `Branch with id of ${updatedBranch.id} has been successfully deactivated`,
         });
         return updatedBranch;
     } catch (error) {
         console.log(error);
-        return res
-            .status(500)
-            .send({
-                message: "An error has occured with the database client",
-                error: error,
-            });
+        return res.status(500).send({
+            message: "An error has occured with the database client",
+            error: error,
+        });
     }
 }

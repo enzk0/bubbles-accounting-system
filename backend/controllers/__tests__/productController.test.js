@@ -9,8 +9,11 @@ import {
 } from "../productController";
 import { prismaMock } from "../../singleton";
 
-const mockRequest = (body) => ({
+const mockRequest = (body, user, params, query) => ({
     body: body,
+    user: user,
+    params: params,
+    query: query,
 });
 
 const mockResponse = () => {
@@ -25,10 +28,15 @@ const mockResponse = () => {
 
 describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     test("createProduct() should create a product in the database and send a HTTP status code of 201", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "WASH", price: 60.0 },
-        });
+        const req = mockRequest(
+            {
+                name: "WASH",
+                price: 60.0,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         const res = mockResponse();
 
@@ -45,10 +53,15 @@ describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     });
 
     test("createProduct() should send an HTTP status code of 422 if any of the fields are missing", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "", price: 60.0 },
-        });
+        let req = mockRequest(
+            {
+                name: "",
+                price: 60.0,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         const res = mockResponse();
 
@@ -56,19 +69,29 @@ describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "WASH", price: null },
-        });
+        req = mockRequest(
+            {
+                name: "WASH",
+                price: null,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         await createProduct(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "", price: null },
-        });
+        req = mockRequest(
+            {
+                name: "",
+                price: null,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         await createProduct(req, res);
 
@@ -76,10 +99,15 @@ describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
     });
 
     test("createProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { name: "WASH", price: 60.0 },
-        });
+        const req = mockRequest(
+            {
+                name: "WASH",
+                price: 60.0,
+            },
+            { id: 1 },
+            {},
+            {}
+        );
 
         const res = mockResponse();
 
@@ -95,10 +123,7 @@ describe("UNIT TEST SUITE FOR 'createProduct()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     test("getProduct() should get the queried product from the database and send a HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 
@@ -119,10 +144,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 
     test("getProduct() should send an HTTP status code of 404 if the queried product does not exist in the database", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 21 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 201 }, {});
 
         const res = mockResponse();
 
@@ -134,10 +156,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 
     test("getProduct() should send an HTTP status code of 422 if the id is null, undefined, or less than 1", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: null },
-        });
+        let req = mockRequest({}, { id: 1 }, { id: 0 }, {});
 
         const res = mockResponse();
 
@@ -145,10 +164,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: -1 },
-        });
+        req = mockRequest({}, { id: 1 }, { id: -1 }, {});
 
         await getProduct(req, res);
 
@@ -156,10 +172,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
     });
 
     test("getProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 
@@ -175,9 +188,7 @@ describe("UNIT TEST SUITE FOR 'getProduct()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     test("getAllProducts() should get all products from the database and send a HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -208,10 +219,7 @@ describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     });
 
     test("getAllProducts() should send an HTTP status code of 404 if no active products exist or can be found in the database", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 21 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -223,10 +231,7 @@ describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
     });
 
     test("getAllProducts() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, {}, {});
 
         const res = mockResponse();
 
@@ -242,11 +247,15 @@ describe("UNIT TEST SUITE FOR 'getAllProducts()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
     test("editProduct() should update a product in the database and send a HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-            edit: { name: "WASHING", price: 65.0 },
-        });
+        const req = mockRequest(
+            {
+                name: "WASHING",
+                price: 65.0,
+            },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -263,11 +272,15 @@ describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
     });
 
     test("editProduct() should send an HTTP status code of 422 if any of the fields are missing", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-            edit: { name: "", price: 60.0 },
-        });
+        let req = mockRequest(
+            {
+                name: "",
+                price: 65.0,
+            },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -275,21 +288,29 @@ describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-            edit: { name: "WASH", price: null },
-        });
+        req = mockRequest(
+            {
+                name: "WASHING",
+                price: null,
+            },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         await editProduct(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-            edit: { name: "", price: null },
-        });
+        req = mockRequest(
+            {
+                name: "",
+                price: null,
+            },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         await editProduct(req, res);
 
@@ -297,11 +318,15 @@ describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
     });
 
     test("editProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-            edit: { name: "WASHING", price: 65.0 },
-        });
+        const req = mockRequest(
+            {
+                name: "WASHING",
+                price: 65.0,
+            },
+            { id: 1 },
+            { id: 1 },
+            {}
+        );
 
         const res = mockResponse();
 
@@ -317,10 +342,7 @@ describe("UNIT TEST SUITE FOR 'editProduct()' CONTROLLER", () => {
 
 describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
     test("deactivateProduct() should update a product in the database and send a HTTP status code of 200", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 
@@ -338,10 +360,7 @@ describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
     });
 
     test("deactivateProduct() should send an HTTP status code of 422 if id is null, undefined, or less than 1", async () => {
-        let req = mockRequest({
-            requester: { id: 1 },
-            product: { id: null },
-        });
+        let req = mockRequest({}, { id: 1 }, { id: -1 }, {});
 
         const res = mockResponse();
 
@@ -349,19 +368,13 @@ describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: undefined },
-        });
+        req = mockRequest({}, { id: 1 }, { id: undefined }, {});
 
         await deactivateProduct(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
 
-        req = mockRequest({
-            requester: { id: 1 },
-            product: { id: null },
-        });
+        req = mockRequest({}, { id: 1 }, { id: null }, {});
 
         await deactivateProduct(req, res);
 
@@ -369,10 +382,7 @@ describe("UNIT TEST SUITE FOR 'deactivateProduct()' CONTROLLER", () => {
     });
 
     test("deactivateProduct() should send an HTTP status code of 500 when an error occurs with the database client", async () => {
-        const req = mockRequest({
-            requester: { id: 1 },
-            product: { id: 1 },
-        });
+        const req = mockRequest({}, { id: 1 }, { id: 1 }, {});
 
         const res = mockResponse();
 

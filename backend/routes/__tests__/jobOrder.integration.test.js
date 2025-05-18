@@ -212,6 +212,32 @@ describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
     });
 });
 
+describe.only("INTEGRATION TEST FOR /job-order/ GET ROUTE", () => {
+    test("/job-order/ GET ROUTE should send a HTTP status code of 200 and fetches the specified job order from the database", async () => {
+        const response = await request(app).get(
+            "/job-order/?idCode=AB&idNumber=1"
+        );
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body.idCode).toEqual("AB");
+        expect(response.body.idNumber).toEqual(1);
+    });
+
+    test("/job-order/ GET ROUTE should send a HTTP status code of 422 when either the idCode or idNumber is invalid", async () => {
+        let response = await request(app).get("/job-order/?idCode=&idNumber=1");
+
+        expect(response.statusCode).toBe(422);
+
+        response = await request(app).get("/job-order/?idCode=AB&idNumber=");
+
+        expect(response.statusCode).toBe(422);
+
+        response = await request(app).get("/job-order/?idCode=&idNumber=");
+
+        expect(response.statusCode).toBe(422);
+    });
+});
+
 //tests for summarizing the job order
 describe("/count GET route", () => {
     test("Should return a response of 200", async () => {
@@ -323,6 +349,49 @@ describe("/count GET route", () => {
         expect(response.body.error).toBe(
             "Interval must be day, week, month, or year."
         );
+    });
+});
+
+//tests for getting all job orders by branch
+describe("/get-by-branch/ GET route", () => {
+    test("Should return a repsonse of 200", async () => {
+        const response = await request(app)
+            .get("/job-order/get-by-branch/")
+            .send({
+                branchId: 1,
+            });
+        expect(response.statusCode).toBe(200);
+    });
+
+    test("getAllJobOrderByBranch() should return all job orders by branch", async () => {
+        const response = await request(app)
+            .get("/job-order/get-by-branch/")
+            .send({
+                branchId: 1,
+            });
+        console.log("All Job Order by Branch response: ", response.body);
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toBeTypeOf("object");
+
+        response.body.result.forEach((jobOrder) => {
+            expect(jobOrder).toHaveProperty("idCode");
+            expect(jobOrder).toHaveProperty("idNumber");
+            expect(jobOrder).toHaveProperty("createdAt");
+            expect(jobOrder).toHaveProperty("updatedAt");
+            expect(jobOrder).toHaveProperty("paidAt");
+            expect(jobOrder).toHaveProperty("claimedAt");
+            expect(jobOrder).toHaveProperty("isPaid");
+            expect(jobOrder).toHaveProperty("isClaimed");
+            expect(jobOrder).toHaveProperty("isHidden");
+            expect(jobOrder).toHaveProperty("remarks");
+            expect(jobOrder).toHaveProperty("branchId");
+            expect(jobOrder).toHaveProperty("customerId");
+            expect(jobOrder).toHaveProperty("userId");
+            expect(jobOrder).toHaveProperty("branch");
+            expect(jobOrder).toHaveProperty("user");
+            expect(jobOrder).toHaveProperty("customer");
+            expect(jobOrder).toHaveProperty("jobOrderItems");
+        });
     });
 });
 
@@ -528,49 +597,6 @@ describe("/get GET route", () => {
         expect(response.body).toBeTypeOf("object");
 
         response.body.jobOrders.forEach((jobOrder) => {
-            expect(jobOrder).toHaveProperty("idCode");
-            expect(jobOrder).toHaveProperty("idNumber");
-            expect(jobOrder).toHaveProperty("createdAt");
-            expect(jobOrder).toHaveProperty("updatedAt");
-            expect(jobOrder).toHaveProperty("paidAt");
-            expect(jobOrder).toHaveProperty("claimedAt");
-            expect(jobOrder).toHaveProperty("isPaid");
-            expect(jobOrder).toHaveProperty("isClaimed");
-            expect(jobOrder).toHaveProperty("isHidden");
-            expect(jobOrder).toHaveProperty("remarks");
-            expect(jobOrder).toHaveProperty("branchId");
-            expect(jobOrder).toHaveProperty("customerId");
-            expect(jobOrder).toHaveProperty("userId");
-            expect(jobOrder).toHaveProperty("branch");
-            expect(jobOrder).toHaveProperty("user");
-            expect(jobOrder).toHaveProperty("customer");
-            expect(jobOrder).toHaveProperty("jobOrderItems");
-        });
-    });
-});
-
-//tests for getting all job orders by branch
-describe("/get-by-branch/ GET route", () => {
-    test("Should return a repsonse of 200", async () => {
-        const response = await request(app)
-            .get("/job-order/get-by-branch/")
-            .send({
-                branchId: 1,
-            });
-        expect(response.statusCode).toBe(200);
-    });
-
-    test("getAllJobOrderByBranch() should return all job orders by branch", async () => {
-        const response = await request(app)
-            .get("/job-order/get-by-branch/")
-            .send({
-                branchId: 1,
-            });
-        console.log("All Job Order by Branch response: ", response.body);
-        expect(response.statusCode).toBe(200);
-        expect(response.body).toBeTypeOf("object");
-
-        response.body.result.forEach((jobOrder) => {
             expect(jobOrder).toHaveProperty("idCode");
             expect(jobOrder).toHaveProperty("idNumber");
             expect(jobOrder).toHaveProperty("createdAt");

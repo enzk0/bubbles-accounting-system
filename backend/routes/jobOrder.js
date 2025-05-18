@@ -1,23 +1,17 @@
 import express from "express";
-import {
-    countJobOrder,
-    countJobOrderByBranch,
-} from "../controllers/countJobOrder.js";
-import {
-    getAllJobOrder,
-    getAllJobOrderByBranch,
-} from "../controllers/getJobOrder.js";
+import { countJobOrder } from "../controllers/countJobOrder.js";
 import { authenticate } from "../middleware/auth.js";
 import { checkPrivilege } from "../middleware/accessControl.js";
 import {
     createJobOrder,
+    getAllJobOrders,
     getJobOrder,
 } from "../controllers/jobOrderController.js";
 const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege([]), createJobOrder);
 
-router.get("/all", authenticate, checkPrivilege([]), getAllJobOrder);
+router.get("/all", authenticate, checkPrivilege([]), getAllJobOrders);
 
 router.get("/", authenticate, checkPrivilege([]), getJobOrder);
 

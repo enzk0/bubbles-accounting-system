@@ -285,8 +285,17 @@ export async function countJobOrders(req, res) {
                 .send({ message: "No job orders can be grouped/summarized" });
         }
 
-        res.status(200).json(found);
-        return found;
+        const parsed = found.map((obj) =>
+            Object.fromEntries(
+                Object.entries(obj).map(([key, value]) => [
+                    key,
+                    typeof value === "bigint" ? Number(value) : value,
+                ])
+            )
+        );
+
+        res.status(200).json(parsed);
+        return parsed;
     } catch (error) {
         console.log(error);
         return res.status(500).send({

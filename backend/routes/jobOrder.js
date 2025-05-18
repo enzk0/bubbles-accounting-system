@@ -1,8 +1,8 @@
 import express from "express";
-import { countJobOrder } from "../controllers/countJobOrder.js";
 import { authenticate } from "../middleware/auth.js";
 import { checkPrivilege } from "../middleware/accessControl.js";
 import {
+    countJobOrders,
     createJobOrder,
     getAllJobOrders,
     getJobOrder,
@@ -15,21 +15,7 @@ router.get("/all", authenticate, checkPrivilege([]), getAllJobOrders);
 
 router.get("/", authenticate, checkPrivilege([]), getJobOrder);
 
-router.get("/count", authenticate, checkPrivilege(["admin"]), countJobOrder);
-
-// router.get(
-//     "/count-by-branch",
-//     authenticate,
-//     checkPrivilege(["admin"]),
-//     countJobOrderByBranch
-// );
-
-// router.get(
-//     "/get-by-branch",
-//     authenticate,
-//     checkPrivilege([]),
-//     getAllJobOrderByBranch
-// );
+router.get("/count", authenticate, checkPrivilege(["admin"]), countJobOrders);
 
 router.patch("/employee/job-orders/:id", async (req, res) => {
     try {

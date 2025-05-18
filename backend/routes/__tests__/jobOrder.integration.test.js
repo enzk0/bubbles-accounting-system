@@ -4,6 +4,7 @@ import app from "../../app.js";
 
 vi.mock("../../middleware/auth", () => ({
     authenticate: (req, res, next) => {
+        req.user = { id: 1 };
         next();
     },
 }));
@@ -73,9 +74,9 @@ const jobOrderTestData = {
     },
 };
 
-describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
     test("/job-order/ POST ROUTE should send a HTTP status code of 201 and create a jobOrder in the database", async () => {
-        const response = await request(app)
+        const response = await request(app, {})
             .post("/job-order/")
             .send(jobOrderTestData);
 
@@ -212,7 +213,7 @@ describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
     });
 });
 
-describe.only("INTEGRATION TEST FOR /job-order/ GET ROUTE", () => {
+describe.only("INTEGRATION TESTS FOR /job-order/ GET ROUTE", () => {
     test("/job-order/ GET ROUTE should send a HTTP status code of 200 and fetches the specified job order from the database", async () => {
         const response = await request(app).get(
             "/job-order/?idCode=AB&idNumber=1"
@@ -235,6 +236,79 @@ describe.only("INTEGRATION TEST FOR /job-order/ GET ROUTE", () => {
         response = await request(app).get("/job-order/?idCode=&idNumber=");
 
         expect(response.statusCode).toBe(422);
+    });
+});
+
+describe.only("INTEGRATION TESTS FOR /job-order/all GET ROUTE", () => {
+    const assertJobOrder = (jobOrder) => {
+        expect(jobOrder).toHaveProperty("idCode");
+        expect(jobOrder).toHaveProperty("idNumber");
+        expect(jobOrder).toHaveProperty("createdAt");
+        expect(jobOrder).toHaveProperty("updatedAt");
+        expect(jobOrder).toHaveProperty("paidAt");
+        expect(jobOrder).toHaveProperty("claimedAt");
+        expect(jobOrder).toHaveProperty("isPaid");
+        expect(jobOrder).toHaveProperty("isClaimed");
+        expect(jobOrder).toHaveProperty("isHidden");
+        expect(jobOrder).toHaveProperty("remarks");
+        expect(jobOrder).toHaveProperty("branchId");
+        expect(jobOrder).toHaveProperty("customerId");
+        expect(jobOrder).toHaveProperty("userId");
+        expect(jobOrder).toHaveProperty("branch");
+        expect(jobOrder).toHaveProperty("user");
+        expect(jobOrder).toHaveProperty("customer");
+        expect(jobOrder).toHaveProperty("jobOrderItems");
+    };
+
+    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders from the database", async () => {
+        const response = await request(app).get("/job-order/all");
+
+        expect(response.statusCode).toBe(200);
+
+        response.body.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+        });
+    });
+
+    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where isHidden is false from the database", async () => {
+        const response = await request(app).get(
+            "/job-order/all?isHidden=false"
+        );
+
+        expect(response.statusCode).toBe(200);
+
+        console.log("isHidden = false Job Orders: ", response.body.length);
+
+        response.body.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.isHidden).toEqual(false);
+        });
+    });
+
+    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where branchId is 1 from the database", async () => {
+        const response = await request(app).get("/job-order/all?branchId=1");
+
+        expect(response.statusCode).toBe(200);
+
+        console.log("branchId = 1 Job Orders: ", response.body.length);
+
+        response.body.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.branchId).toEqual(1);
+        });
+    });
+
+    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where userId is 1 from the database", async () => {
+        const response = await request(app).get("/job-order/all?userId=1");
+
+        expect(response.statusCode).toBe(200);
+
+        console.log("userId = 1 Job Orders: ", response.body.length);
+
+        response.body.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.userId).toEqual(1);
+        });
     });
 });
 

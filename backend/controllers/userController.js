@@ -176,6 +176,27 @@ export async function getSelf(req, res) {
 
     if (jobOrders !== undefined) {
         include.jobOrders = jobOrders === "true";
+
+        if (jobOrders === "true") {
+            include.jobOrders = {
+                where: {
+                    branchId: {
+                        equals: (
+                            await prisma.user.findUnique({
+                                where: { id: id },
+                                select: { branchId: true },
+                            })
+                        ).branchId,
+                    },
+                },
+                include: {
+                    branch: true,
+                    customer: true,
+                    user: true,
+                    jobOrderItems: true,
+                },
+            };
+        }
     }
 
     if (!id) {

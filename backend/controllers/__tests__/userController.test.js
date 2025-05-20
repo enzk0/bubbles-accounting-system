@@ -6,6 +6,7 @@ import {
     getUser,
     getAllUsers,
     deactivateUser,
+    getSelf,
 } from "../userController";
 import { prismaMock } from "../../singleton";
 import bcrypt from "bcrypt";
@@ -456,6 +457,67 @@ describe("UNIT TESTING FOR 'editPassword()' CONTROLLER", () => {
         await editPassword(req, res);
 
         expect(res.status).toHaveBeenCalledWith(422);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'getSelf()' CONTROLLER", async () => {
+    test("getSelf() should send a HTTP response code of 200 and return a user matching the requesting user from the database.", async () => {
+        let req = mockRequest(
+            { id: 1 },
+            {},
+            {},
+            { branch: "true", jobOrders: "false" }
+        );
+
+        const res = mockResponse();
+
+        const mock = {
+            id: 2,
+            name: "john_doe",
+            firstName: "John",
+            lastName: "Doe",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            roleId: 0,
+            role: {
+                id: 0,
+                name: "ADMIN",
+            },
+        };
+
+        prismaMock.user.findUnique.mockResolvedValue(mock);
+
+        const found = await getSelf(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("getSelf() should send a HTTP response code of 404 when the requesting user cannot be found in the database", async () => {
+        let req = mockRequest({ id: 1 }, {}, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue(null);
+
+        const found = await getSelf(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+        expect(found).toEqual(null);
+    });
+
+    test("getUser() should send a HTTP response code of 500 when an error occurs with database client", async () => {
+        let req = mockRequest({ id: 1 }, {}, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockImplementation(() => {
+            let error = new Error();
+            throw error;
+        });
+
+        await getSelf(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
     });
 });
 

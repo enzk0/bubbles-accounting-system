@@ -164,6 +164,50 @@ export async function editPassword(req, res) {
     }
 }
 
+export async function getSelf(req, res) {
+    const { id } = req.user;
+    const { branch, jobOrders } = req.query;
+
+    let include = {};
+
+    if (branch !== undefined) {
+        include.branch = branch === "true";
+    }
+
+    if (jobOrders !== undefined) {
+        include.jobOrders = jobOrders === "true";
+    }
+
+    if (!id) {
+        res.status(422).send({ message: "User id provided is invalid" });
+    }
+
+    try {
+        const found = await prisma.user.findUnique({
+            where: { id: id },
+            omit: {
+                password: true,
+            },
+            include: include,
+        });
+
+        if (!found || found === null) {
+            res.status(404).send({ message: "User not found" });
+            return found;
+        }
+
+        res.status(200);
+        res.json(found);
+        return found;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error with the database client has occurred",
+            error: error,
+        });
+    }
+}
+
 export async function getUser(req, res) {
     const { id: rawId } = req.params;
     const id = parseInt(rawId);

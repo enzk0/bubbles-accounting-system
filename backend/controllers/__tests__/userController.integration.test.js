@@ -6,6 +6,7 @@ import {
     getUser,
     getAllUsers,
     editUser,
+    getSelf,
 } from "../userController";
 import prisma from "../../client";
 import bcrypt from "bcrypt";
@@ -114,7 +115,7 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
         expect(updated.username).toEqual(req.body.username);
     });
 
-    test("getUser() should get/fetch a User in the database via their name", async () => {
+    test("getUser() should get/fetch a User in the database via their id", async () => {
         const req = mockRequest({}, {}, { id: "11" }, {});
 
         const res = mockResponse();
@@ -126,6 +127,20 @@ describe("INTEGRATION TESTS BETWEEN USER CONTROLLERS AND DATABASE", () => {
         expect(res.status).toHaveBeenCalledWith(200);
         expect(typeof found).toBe("object");
         expect(found.id).toEqual(parseInt(req.params.id));
+    });
+
+    test("getSelf() should get/fetch the requesting User from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        const found = await getSelf(req, res);
+
+        console.log(found);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(typeof found).toBe("object");
+        expect(found.id).toEqual(parseInt(req.user.id));
     });
 
     test("getAllUsers() should get/fetch all Users in the database", async () => {

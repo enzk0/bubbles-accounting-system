@@ -6,6 +6,7 @@ import {
     editPassword,
     getUser,
     getAllUsers,
+    getSelf,
 } from "../controllers/userController.js";
 import { authenticate } from "../middleware/auth.js";
 import { checkPrivilege } from "../middleware/accessControl.js";
@@ -13,6 +14,8 @@ import { checkPrivilege } from "../middleware/accessControl.js";
 const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege(["admin"]), createUser);
+
+router.get("/self", authenticate, checkPrivilege([]), getSelf);
 
 router.get("/all", authenticate, checkPrivilege(["admin"]), getAllUsers);
 

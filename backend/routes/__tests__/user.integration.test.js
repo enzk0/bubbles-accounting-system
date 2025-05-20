@@ -5,6 +5,7 @@ import prisma from "../../client";
 
 vi.mock("../../middleware/auth", () => ({
     authenticate: (req, res, next) => {
+        req.user = { id: 1 };
         next();
     },
 }));
@@ -106,21 +107,86 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
     });
 });
 
+describe("INTEGRATION TESTS FOR /user/self GET ROUTE", () => {
+    test("/user/self GET route should fetch the requesting user in the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/user/self");
+
+        expect(response.statusCode).toBe(200);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: 1,
+            },
+        });
+
+        expect(response.body.id).toEqual(user.id);
+        expect(response.body.username).toEqual(user.username);
+        expect(response.body.firstName).toEqual(user.firstName);
+        expect(response.body.lastName).toEqual(user.lastName);
+    });
+
+    test("/user/self GET route should fetch the requesting user in the database with the users' branch and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/user/self?branch=true");
+
+        expect(response.statusCode).toBe(200);
+
+        expect(response.body.branch).toHaveProperty("code");
+        expect(response.body.branch).toHaveProperty("name");
+        expect(response.body.branch).toHaveProperty("address");
+        expect(response.body.branch).toHaveProperty("counter");
+        expect(response.body.branch).toHaveProperty("createdAt");
+        expect(response.body.branch).toHaveProperty("updatedAt");
+    });
+
+    test("/user/self GET route should fetch the requesting user in the database with the users' job orders and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/user/self?jobOrders=true");
+
+        console.log(response.body);
+
+        expect(response.statusCode).toBe(200);
+
+        response.body.jobOrders.forEach((jobOrder) => {
+            expect(jobOrder).toHaveProperty("idCode");
+            expect(jobOrder).toHaveProperty("idNumber");
+            expect(jobOrder).toHaveProperty("createdAt");
+            expect(jobOrder).toHaveProperty("updatedAt");
+            expect(jobOrder).toHaveProperty("paidAt");
+            expect(jobOrder).toHaveProperty("claimedAt");
+            expect(jobOrder).toHaveProperty("isPaid");
+            expect(jobOrder).toHaveProperty("isClaimed");
+            expect(jobOrder).toHaveProperty("isHidden");
+            expect(jobOrder).toHaveProperty("remarks");
+            expect(jobOrder).toHaveProperty("branchId");
+            expect(jobOrder).toHaveProperty("customerId");
+            expect(jobOrder).toHaveProperty("userId");
+            expect(jobOrder).toHaveProperty("branch");
+            expect(jobOrder).toHaveProperty("user");
+            expect(jobOrder).toHaveProperty("customer");
+            expect(jobOrder).toHaveProperty("jobOrderItems");
+            expect(jobOrder.branchId).toEqual(response.body.branchId);
+        });
+    });
+});
+
 describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
+    const assertUser = (user) => {
+        expect(user).toHaveProperty("id");
+        expect(user).toHaveProperty("username");
+        expect(user).toHaveProperty("firstName");
+        expect(user).toHaveProperty("lastName");
+        expect(user).toHaveProperty("password");
+        expect(user).toHaveProperty("createdAt");
+        expect(user).toHaveProperty("updatedAt");
+        expect(user).toHaveProperty("isActive");
+    };
+
     test("/user/all GET route should get all users in the database and send an HTTP status code of 200", async () => {
         const response = await request(app).get("/user/all");
 
         expect(response.statusCode).toBe(200);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
         });
     });
 
@@ -130,14 +196,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         expect(response.statusCode).toBe(200);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
             expect(user.roleId).toEqual(2);
         });
     });
@@ -148,14 +207,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         expect(response.statusCode).toBe(200);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
             expect(user.isActive).toEqual(true);
         });
     });
@@ -168,14 +220,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         console.log(response.body);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
             expect(user.isActive).toEqual(false);
         });
     });

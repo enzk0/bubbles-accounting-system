@@ -107,20 +107,24 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
 });
 
 describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
+    const assertUser = (user) => {
+        expect(user).toHaveProperty("id");
+        expect(user).toHaveProperty("username");
+        expect(user).toHaveProperty("firstName");
+        expect(user).toHaveProperty("lastName");
+        expect(user).toHaveProperty("password");
+        expect(user).toHaveProperty("createdAt");
+        expect(user).toHaveProperty("updatedAt");
+        expect(user).toHaveProperty("isActive");
+    };
+
     test("/user/all GET route should get all users in the database and send an HTTP status code of 200", async () => {
         const response = await request(app).get("/user/all");
 
         expect(response.statusCode).toBe(200);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
         });
     });
 
@@ -130,14 +134,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         expect(response.statusCode).toBe(200);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
             expect(user.roleId).toEqual(2);
         });
     });
@@ -148,14 +145,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         expect(response.statusCode).toBe(200);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
             expect(user.isActive).toEqual(true);
         });
     });
@@ -168,14 +158,7 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         console.log(response.body);
 
         response.body.forEach((user) => {
-            expect(user).toHaveProperty("id");
-            expect(user).toHaveProperty("username");
-            expect(user).toHaveProperty("firstName");
-            expect(user).toHaveProperty("lastName");
-            expect(user).toHaveProperty("password");
-            expect(user).toHaveProperty("createdAt");
-            expect(user).toHaveProperty("updatedAt");
-            expect(user).toHaveProperty("isActive");
+            assertUser(user);
             expect(user.isActive).toEqual(false);
         });
     });

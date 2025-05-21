@@ -4,6 +4,7 @@ import { checkPrivilege } from "../middleware/accessControl.js";
 import {
     countJobOrders,
     createJobOrder,
+    editJobOrderStatus,
     getAllJobOrders,
     getJobOrder,
 } from "../controllers/jobOrderController.js";
@@ -16,6 +17,8 @@ router.get("/all", authenticate, checkPrivilege([]), getAllJobOrders);
 router.get("/", authenticate, checkPrivilege([]), getJobOrder);
 
 router.get("/count", authenticate, checkPrivilege(["admin"]), countJobOrders);
+
+router.patch("/status", authenticate, checkPrivilege([]), editJobOrderStatus);
 
 router.patch("/employee/job-orders/:id", async (req, res) => {
     try {

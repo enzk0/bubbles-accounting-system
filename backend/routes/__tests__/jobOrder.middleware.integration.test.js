@@ -34,13 +34,13 @@ describe("INTEGRATION TESTS FOR /api/job-order/count GET ROUTE W/ MIDDLEWARE", (
         expect(response.statusCode).toBe(403);
     });
 
-    test("/api/job-order/count GET route should send an HTTP status code of 403 token is expired", async () => {
+    test("/api/job-order/count GET route should send an HTTP status code of 401 token is expired", async () => {
         const token = testExpiredToken({ id: 10 });
 
         const response = await request(app)
             .get("/api/job-order/count?interval=day")
             .set("Authorization", `Bearer ${token}`);
 
-        expect(response.statusCode).toBe(403);
+        expect(response.statusCode).toBe(401);
     });
 });

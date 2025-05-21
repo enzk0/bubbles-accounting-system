@@ -44,7 +44,7 @@ describe("INTEGRATION TESTS FOR /api/branch/ POST ROUTE W/ MIDDLEWARE", () => {
         expect(response.statusCode).toBe(403);
     });
 
-    test("/api/branch/ POST route should send an HTTP status code of 403 and an error message if the token is expired", async () => {
+    test("/api/branch/ POST route should send an HTTP status code of 401 and an error message if the token is expired", async () => {
         const token = testExpiredToken({ id: 10 });
 
         const response = await request(app)
@@ -56,6 +56,6 @@ describe("INTEGRATION TESTS FOR /api/branch/ POST ROUTE W/ MIDDLEWARE", () => {
                 address: "Persia",
             });
 
-        expect(response.statusCode).toBe(403);
+        expect(response.statusCode).toBe(401);
     });
 });

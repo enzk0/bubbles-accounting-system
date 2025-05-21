@@ -240,7 +240,21 @@ export async function getAllJobOrders(req, res) {
                 .send({ message: "No job orders could be found" });
         }
 
-        res.status(200).json(found);
+        const processed = found.map((jobOrder) => {
+            console.log(jobOrder.jobOrderItems);
+            const total = jobOrder.jobOrderItems.reduce(
+                (sum, jobOrderItem) =>
+                    sum +
+                    jobOrderItem.productPrice * jobOrderItem.productQuantity,
+                0
+            );
+            return {
+                ...jobOrder,
+                total: total,
+            };
+        });
+
+        res.status(200).json(processed);
         return found;
     } catch (error) {
         console.log(error);

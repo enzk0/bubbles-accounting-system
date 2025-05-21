@@ -243,6 +243,50 @@ describe("INTEGRATION TESTS FOR /api/job-order/ GET ROUTE", () => {
     });
 });
 
+describe("INTEGRATION TESTS FOR /api/job-order/status/ PATCH ROUTE", () => {
+    test("/api/job-order/status/ PATCH ROUTE should send a HTTP status code of 200 and modifies that status of the specified job order from the database", async () => {
+        const response = await request(app)
+            .patch("/api/job-order/status?idCode=AB&idNumber=2")
+            .send({ isPaid: true });
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    test("/api/job-order/status/ PATCH ROUTE should send a HTTP status code of 422 when either the idCode or idNumber is invalid", async () => {
+        let response = await request(app)
+            .patch("/api/job-order/status?idCode=&idNumber=2")
+            .send({ isPaid: false });
+
+        expect(response.statusCode).toBe(422);
+
+        response = await request(app)
+            .patch("/api/job-order/status?idCodeAB=&idNumber=")
+            .send({ isPaid: false });
+
+        expect(response.statusCode).toBe(422);
+
+        response = await request(app)
+            .patch("/api/job-order/status?idCode=&idNumber=")
+            .send({ isPaid: false });
+
+        expect(response.statusCode).toBe(422);
+    });
+
+    test("/api/job-order/status/ PATCH ROUTE should send a HTTP status code of 422 type of isPaid or isClaimed is not boolean", async () => {
+        let response = await request(app)
+            .patch("/api/job-order/status?idCode=AB&idNumber=2")
+            .send({ isPaid: 100 });
+
+        expect(response.statusCode).toBe(422);
+
+        response = await request(app)
+            .patch("/api/job-order/status?idCode=AB&idNumber=2")
+            .send({ isClaimed: "true" });
+
+        expect(response.statusCode).toBe(422);
+    });
+});
+
 describe("INTEGRATION TESTS FOR /api/job-order/all GET ROUTE", () => {
     const assertJobOrder = (jobOrder) => {
         expect(jobOrder).toHaveProperty("idCode");

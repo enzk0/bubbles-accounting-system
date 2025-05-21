@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 import "dotenv/config";
 
 async function seed() {
@@ -108,7 +109,7 @@ async function seed() {
             {
                 name: "PERFUME",
                 price: 50.0,
-                isActive: false,
+                isActive: true,
             },
             {
                 name: "IRON",
@@ -518,6 +519,19 @@ async function seed() {
     });
 
     console.dir(allJobOrders, { depth: null });
+
+    const users = await prisma.user.findMany();
+
+    for (const user of users) {
+        await prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                password: bcrypt.hashSync(user.password, 10),
+            },
+        });
+    }
 }
 
 seed();

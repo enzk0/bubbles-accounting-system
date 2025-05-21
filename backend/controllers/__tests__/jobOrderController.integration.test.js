@@ -2,6 +2,7 @@ import { test, expect, describe, vi } from "vitest";
 import {
     countJobOrders,
     createJobOrder,
+    editJobOrderStatus,
     getAllJobOrders,
     getJobOrder,
 } from "../jobOrderController";
@@ -413,5 +414,33 @@ describe("INTEGRATION TESTS FOR 'countJobOrders()' CONTROLLER", () => {
         console.log(jobOrders);
 
         expect(res.status).toHaveBeenCalledWith(200);
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'editJobOrderStatus()' CONTROLLER", () => {
+    test("getJobOrder() should send an HTTP status of 200 when job order status has been successfully modified in the database", async () => {
+        const req = mockRequest(
+            { isPaid: true, isClaimed: true },
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1 }
+        );
+
+        const res = mockResponse();
+
+        const jobOrder = await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const found = await prisma.jobOrder.findUnique({
+            where: {
+                idCode_idNumber: {
+                    idCode: "AB",
+                    idNumber: 1,
+                },
+            },
+        });
+
+        expect(jobOrder.isPaid).toEqual(found.isPaid);
     });
 });

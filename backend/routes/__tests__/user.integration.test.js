@@ -16,10 +16,10 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
-    test("/user/ POST route should create a user in the database and send an HTTP status code of 201", async () => {
+describe("INTEGRATION TESTS FOR /api/user/ POST ROUTE", () => {
+    test("/api/user/ POST route should create a user in the database and send an HTTP status code of 201", async () => {
         const response = await request(app)
-            .post("/user/")
+            .post("/api/user/")
             .send({
                 requester: { id: 1 },
                 user: {
@@ -43,9 +43,9 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
         expect(user.lastName).toEqual("Dingle");
     });
 
-    test("/user/ POST route should send an HTTP status code of 422 when any of the fields are incmomplete or invalid", async () => {
+    test("/api/user/ POST route should send an HTTP status code of 422 when any of the fields are incmomplete or invalid", async () => {
         const response = await request(app)
-            .post("/user/")
+            .post("/api/user/")
             .send({
                 requester: { id: 1 },
                 user: {
@@ -59,9 +59,9 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
         expect(response.statusCode).toBe(422);
     });
 
-    test("/user/ POST route should send an HTTP status code of 500 when there is an attempt to make a duplicate/non-unique user", async () => {
+    test("/api/user/ POST route should send an HTTP status code of 500 when there is an attempt to make a duplicate/non-unique user", async () => {
         const response = await request(app)
-            .post("/user/")
+            .post("/api/user/")
             .send({
                 requester: { id: 1 },
                 user: {
@@ -76,9 +76,9 @@ describe("INTEGRATION TESTS FOR /user/ POST ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
-    test("/user/ GET route should fetch a user in the database with the specified user id and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/1");
+describe("INTEGRATION TESTS FOR /api/user/ GET ROUTE", () => {
+    test("/api/user/ GET route should fetch a user in the database with the specified user id and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/api/user/1");
 
         expect(response.statusCode).toBe(200);
 
@@ -94,22 +94,22 @@ describe("INTEGRATION TESTS FOR /user/ GET ROUTE", () => {
         expect(response.body.lastName).toEqual(user.lastName);
     });
 
-    test("/user/ GET route should send an HTTP status code of 404 when the queried user does not exist or cannot be found", async () => {
-        const response = await request(app).get("/user/999");
+    test("/api/user/ GET route should send an HTTP status code of 404 when the queried user does not exist or cannot be found", async () => {
+        const response = await request(app).get("/api/user/999");
 
         expect(response.statusCode).toBe(404);
     });
 
-    test("/user/ GET route should send an HTTP status code of 422 when the user id used in the query is invalid", async () => {
-        const response = await request(app).get("/user/asdgkljasd");
+    test("/api/user/ GET route should send an HTTP status code of 422 when the user id used in the query is invalid", async () => {
+        const response = await request(app).get("/api/user/asdgkljasd");
 
         expect(response.statusCode).toBe(422);
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/self GET ROUTE", () => {
-    test("/user/self GET route should fetch the requesting user in the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/self");
+describe("INTEGRATION TESTS FOR /api/user/self GET ROUTE", () => {
+    test("/api/user/self GET route should fetch the requesting user in the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/api/user/self");
 
         expect(response.statusCode).toBe(200);
 
@@ -125,8 +125,8 @@ describe("INTEGRATION TESTS FOR /user/self GET ROUTE", () => {
         expect(response.body.lastName).toEqual(user.lastName);
     });
 
-    test("/user/self GET route should fetch the requesting user in the database with the users' branch and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/self?branch=true");
+    test("/api/user/self GET route should fetch the requesting user in the database with the users' branch and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/api/user/self?branch=true");
 
         expect(response.statusCode).toBe(200);
 
@@ -138,8 +138,10 @@ describe("INTEGRATION TESTS FOR /user/self GET ROUTE", () => {
         expect(response.body.branch).toHaveProperty("updatedAt");
     });
 
-    test("/user/self GET route should fetch the requesting user in the database with the users' job orders and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/self?jobOrders=true");
+    test("/api/user/self GET route should fetch the requesting user in the database with the users' job orders and send an HTTP status code of 200", async () => {
+        const response = await request(app).get(
+            "/api/user/self?jobOrders=true"
+        );
 
         console.log(response.body);
 
@@ -168,7 +170,7 @@ describe("INTEGRATION TESTS FOR /user/self GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
+describe("INTEGRATION TESTS FOR /api/user/all GET ROUTE", () => {
     const assertUser = (user) => {
         expect(user).toHaveProperty("id");
         expect(user).toHaveProperty("username");
@@ -180,8 +182,8 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         expect(user).toHaveProperty("isActive");
     };
 
-    test("/user/all GET route should get all users in the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/all");
+    test("/api/user/all GET route should get all users in the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/api/user/all");
 
         expect(response.statusCode).toBe(200);
 
@@ -190,8 +192,8 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         });
     });
 
-    test("/user/all GET route should get all users in the database who has a role of employee and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/all?roleId=2");
+    test("/api/user/all GET route should get all users in the database who has a role of employee and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/api/user/all?roleId=2");
 
         expect(response.statusCode).toBe(200);
 
@@ -201,8 +203,8 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         });
     });
 
-    test("/user/all GET route should get all users in the database who are active and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/all?isActive=true");
+    test("/api/user/all GET route should get all users in the database who are active and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/api/user/all?isActive=true");
 
         expect(response.statusCode).toBe(200);
 
@@ -212,8 +214,8 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         });
     });
 
-    test("/user/all GET route should get all users in the database who are inactive and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/user/all?isActive=false");
+    test("/api/user/all GET route should get all users in the database who are inactive and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/api/user/all?isActive=false");
 
         expect(response.statusCode).toBe(200);
 
@@ -225,15 +227,15 @@ describe("INTEGRATION TESTS FOR /user/all GET ROUTE", () => {
         });
     });
 
-    test("/user/all GET route should send an HTTP status code of 404 when no users can be found in the database when a filter is applied", async () => {
-        const response = await request(app).get("/user/all?roleId=3");
+    test("/api/user/all GET route should send an HTTP status code of 404 when no users can be found in the database when a filter is applied", async () => {
+        const response = await request(app).get("/api/user/all?roleId=3");
 
         expect(response.statusCode).toBe(404);
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
-    test("/user/:id PATCH route should edit the specified in the database and send an HTTP status code of 200", async () => {
+describe("INTEGRATION TESTS FOR /api/user/:id PATCH ROUTE", () => {
+    test("/api/user/:id PATCH route should edit the specified in the database and send an HTTP status code of 200", async () => {
         const user = await prisma.user.findUnique({
             where: {
                 username: "quandale_dingle",
@@ -242,7 +244,7 @@ describe("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
 
         console.log(user);
 
-        const response = await request(app).patch(`/user/${user.id}`).send({
+        const response = await request(app).patch(`/api/user/${user.id}`).send({
             username: "quandale_dingleberry",
             firstName: "Quandale",
             lastName: "Dingleberry",
@@ -263,8 +265,8 @@ describe("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
         expect(updated.branchId).toEqual(2);
     });
 
-    test("/user/:id PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
-        const response = await request(app).patch("/user/2077").send({
+    test("/api/user/:id PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
+        const response = await request(app).patch("/api/user/2077").send({
             username: "anachiro",
             firstName: "Anachiro",
             lastName: "Grimms",
@@ -273,8 +275,8 @@ describe("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
         expect(response.statusCode).toBe(404);
     });
 
-    test("/user/:id PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
-        const response = await request(app).patch("/user/1").send({
+    test("/api/user/:id PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
+        const response = await request(app).patch("/api/user/1").send({
             username: "",
             firstName: null,
             lastName: undefined,
@@ -284,14 +286,14 @@ describe("INTEGRATION TESTS FOR /user/:id PATCH ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
-    test("/user/password PATCH route updated the password of a user in the database and send an HTTP status code of 200", async () => {
+describe("INTEGRATION TESTS FOR /api/user/password PATCH ROUTE", () => {
+    test("/api/user/password PATCH route updated the password of a user in the database and send an HTTP status code of 200", async () => {
         const user = await prisma.user.findUnique({
             where: { username: "quandale_dingleberry" },
         });
 
         const response = await request(app)
-            .patch(`/user/password/${user.id}`)
+            .patch(`/api/user/password/${user.id}`)
             .send({
                 password: "pass456",
             });
@@ -299,17 +301,19 @@ describe("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
         expect(response.statusCode).toBe(200);
     });
 
-    test("/user/password PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
-        const response = await request(app).patch("/user/password/2050").send({
-            password: "pass456",
-        });
+    test("/api/user/password PATCH route should send an HTTP status code of 404 when the user to be updated cannot be found", async () => {
+        const response = await request(app)
+            .patch("/api/user/password/2050")
+            .send({
+                password: "pass456",
+            });
 
         expect(response.statusCode).toBe(404);
     });
 
-    test("/user/password PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
+    test("/api/user/password PATCH route should send an HTTP status code of 422 when any of the fields are invalid", async () => {
         const response = await request(app)
-            .patch("/user/password")
+            .patch("/api/user/password")
             .send({
                 requester: { id: 1 },
                 user: { id: 1 },
@@ -320,13 +324,13 @@ describe("INTEGRATION TESTS FOR /user/password PATCH ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /user/ DELETE ROUTE", () => {
-    test("/user/ DELETE route should deactivate the specified user and send an HTTP status code of 200", async () => {
+describe("INTEGRATION TESTS FOR /api/user/ DELETE ROUTE", () => {
+    test("/api/user/ DELETE route should deactivate the specified user and send an HTTP status code of 200", async () => {
         const user = await prisma.user.findUnique({
             where: { username: "quandale_dingleberry" },
         });
 
-        const response = await request(app).delete(`/user/${user.id}`);
+        const response = await request(app).delete(`/api/user/${user.id}`);
 
         expect(response.statusCode).toBe(200);
 
@@ -339,8 +343,8 @@ describe("INTEGRATION TESTS FOR /user/ DELETE ROUTE", () => {
         expect(found.isActive).toEqual(false);
     });
 
-    test("/user/ DELETE route should send an HTTP status code of 404 when the user to be deactivated cannot be found", async () => {
-        const response = await request(app).delete("/user/2049");
+    test("/api/user/ DELETE route should send an HTTP status code of 404 when the user to be deactivated cannot be found", async () => {
+        const response = await request(app).delete("/api/user/2049");
 
         expect(response.statusCode).toBe(404);
     });

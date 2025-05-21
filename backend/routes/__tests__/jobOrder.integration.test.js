@@ -74,20 +74,20 @@ const jobOrderTestData = {
     },
 };
 
-describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
-    test("/job-order/ POST ROUTE should send a HTTP status code of 201 and create a jobOrder in the database", async () => {
+describe("INTEGRATION TESTS FOR /api/job-order/ POST ROUTE", () => {
+    test("/api/job-order/ POST ROUTE should send a HTTP status code of 201 and create a jobOrder in the database", async () => {
         const response = await request(app, {})
-            .post("/job-order/")
+            .post("/api/job-order/")
             .send(jobOrderTestData);
 
-        console.log("/job-order/ response.body: ", response.body);
+        console.log("/api/job-order/ response.body: ", response.body);
 
         expect(response.statusCode).toBe(201);
     });
 
-    test("/job-order/ POST ROUTE should send a HTTP status code of 403 when the branch information provided points to an inactive branch", async () => {
+    test("/api/job-order/ POST ROUTE should send a HTTP status code of 403 when the branch information provided points to an inactive branch", async () => {
         const response = await request(app)
-            .post("/job-order/")
+            .post("/api/job-order/")
             .send({
                 ...jobOrderTestData,
                 branch: { id: 8 },
@@ -96,9 +96,9 @@ describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
         expect(response.statusCode).toBe(403);
     });
 
-    test("/job-order/ POST ROUTE should send a HTTP status code of 403 when any of the job order items are inactive products", async () => {
+    test("/api/job-order/ POST ROUTE should send a HTTP status code of 403 when any of the job order items are inactive products", async () => {
         const response = await request(app)
-            .post("/job-order/")
+            .post("/api/job-order/")
             .send({
                 ...jobOrderTestData,
                 jobOrder: {
@@ -152,9 +152,9 @@ describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
         expect(response.statusCode).toBe(403);
     });
 
-    test("/job-order/ POST ROUTE should send a HTTP status code of 404 when the branch information provided points to a non-existent branch", async () => {
+    test("/api/job-order/ POST ROUTE should send a HTTP status code of 404 when the branch information provided points to a non-existent branch", async () => {
         const response = await request(app)
-            .post("/job-order/")
+            .post("/api/job-order/")
             .send({
                 ...jobOrderTestData,
                 branch: { id: 727 },
@@ -163,9 +163,9 @@ describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
         expect(response.statusCode).toBe(404);
     });
 
-    test("/job-order/ POST ROUTE should send a HTTP status code of 422 when there are less than 7 job order items", async () => {
+    test("/api/job-order/ POST ROUTE should send a HTTP status code of 422 when there are less than 7 job order items", async () => {
         const response = await request(app)
-            .post("/job-order/")
+            .post("/api/job-order/")
             .send({
                 ...jobOrderTestData,
                 jobOrder: {
@@ -201,9 +201,9 @@ describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
         expect(response.statusCode).toBe(422);
     });
 
-    test("/job-order/ POST ROUTE should send a HTTP status code of 422 when customer information is incomplete", async () => {
+    test("/api/job-order/ POST ROUTE should send a HTTP status code of 422 when customer information is incomplete", async () => {
         const response = await request(app)
-            .post("/job-order/")
+            .post("/api/job-order/")
             .send({
                 ...jobOrderTestData,
                 customer: {},
@@ -213,10 +213,10 @@ describe("INTEGRATION TESTS FOR /job-order/ POST ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /job-order/ GET ROUTE", () => {
-    test("/job-order/ GET ROUTE should send a HTTP status code of 200 and fetches the specified job order from the database", async () => {
+describe("INTEGRATION TESTS FOR /api/job-order/ GET ROUTE", () => {
+    test("/api/job-order/ GET ROUTE should send a HTTP status code of 200 and fetches the specified job order from the database", async () => {
         const response = await request(app).get(
-            "/job-order/?idCode=AB&idNumber=1"
+            "/api/job-order/?idCode=AB&idNumber=1"
         );
 
         expect(response.statusCode).toBe(200);
@@ -224,22 +224,26 @@ describe("INTEGRATION TESTS FOR /job-order/ GET ROUTE", () => {
         expect(response.body.idNumber).toEqual(1);
     });
 
-    test("/job-order/ GET ROUTE should send a HTTP status code of 422 when either the idCode or idNumber is invalid", async () => {
-        let response = await request(app).get("/job-order/?idCode=&idNumber=1");
+    test("/api/job-order/ GET ROUTE should send a HTTP status code of 422 when either the idCode or idNumber is invalid", async () => {
+        let response = await request(app).get(
+            "/api/job-order/?idCode=&idNumber=1"
+        );
 
         expect(response.statusCode).toBe(422);
 
-        response = await request(app).get("/job-order/?idCode=AB&idNumber=");
+        response = await request(app).get(
+            "/api/job-order/?idCode=AB&idNumber="
+        );
 
         expect(response.statusCode).toBe(422);
 
-        response = await request(app).get("/job-order/?idCode=&idNumber=");
+        response = await request(app).get("/api/job-order/?idCode=&idNumber=");
 
         expect(response.statusCode).toBe(422);
     });
 });
 
-describe("INTEGRATION TESTS FOR /job-order/all GET ROUTE", () => {
+describe("INTEGRATION TESTS FOR /api/job-order/all GET ROUTE", () => {
     const assertJobOrder = (jobOrder) => {
         expect(jobOrder).toHaveProperty("idCode");
         expect(jobOrder).toHaveProperty("idNumber");
@@ -260,8 +264,8 @@ describe("INTEGRATION TESTS FOR /job-order/all GET ROUTE", () => {
         expect(jobOrder).toHaveProperty("jobOrderItems");
     };
 
-    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders from the database", async () => {
-        const response = await request(app).get("/job-order/all");
+    test("/api/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders from the database", async () => {
+        const response = await request(app).get("/api/job-order/all");
 
         expect(response.statusCode).toBe(200);
 
@@ -270,9 +274,9 @@ describe("INTEGRATION TESTS FOR /job-order/all GET ROUTE", () => {
         });
     });
 
-    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where isHidden is false from the database", async () => {
+    test("/api/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where isHidden is false from the database", async () => {
         const response = await request(app).get(
-            "/job-order/all?isHidden=false"
+            "/api/job-order/all?isHidden=false"
         );
 
         expect(response.statusCode).toBe(200);
@@ -285,8 +289,10 @@ describe("INTEGRATION TESTS FOR /job-order/all GET ROUTE", () => {
         });
     });
 
-    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where branchId is 1 from the database", async () => {
-        const response = await request(app).get("/job-order/all?branchId=1");
+    test("/api/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where branchId is 1 from the database", async () => {
+        const response = await request(app).get(
+            "/api/job-order/all?branchId=1"
+        );
 
         expect(response.statusCode).toBe(200);
 
@@ -298,8 +304,8 @@ describe("INTEGRATION TESTS FOR /job-order/all GET ROUTE", () => {
         });
     });
 
-    test("/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where userId is 1 from the database", async () => {
-        const response = await request(app).get("/job-order/all?userId=1");
+    test("/api/job-order/all GET ROUTE should send a HTTP status code of 200 and get all job orders where userId is 1 from the database", async () => {
+        const response = await request(app).get("/api/job-order/all?userId=1");
 
         expect(response.statusCode).toBe(200);
 
@@ -312,7 +318,7 @@ describe("INTEGRATION TESTS FOR /job-order/all GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE", () => {
+describe("INTEGRATION TESTS FOR /api/job-order/count GET ROUTE", () => {
     const assertSummary = (summary) => {
         expect(summary).toHaveProperty("interval_start");
         expect(summary).toHaveProperty("total_unpaid");
@@ -325,9 +331,9 @@ describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE", () => {
         expect(summary).toHaveProperty("no_of_unclaimed");
     };
 
-    test("/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in daily granularity", async () => {
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in daily granularity", async () => {
         const response = await request(app).get(
-            "/job-order/count?interval=day"
+            "/api/job-order/count?interval=day"
         );
 
         expect(response.statusCode).toBe(200);
@@ -337,9 +343,9 @@ describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE", () => {
         });
     });
 
-    test("/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in weekly granularity", async () => {
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in weekly granularity", async () => {
         const response = await request(app).get(
-            "/job-order/count?interval=week"
+            "/api/job-order/count?interval=week"
         );
 
         expect(response.statusCode).toBe(200);
@@ -349,9 +355,9 @@ describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE", () => {
         });
     });
 
-    test("/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in monthly granularity", async () => {
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in monthly granularity", async () => {
         const response = await request(app).get(
-            "/job-order/count?interval=month"
+            "/api/job-order/count?interval=month"
         );
 
         expect(response.statusCode).toBe(200);
@@ -361,9 +367,9 @@ describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE", () => {
         });
     });
 
-    test("/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in yearly granularity", async () => {
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in yearly granularity", async () => {
         const response = await request(app).get(
-            "/job-order/count?interval=year"
+            "/api/job-order/count?interval=year"
         );
 
         expect(response.statusCode).toBe(200);
@@ -373,18 +379,20 @@ describe("INTEGRATION TESTS FOR /job-order/count GET ROUTE", () => {
         });
     });
 
-    test("/job-order/count GET routes should send an HTTP status code of 422 when interval is invalid", async () => {
+    test("/api/job-order/count GET routes should send an HTTP status code of 422 when interval is invalid", async () => {
         let response = await request(app).get(
-            "/job-order/count?interval=minute"
+            "/api/job-order/count?interval=minute"
         );
 
         expect(response.statusCode).toBe(422);
 
-        response = await request(app).get("/job-order/count");
+        response = await request(app).get("/api/job-order/count");
 
         expect(response.statusCode).toBe(422);
 
-        response = await request(app).get("/job-order/count?interval=skibidi");
+        response = await request(app).get(
+            "/api/job-order/count?interval=skibidi"
+        );
 
         expect(response.statusCode).toBe(422);
     });

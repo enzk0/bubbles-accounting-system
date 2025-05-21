@@ -311,3 +311,75 @@ export async function countJobOrders(req, res) {
         });
     }
 }
+
+export async function editJobOrderStatus(req, res) {
+    const { isPaid, isClaimed } = req.body;
+    const { idCode, idNumber: rawIdNumber } = req.query;
+    const idNumber = parseInt(rawIdNumber);
+
+    let data = {};
+
+    if (!idCode || !idNumber) {
+        return res
+            .status(422)
+            .send({ message: "idCode and idNumber provided is invalid" });
+    }
+
+    if (isPaid !== undefined) {
+        if (typeof isPaid !== "boolean") {
+            return res
+                .status(422)
+                .send({ message: "The provided isPaid status is invalid" });
+        }
+
+        data.isPaid = isPaid;
+    }
+
+    if (isClaimed !== undefined) {
+        if (typeof isClaimed !== "boolean") {
+            return res
+                .status(422)
+                .send({ message: "The provided isClaimed status is invalid" });
+        }
+
+        data.isClaimed = isClaimed;
+    }
+
+    try {
+        const found = await prisma.jobOrder.findUnique({
+            where: {
+                idCode_idNumber: {
+                    idCode: idCode,
+                    idNumber: idNumber,
+                },
+            },
+        });
+
+        if (found.isPaid === true && found.isClaimed === true) {
+            return res.status(403).send({
+                message: "Cannot edit the status of a completed job order",
+            });
+        }
+
+        const edited = await prisma.jobOrder.update({
+            where: {
+                idCode_idNumber: {
+                    idCode: idCode,
+                    idNumber: idNumber,
+                },
+            },
+            data: data,
+        });
+
+        res.status(200).send({
+            message: "Job Order Status has been successfully edited",
+        });
+        return edited;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}

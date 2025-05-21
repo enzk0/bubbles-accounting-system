@@ -186,6 +186,7 @@ export async function getAllJobOrders(req, res) {
         isPaid,
         isClaimed,
         isHidden,
+        isOngoing,
     } = req.query;
 
     let filter = {};
@@ -212,6 +213,12 @@ export async function getAllJobOrders(req, res) {
 
     if (isHidden !== undefined) {
         filter.isHidden = isHidden === "true";
+    }
+
+    if (isOngoing !== undefined) {
+        if (isOngoing === "true") {
+            filter.OR = [{ isPaid: false }, { isClaimed: false }];
+        }
     }
 
     console.log(filter);

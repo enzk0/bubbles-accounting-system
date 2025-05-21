@@ -22,6 +22,6 @@ export async function authenticate(req, res, next) {
         return req.user;
     } catch (error) {
         console.log(error);
-        return res.status(403).send({ message: "Token has already expired" });
+        return res.status(401).send({ message: "Token has already expired" });
     }
 }

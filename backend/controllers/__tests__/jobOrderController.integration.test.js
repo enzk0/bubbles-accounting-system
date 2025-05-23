@@ -4,6 +4,7 @@ import {
     createJobOrder,
     editJobOrderStatus,
     getAllJobOrders,
+    getAssignedJobOrders,
     getJobOrder,
 } from "../jobOrderController";
 import prisma from "../../client";
@@ -384,6 +385,66 @@ describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
             expect(jobOrder.isPaid).toEqual(false);
             expect(jobOrder.isClaimed).toEqual(false);
             expect(jobOrder.isHidden).toEqual(false);
+        });
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'getAssignedJobOrders()' CONTROLLER", () => {
+    const assertJobOrder = (jobOrder) => {
+        expect(jobOrder).toHaveProperty("idCode");
+        expect(jobOrder).toHaveProperty("idNumber");
+        expect(jobOrder).toHaveProperty("createdAt");
+        expect(jobOrder).toHaveProperty("updatedAt");
+        expect(jobOrder).toHaveProperty("isPaid");
+        expect(jobOrder).toHaveProperty("isClaimed");
+        expect(jobOrder).toHaveProperty("isHidden");
+    };
+
+    test("getAssignedJobOrders() should send an HTTP status of 200 and send an array of job orders assigned to the user from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        const jobOrders = await getAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: 1,
+            },
+        });
+
+        jobOrders.forEach((jobOrder) => {
+            console.log(jobOrder);
+            assertJobOrder(jobOrder);
+            expect(jobOrder.userId).toEqual(user.id);
+            expect(jobOrder.branchId).toEqual(user.branchId);
+        });
+    });
+
+    test("getAssignedJobOrders() should send an HTTP status of 200 and send an array of all ongoing job orders assigned to the user from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        const jobOrders = await getAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: 1,
+            },
+        });
+
+        jobOrders.forEach((jobOrder) => {
+            console.log(jobOrder);
+            assertJobOrder(jobOrder);
+            expect(jobOrder.userId).toEqual(user.id);
+            expect(jobOrder.branchId).toEqual(user.branchId);
+            expect(jobOrder.isPaid).toEqual(false);
+            expect(jobOrder.isClaimed).toEqual(false);
         });
     });
 });

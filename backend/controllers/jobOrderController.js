@@ -178,6 +178,73 @@ export async function getJobOrder(req, res) {
     }
 }
 
+export async function getAssignedJobOrders(req, res) {
+    const { isOngoing } = req.query;
+    const { id } = req.user;
+
+    let filter = {};
+
+    if (isOngoing !== undefined) {
+        if (isOngoing === "true") {
+            filter.OR = [{ isPaid: false }, { isClaimed: false }];
+        }
+
+        if (isOngoing === "false") {
+            filter.OR = [{ isPaid: true }, { isClaimed: true }];
+        }
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+
+        const found = await prisma.jobOrder.findMany({
+            where: {
+                ...filter,
+                userId: user.id,
+                branchId: user.branchId,
+            },
+            include: {
+                branch: true,
+                customer: true,
+                user: true,
+                jobOrderItems: true,
+            },
+        });
+
+        if (found.length === 0 || found === null || found === undefined) {
+            return res
+                .status(404)
+                .send({ message: "No job orders could be found" });
+        }
+
+        const processed = found.map((jobOrder) => {
+            const total = jobOrder.jobOrderItems.reduce(
+                (sum, jobOrderItem) =>
+                    sum +
+                    jobOrderItem.productPrice * jobOrderItem.productQuantity,
+                0
+            );
+            return {
+                ...jobOrder,
+                total: total,
+            };
+        });
+
+        res.status(200).json(processed);
+        return found;
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}
+
 export async function getAllJobOrders(req, res) {
     const {
         branchId: rawBranchId,
@@ -347,6 +414,12 @@ export async function editJobOrderStatus(req, res) {
         }
 
         data.isPaid = isPaid;
+
+        if (isPaid === true) {
+            data.paidAt = new Date();
+        } else {
+            data.paidAt = null;
+        }
     }
 
     if (isClaimed !== undefined) {
@@ -357,7 +430,15 @@ export async function editJobOrderStatus(req, res) {
         }
 
         data.isClaimed = isClaimed;
+
+        if (isClaimed === true) {
+            data.claimedAt = new Date();
+        } else {
+            data.claimedAt = null;
+        }
     }
+
+    console.log(data);
 
     try {
         const found = await prisma.jobOrder.findUnique({

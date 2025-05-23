@@ -362,6 +362,73 @@ describe("INTEGRATION TESTS FOR /api/job-order/all GET ROUTE", () => {
     });
 });
 
+describe("INTEGRATION TESTS FOR /api/job-order/all GET ROUTE", () => {
+    const assertJobOrder = (jobOrder) => {
+        expect(jobOrder).toHaveProperty("idCode");
+        expect(jobOrder).toHaveProperty("idNumber");
+        expect(jobOrder).toHaveProperty("createdAt");
+        expect(jobOrder).toHaveProperty("updatedAt");
+        expect(jobOrder).toHaveProperty("paidAt");
+        expect(jobOrder).toHaveProperty("claimedAt");
+        expect(jobOrder).toHaveProperty("isPaid");
+        expect(jobOrder).toHaveProperty("isClaimed");
+        expect(jobOrder).toHaveProperty("isHidden");
+        expect(jobOrder).toHaveProperty("remarks");
+        expect(jobOrder).toHaveProperty("branchId");
+        expect(jobOrder).toHaveProperty("customerId");
+        expect(jobOrder).toHaveProperty("userId");
+        expect(jobOrder).toHaveProperty("branch");
+        expect(jobOrder).toHaveProperty("user");
+        expect(jobOrder).toHaveProperty("customer");
+        expect(jobOrder).toHaveProperty("jobOrderItems");
+    };
+
+    test("/api/job-order/assigned GET ROUTE should send a HTTP status code of 200 and get the job orders assigned to the user from the database", async () => {
+        const response = await request(app).get("/api/job-order/assigned");
+
+        expect(response.statusCode).toBe(200);
+
+        response.body.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.userId).toEqual(1);
+        });
+    });
+
+    test("/api/job-order/assigned GET ROUTE should send a HTTP status code of 200 and get the ongoing job orders assigned to the user from the database", async () => {
+        const response = await request(app).get(
+            "/api/job-order/assigned?isOngoing=true"
+        );
+
+        expect(response.statusCode).toBe(200);
+
+        console.log("isHidden = false Job Orders: ", response.body.length);
+
+        response.body.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.isPaid).toEqual(false);
+            expect(jobOrder.isClaimed).toEqual(false);
+            expect(jobOrder.userId).toEqual(1);
+        });
+    });
+
+    test("/api/job-order/assigned GET ROUTE should send a HTTP status code of 200 and get the completed job orders assigned to the user from the database", async () => {
+        const response = await request(app).get(
+            "/api/job-order/assigned?isOngoing=false"
+        );
+
+        expect(response.statusCode).toBe(200);
+
+        console.log("isHidden = false Job Orders: ", response.body.length);
+
+        response.body.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.isPaid).toEqual(true);
+            expect(jobOrder.isClaimed).toEqual(true);
+            expect(jobOrder.userId).toEqual(1);
+        });
+    });
+});
+
 describe("INTEGRATION TESTS FOR /api/job-order/count GET ROUTE", () => {
     const assertSummary = (summary) => {
         expect(summary).toHaveProperty("interval_start");

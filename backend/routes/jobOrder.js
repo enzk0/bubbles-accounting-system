@@ -6,13 +6,21 @@ import {
     createJobOrder,
     editJobOrderStatus,
     getAllJobOrders,
+    getAssignedJobOrders,
     getJobOrder,
 } from "../controllers/jobOrderController.js";
 const router = express.Router();
 
 router.post("/", authenticate, checkPrivilege([]), createJobOrder);
 
-router.get("/all", authenticate, checkPrivilege([]), getAllJobOrders);
+router.get(
+    "/assigned",
+    authenticate,
+    checkPrivilege(["employee"]),
+    getAssignedJobOrders
+);
+
+router.get("/all", authenticate, checkPrivilege(["admin"]), getAllJobOrders);
 
 router.get("/", authenticate, checkPrivilege([]), getJobOrder);
 

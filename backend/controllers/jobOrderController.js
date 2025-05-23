@@ -156,7 +156,11 @@ export async function getJobOrder(req, res) {
             include: {
                 branch: true,
                 customer: true,
-                user: true,
+                user: {
+                    omit: {
+                        password: true,
+                    },
+                },
                 jobOrderItems: true,
             },
         });
@@ -210,7 +214,11 @@ export async function getAssignedJobOrders(req, res) {
             include: {
                 branch: true,
                 customer: true,
-                user: true,
+                user: {
+                    omit: {
+                        password: true,
+                    },
+                },
                 jobOrderItems: true,
             },
         });
@@ -296,7 +304,11 @@ export async function getAllJobOrders(req, res) {
             include: {
                 branch: true,
                 customer: true,
-                user: true,
+                user: {
+                    omit: {
+                        password: true,
+                    },
+                },
                 jobOrderItems: true,
             },
         });

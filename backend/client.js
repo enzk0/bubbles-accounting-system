@@ -59,7 +59,7 @@ const custom = new PrismaClient().$extends({
                         "JobOrderItem"."jobOrderIdNumber" = "JobOrder"."idNumber"
                     ${whereClause}
                     GROUP BY DATE_TRUNC($${paramIndex}, "JobOrder"."createdAt")
-                    ORDER BY interval_start
+                    ORDER BY interval_start DESC
                 `;
 
                 values.push(interval);

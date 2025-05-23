@@ -194,7 +194,11 @@ export async function getAssignedJobOrders(req, res) {
         }
 
         if (isOngoing === "false") {
-            filter.OR = [{ isPaid: true }, { isClaimed: true }];
+            filter = {
+                ...filter,
+                isPaid: true,
+                isClaimed: true,
+            };
         }
     }
 

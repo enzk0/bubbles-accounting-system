@@ -312,6 +312,15 @@ describe("INTEGRATION TESTS FOR 'getJobOrder()' CONTROLLER", () => {
 });
 
 describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
+    const assertJobOrder = (jobOrder) => {
+        expect(jobOrder).toHaveProperty("idCode");
+        expect(jobOrder).toHaveProperty("idNumber");
+        expect(jobOrder).toHaveProperty("createdAt");
+        expect(jobOrder).toHaveProperty("updatedAt");
+        expect(jobOrder).toHaveProperty("isPaid");
+        expect(jobOrder).toHaveProperty("isClaimed");
+        expect(jobOrder).toHaveProperty("isHidden");
+    };
     test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders from the database", async () => {
         const req = mockRequest({}, { id: 1 }, {}, {});
 
@@ -322,13 +331,7 @@ describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(200);
 
         jobOrders.forEach((jobOrder) => {
-            expect(jobOrder).toHaveProperty("idCode");
-            expect(jobOrder).toHaveProperty("idNumber");
-            expect(jobOrder).toHaveProperty("createdAt");
-            expect(jobOrder).toHaveProperty("updatedAt");
-            expect(jobOrder).toHaveProperty("isPaid");
-            expect(jobOrder).toHaveProperty("isClaimed");
-            expect(jobOrder).toHaveProperty("isHidden");
+            assertJobOrder(jobOrder);
         });
     });
 
@@ -342,13 +345,7 @@ describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(200);
 
         jobOrders.forEach((jobOrder) => {
-            expect(jobOrder).toHaveProperty("idCode");
-            expect(jobOrder).toHaveProperty("idNumber");
-            expect(jobOrder).toHaveProperty("createdAt");
-            expect(jobOrder).toHaveProperty("updatedAt");
-            expect(jobOrder).toHaveProperty("isPaid");
-            expect(jobOrder).toHaveProperty("isClaimed");
-            expect(jobOrder).toHaveProperty("isHidden");
+            assertJobOrder(jobOrder);
             expect(jobOrder.branchId).toEqual(1);
         });
     });
@@ -363,13 +360,7 @@ describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(200);
 
         jobOrders.forEach((jobOrder) => {
-            expect(jobOrder).toHaveProperty("idCode");
-            expect(jobOrder).toHaveProperty("idNumber");
-            expect(jobOrder).toHaveProperty("createdAt");
-            expect(jobOrder).toHaveProperty("updatedAt");
-            expect(jobOrder).toHaveProperty("isPaid");
-            expect(jobOrder).toHaveProperty("isClaimed");
-            expect(jobOrder).toHaveProperty("isHidden");
+            assertJobOrder(jobOrder);
             expect(jobOrder.userId).toEqual(1);
         });
     });
@@ -389,13 +380,7 @@ describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
         expect(res.status).toHaveBeenCalledWith(200);
 
         jobOrders.forEach((jobOrder) => {
-            expect(jobOrder).toHaveProperty("idCode");
-            expect(jobOrder).toHaveProperty("idNumber");
-            expect(jobOrder).toHaveProperty("createdAt");
-            expect(jobOrder).toHaveProperty("updatedAt");
-            expect(jobOrder).toHaveProperty("isPaid");
-            expect(jobOrder).toHaveProperty("isClaimed");
-            expect(jobOrder).toHaveProperty("isHidden");
+            assertJobOrder(jobOrder);
             expect(jobOrder.isPaid).toEqual(false);
             expect(jobOrder.isClaimed).toEqual(false);
             expect(jobOrder.isHidden).toEqual(false);

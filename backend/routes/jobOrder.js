@@ -2,6 +2,7 @@ import express from "express";
 import { authenticate } from "../middleware/auth.js";
 import { checkPrivilege } from "../middleware/accessControl.js";
 import {
+    countAssignedJobOrders,
     countJobOrders,
     createJobOrder,
     editJobOrderStatus,
@@ -23,6 +24,13 @@ router.get(
 router.get("/all", authenticate, checkPrivilege(["admin"]), getAllJobOrders);
 
 router.get("/", authenticate, checkPrivilege([]), getJobOrder);
+
+router.get(
+    "/count/assigned",
+    authenticate,
+    checkPrivilege(["employee"]),
+    countAssignedJobOrders
+);
 
 router.get("/count", authenticate, checkPrivilege(["admin"]), countJobOrders);
 

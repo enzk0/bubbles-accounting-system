@@ -225,6 +225,9 @@ export async function getAssignedJobOrders(req, res) {
                 },
                 jobOrderItems: true,
             },
+            orderBy: {
+                idNumber: "desc",
+            },
         });
 
         if (found.length === 0 || found === null || found === undefined) {
@@ -486,6 +489,61 @@ export async function editJobOrderStatus(req, res) {
             message: "Job Order Status has been successfully edited",
         });
         return edited;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}
+
+export async function countAssignedJobOrders(req, res) {
+    const { id } = req.user;
+    const { interval } = req.query;
+
+    let filter = {};
+
+    const validIntervals = ["day", "week", "month", "quarter", "year"];
+
+    if (!validIntervals.includes(interval)) {
+        return res
+            .status(422)
+            .send({ message: "Provided interval is not valid" });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+
+        filter = {
+            ...filter,
+            userId: user.id,
+            branchId: user.branchId,
+        };
+
+        const found = await custom.jobOrder.groupByDate(interval, filter);
+
+        if (found.length === 0 || found === null || found === undefined) {
+            return res
+                .status(404)
+                .send({ message: "No job orders can be grouped/summarized" });
+        }
+
+        const parsed = found.map((obj) =>
+            Object.fromEntries(
+                Object.entries(obj).map(([key, value]) => [
+                    key,
+                    typeof value === "bigint" ? Number(value) : value,
+                ])
+            )
+        );
+
+        res.status(200).json(parsed[0]);
+        return parsed[0];
     } catch (error) {
         console.log(error);
         return res.status(500).send({

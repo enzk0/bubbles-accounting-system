@@ -4,7 +4,8 @@
     "main": "index.js",
     "type": "module",
     "prisma": {
-        "seed": "node ./prisma/seed.js"
+        "seed": "node ./prisma/seed.js",
+        "seed:stage": "node ./prisma/init.js"
     },
     "scripts": {
         "docker:up": "docker compose up -d",
@@ -13,7 +14,8 @@
         "test": "cross-env ENVIRONMENT=testing vitest --reporter=verbose --run",
         "test:unit": "cross-env TESTING_TYPE=unit npm run test",
         "test:integration": "prisma migrate deploy && prisma generate && prisma db seed && cross-env TESTING_TYPE=integration npm run test",
-        "dev": "nodemon index.js"
+        "dev": "nodemon index.js",
+        "start": "npx prisma migrate deploy && prisma db seed  && node index.js"
     },
     "author": "",
     "license": "ISC",

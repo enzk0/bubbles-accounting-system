@@ -70,7 +70,7 @@ describe("UNIT TEST SUITE FOR 'authenticate()' MIDDLEWARE", () => {
         expect(res.status).toHaveBeenCalledWith(401);
     });
 
-    test("authenticate() should send a HTTP status code of 403 if the access token is invalid/expires", async () => {
+    test("authenticate() should send a HTTP status code of 401 if the access token is invalid/expires", async () => {
         const req = mockRequest(
             {
                 authorization: `Bearer ${expired_test_token}`,
@@ -84,6 +84,6 @@ describe("UNIT TEST SUITE FOR 'authenticate()' MIDDLEWARE", () => {
 
         await authenticate(req, res, next);
 
-        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.status).toHaveBeenCalledWith(401);
     });
 });

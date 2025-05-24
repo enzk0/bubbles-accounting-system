@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
-
 import { BiSolidLeftArrow, BiSolidRightArrow } from "react-icons/bi";
+import EditModal from "./EditModal";
 
 import JobOrderTable from "./JobOrderTable";
-import EditModal from "./EditModal";
+import ViewModal from "./ViewModal";
 
 function Header({ page, prevPage, nextPage }) {
     const leftSection = (
@@ -43,13 +43,26 @@ function Footer() {
     return <div></div>;
 }
 
-function JobOrderView({ pageRows, jobOrders }) {
+function JobOrderView({ pageRows, jobOrders, refresh }) {
     const editModalRef = useRef(null);
-    const [page, setPage] = useState(1);
-    const [modalJobOrderId, setModalJobOrderId] = useState(null);
+    const viewModalRef = useRef(null);
+
+    const [editModalData, setEditModalData] = useState({
+        idCode: "",
+        idNumber: 0,
+    });
+
+    const [viewModalData, setViewModalData] = useState({
+        idCode: "",
+        idNumber: 0,
+    });
+
     const [visibility, setVisibility] = useState({
         editModal: false,
+        viewModal: false,
     });
+
+    const [page, setPage] = useState(1);
 
     const prevPage = () => {
         console.log("Previous Page");
@@ -62,46 +75,91 @@ function JobOrderView({ pageRows, jobOrders }) {
         );
     };
 
-    const handleOpenModal = (jobOrderId) => {
-        console.log("Open Edit Modal");
-        setModalJobOrderId(jobOrderId);
-        setVisibility((prev) => ({ ...prev, editModal: true }));
+    const handleOpenEdit = (idCode, idNumber) => {
+        setEditModalData({ idCode: idCode, idNumber: idNumber });
+    };
+
+    const handleOpenView = (idCode, idNumber) => {
+        setViewModalData({ idCode: idCode, idNumber: idNumber });
     };
 
     useEffect(() => {
+        if (editModalData.idCode && editModalData.idNumber) {
+            setVisibility((prev) => ({ ...prev, editModal: true }));
+        }
+    }, [editModalData]);
+
+    useEffect(() => {
+        if (viewModalData.idCode && viewModalData.idNumber) {
+            setVisibility((prev) => ({ ...prev, viewModal: true }));
+        }
+    }, [viewModalData]);
+
+    useEffect(() => {
         const handleClickOutside = (e) => {
-            if (
-                editModalRef.current &&
-                !editModalRef.current.contains(e.target)
-            ) {
-                setVisibility((prev) => ({
-                    ...prev,
-                    editModal: false,
-                }));
+            const clickedOutside = {
+                editModal:
+                    editModalRef.current &&
+                    !editModalRef.current.contains(e.target),
+                viewModal:
+                    viewModalRef.current &&
+                    !viewModalRef.current.contains(e.target),
+            };
+
+            if (clickedOutside.editModal) {
+                setVisibility((prev) => ({ ...prev, editModal: false }));
+            }
+            if (clickedOutside.viewModal) {
+                setVisibility((prev) => ({ ...prev, viewModal: false }));
+            }
+        };
+
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                setVisibility((prev) => ({ ...prev, editModal: false }));
+                setVisibility((prev) => ({ ...prev, viewModal: false }));
             }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleKeyDown);
 
         return () => {
             document.removeEventListener("mouseup", handleClickOutside);
+            document.removeEventListener("keydown", handleKeyDown);
         };
     }, []);
 
     return (
         <div className="flex flex-col p-4 rounded-lg border-1 border-slate-300 bg-white">
             <EditModal
-                jobOrderId={modalJobOrderId}
+                idCode={editModalData.idCode}
+                idNumber={editModalData.idNumber}
                 isVisible={visibility.editModal}
                 ref={editModalRef}
+                refresh={refresh}
+            />
+            <ViewModal
+                idCode={viewModalData.idCode}
+                idNumber={viewModalData.idNumber}
+                isVisible={visibility.viewModal}
+                ref={viewModalRef}
             />
             <Header page={page} prevPage={prevPage} nextPage={nextPage} />
             <JobOrderTable
                 page={page}
                 pageRows={pageRows}
                 jobOrders={jobOrders}
-                openEditModal={handleOpenModal}
+                openEditModal={handleOpenEdit}
+                openViewModal={handleOpenView}
             />
+            {jobOrders.length === 0 ? (
+                <div className="text-slate-400 text-center pt-8 pb-4 font-bold">
+                    No Completed Job Orders Found
+                </div>
+            ) : (
+                ""
+            )}
             <Footer />
         </div>
     );

@@ -156,7 +156,11 @@ export async function getJobOrder(req, res) {
             include: {
                 branch: true,
                 customer: true,
-                user: true,
+                user: {
+                    omit: {
+                        password: true,
+                    },
+                },
                 jobOrderItems: true,
             },
         });
@@ -178,6 +182,84 @@ export async function getJobOrder(req, res) {
     }
 }
 
+export async function getAssignedJobOrders(req, res) {
+    const { isOngoing } = req.query;
+    const { id } = req.user;
+
+    let filter = {};
+
+    if (isOngoing !== undefined) {
+        if (isOngoing === "true") {
+            filter.OR = [{ isPaid: false }, { isClaimed: false }];
+        }
+
+        if (isOngoing === "false") {
+            filter = {
+                ...filter,
+                isPaid: true,
+                isClaimed: true,
+            };
+        }
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+
+        const found = await prisma.jobOrder.findMany({
+            where: {
+                ...filter,
+                userId: user.id,
+                branchId: user.branchId,
+            },
+            include: {
+                branch: true,
+                customer: true,
+                user: {
+                    omit: {
+                        password: true,
+                    },
+                },
+                jobOrderItems: true,
+            },
+            orderBy: {
+                idNumber: "desc",
+            },
+        });
+
+        if (found.length === 0 || found === null || found === undefined) {
+            return res
+                .status(404)
+                .send({ message: "No job orders could be found" });
+        }
+
+        const processed = found.map((jobOrder) => {
+            const total = jobOrder.jobOrderItems.reduce(
+                (sum, jobOrderItem) =>
+                    sum +
+                    jobOrderItem.productPrice * jobOrderItem.productQuantity,
+                0
+            );
+            return {
+                ...jobOrder,
+                total: total,
+            };
+        });
+
+        res.status(200).json(processed);
+        return found;
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}
+
 export async function getAllJobOrders(req, res) {
     const {
         branchId: rawBranchId,
@@ -186,6 +268,7 @@ export async function getAllJobOrders(req, res) {
         isPaid,
         isClaimed,
         isHidden,
+        isOngoing,
     } = req.query;
 
     let filter = {};
@@ -214,6 +297,12 @@ export async function getAllJobOrders(req, res) {
         filter.isHidden = isHidden === "true";
     }
 
+    if (isOngoing !== undefined) {
+        if (isOngoing === "true") {
+            filter.OR = [{ isPaid: false }, { isClaimed: false }];
+        }
+    }
+
     console.log(filter);
 
     try {
@@ -222,7 +311,11 @@ export async function getAllJobOrders(req, res) {
             include: {
                 branch: true,
                 customer: true,
-                user: true,
+                user: {
+                    omit: {
+                        password: true,
+                    },
+                },
                 jobOrderItems: true,
             },
         });
@@ -233,7 +326,21 @@ export async function getAllJobOrders(req, res) {
                 .send({ message: "No job orders could be found" });
         }
 
-        res.status(200).json(found);
+        const processed = found.map((jobOrder) => {
+            console.log(jobOrder.jobOrderItems);
+            const total = jobOrder.jobOrderItems.reduce(
+                (sum, jobOrderItem) =>
+                    sum +
+                    jobOrderItem.productPrice * jobOrderItem.productQuantity,
+                0
+            );
+            return {
+                ...jobOrder,
+                total: total,
+            };
+        });
+
+        res.status(200).json(processed);
         return found;
     } catch (error) {
         console.log(error);
@@ -296,6 +403,147 @@ export async function countJobOrders(req, res) {
 
         res.status(200).json(parsed);
         return parsed;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}
+
+export async function editJobOrderStatus(req, res) {
+    const { isPaid, isClaimed } = req.body;
+    const { idCode, idNumber: rawIdNumber } = req.query;
+    const idNumber = parseInt(rawIdNumber);
+
+    let data = {};
+
+    if (!idCode || !idNumber) {
+        return res
+            .status(422)
+            .send({ message: "idCode and idNumber provided is invalid" });
+    }
+
+    if (isPaid !== undefined) {
+        if (typeof isPaid !== "boolean") {
+            return res
+                .status(422)
+                .send({ message: "The provided isPaid status is invalid" });
+        }
+
+        data.isPaid = isPaid;
+
+        if (isPaid === true) {
+            data.paidAt = new Date();
+        } else {
+            data.paidAt = null;
+        }
+    }
+
+    if (isClaimed !== undefined) {
+        if (typeof isClaimed !== "boolean") {
+            return res
+                .status(422)
+                .send({ message: "The provided isClaimed status is invalid" });
+        }
+
+        data.isClaimed = isClaimed;
+
+        if (isClaimed === true) {
+            data.claimedAt = new Date();
+        } else {
+            data.claimedAt = null;
+        }
+    }
+
+    console.log(data);
+
+    try {
+        const found = await prisma.jobOrder.findUnique({
+            where: {
+                idCode_idNumber: {
+                    idCode: idCode,
+                    idNumber: idNumber,
+                },
+            },
+        });
+
+        if (found.isPaid === true && found.isClaimed === true) {
+            return res.status(403).send({
+                message: "Cannot edit the status of a completed job order",
+            });
+        }
+
+        const edited = await prisma.jobOrder.update({
+            where: {
+                idCode_idNumber: {
+                    idCode: idCode,
+                    idNumber: idNumber,
+                },
+            },
+            data: data,
+        });
+
+        res.status(200).send({
+            message: "Job Order Status has been successfully edited",
+        });
+        return edited;
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            message: "An error has occurred with the database client",
+            error: error,
+        });
+    }
+}
+
+export async function countAssignedJobOrders(req, res) {
+    const { id } = req.user;
+    const { interval } = req.query;
+
+    let filter = {};
+
+    const validIntervals = ["day", "week", "month", "quarter", "year"];
+
+    if (!validIntervals.includes(interval)) {
+        return res
+            .status(422)
+            .send({ message: "Provided interval is not valid" });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+
+        filter = {
+            ...filter,
+            userId: user.id,
+            branchId: user.branchId,
+        };
+
+        const found = await custom.jobOrder.groupByDate(interval, filter);
+
+        if (found.length === 0 || found === null || found === undefined) {
+            return res
+                .status(404)
+                .send({ message: "No job orders can be grouped/summarized" });
+        }
+
+        const parsed = found.map((obj) =>
+            Object.fromEntries(
+                Object.entries(obj).map(([key, value]) => [
+                    key,
+                    typeof value === "bigint" ? Number(value) : value,
+                ])
+            )
+        );
+
+        res.status(200).json(parsed[0]);
+        return parsed[0];
     } catch (error) {
         console.log(error);
         return res.status(500).send({

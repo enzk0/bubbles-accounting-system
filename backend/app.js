@@ -1,4 +1,6 @@
 import express from "express";
+import cors from "cors";
+
 import jobOrderRoutes from "./routes/jobOrder.js";
 import salesRoutes from "./routes/salesRoutes.js";
 import userRoutes from "./routes/user.js";
@@ -10,56 +12,17 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
-app.use("/api", salesRoutes);
-app.use("/user", userRoutes);
-app.use("/job-order", jobOrderRoutes);
-app.use("/branch", branchRoutes);
-app.use("/product", productRoutes);
-app.use("/auth", authRoutes);
+const apiRouter = express.Router();
 
-app.get("/", async (req, res) => {
-    try {
-        res.status(200).send({
-            type: "GET",
-            message: "Successfully received GET request.",
-        });
-    } catch (error) {
-        res.status(500).send({ message: error });
-    }
-});
+apiRouter.use("/api", salesRoutes);
+apiRouter.use("/user", userRoutes);
+apiRouter.use("/job-order", jobOrderRoutes);
+apiRouter.use("/branch", branchRoutes);
+apiRouter.use("/product", productRoutes);
+apiRouter.use("/auth", authRoutes);
 
-app.post("/", async (req, res) => {
-    try {
-        res.status(200).send({
-            type: "POST",
-            message: "Successfully received POST request.",
-        });
-    } catch (error) {
-        res.status(500).send({ message: error });
-    }
-});
-
-app.put("/", async (req, res) => {
-    try {
-        res.status(200).send({
-            type: "PUT",
-            message: "Successfully received PUT request.",
-        });
-    } catch (error) {
-        res.status(500).send({ message: error });
-    }
-});
-
-app.delete("/", async (req, res) => {
-    try {
-        res.status(200).send({
-            type: "DELETE",
-            message: "Successfully received DELETE request.",
-        });
-    } catch (error) {
-        res.status(500).send({ message: error });
-    }
-});
+app.use("/api", apiRouter);
 
 export default app;

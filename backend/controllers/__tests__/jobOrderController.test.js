@@ -2,8 +2,11 @@ import { test, expect, describe, vi } from "vitest";
 import {
     countJobOrders,
     createJobOrder,
+    editJobOrderStatus,
+    getAssignedJobOrders,
     getAllJobOrders,
     getJobOrder,
+    countAssignedJobOrders,
 } from "../jobOrderController";
 import { prismaMock, customMock } from "../../singleton";
 
@@ -325,6 +328,13 @@ describe("UNIT TEST SUITE FOR 'getAllJobOrders()' CONTROLLER", () => {
                 isPaid: false,
                 isClaimed: false,
                 isHidden: false,
+
+                jobOrderItems: [
+                    {
+                        productPrice: 60.0,
+                        productQuantity: 1,
+                    },
+                ],
             },
         ]);
 
@@ -360,8 +370,91 @@ describe("UNIT TEST SUITE FOR 'getAllJobOrders()' CONTROLLER", () => {
     });
 });
 
+describe("UNIT TEST SUITE FOR 'getAssignedJobOrders()' CONTROLLER", () => {
+    test("getAssignedJobOrders() should send an HTTP status of 200 and send an array of job orders assigned to the requesting user", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue([
+            {
+                id: 1,
+                branchId: 1,
+            },
+        ]);
+
+        prismaMock.jobOrder.findMany.mockResolvedValue([
+            {
+                idCode: "AB",
+                idNumber: 1234,
+
+                createdAt: new Date(),
+                updatedAt: new Date(),
+
+                userId: 1,
+                branchId: 1,
+
+                isPaid: false,
+                isClaimed: false,
+                isHidden: false,
+
+                jobOrderItems: [
+                    {
+                        productPrice: 60.0,
+                        productQuantity: 1,
+                    },
+                ],
+            },
+        ]);
+
+        const jobOrder = await getAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("getAssignedJobOrders() should send an HTTP status of 404 when no job order can be found", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue([
+            {
+                id: 1,
+                branchId: 1,
+            },
+        ]);
+
+        prismaMock.jobOrder.findMany.mockResolvedValue([]);
+
+        const jobOrder = await getAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("getAssignedJobOrders() should send an HTTP status of 500 when an error occurs", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue([
+            {
+                id: 1,
+                branchId: 1,
+            },
+        ]);
+
+        prismaMock.jobOrder.findMany.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await getAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
 describe("UNIT TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
-    test("countJobOrders() should send an HTTP status of 200 and send an array of all job orders", async () => {
+    test("countJobOrders() should send an HTTP status of 200 and send an array of the summary of all job orders based on an interval", async () => {
         const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
 
         const res = mockResponse();
@@ -419,6 +512,217 @@ describe("UNIT TEST SUITE FOR 'countJobOrders()' CONTROLLER", () => {
         });
 
         const jobOrders = await countJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'editJobOrderStatus()' CONTROLLER", () => {
+    test("editJobOrderStatus() should send an HTTP status of 200 when job order status has been successfully edited", async () => {
+        const req = mockRequest(
+            { isPaid: true },
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findUnique.mockResolvedValue({
+            idCode: "AB",
+            idNumber: 1234,
+
+            createdAt: new Date(),
+            updatedAt: new Date(),
+
+            isPaid: false,
+            isClaimed: false,
+            isHidden: false,
+        });
+
+        prismaMock.jobOrder.update.mockResolvedValue({
+            idCode: "AB",
+            idNumber: 1234,
+
+            createdAt: new Date(),
+            updatedAt: new Date(),
+
+            isPaid: true,
+            isClaimed: false,
+            isHidden: false,
+        });
+
+        const jobOrder = await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(jobOrder.isPaid).toEqual(true);
+    });
+
+    test("editJobOrderStatus() should send an HTTP status of 403 when attempting to change the status of a jobOrder whose isPaid and isClaimed is true", async () => {
+        const req = mockRequest(
+            { isPaid: false },
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findUnique.mockResolvedValue({
+            idCode: "AB",
+            idNumber: 1234,
+
+            createdAt: new Date(),
+            updatedAt: new Date(),
+
+            isPaid: true,
+            isClaimed: true,
+            isHidden: false,
+        });
+
+        await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    test("editJobOrderStatus() should send an HTTP status of 422 when isPaid or isClaimed is not a boolean", async () => {
+        const req = mockRequest(
+            { isPaid: 100 },
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1 }
+        );
+
+        const res = mockResponse();
+
+        await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("editJobOrderStatus() should send an HTTP status of 422 when idCode or idNumber is invalid", async () => {
+        let req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        let jobOrder = await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({}, { id: 1 }, {}, { idCode: "AB", idNumber: null });
+        jobOrder = await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+
+        req = mockRequest({}, { id: 1 }, {}, { idCode: "", idNumber: null });
+        jobOrder = await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("editJobOrderStatus() should send an HTTP status of 500 when an error occurs", async () => {
+        const req = mockRequest(
+            { isPaid: true },
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1234 }
+        );
+
+        const res = mockResponse();
+
+        prismaMock.jobOrder.findUnique.mockImplementation(() => {
+            throw new Error();
+        });
+
+        await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+    });
+});
+
+describe("UNIT TEST SUITE FOR 'countAssignedJobOrders()' CONTROLLER", () => {
+    test("countAssignedJobOrders() should send an HTTP status of 200 and send an array of the summary of job orders assigned to a user based on an interval", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue([
+            {
+                id: 1,
+                branchId: 1,
+            },
+        ]);
+
+        customMock.jobOrder.groupByDate.mockResolvedValue([
+            {
+                interval_start: "2024-05-01T00:00:00Z",
+                total: 1000,
+                total_paid: 700,
+                total_unpaid: 300,
+                no_of_job_orders: 5,
+                no_of_paid: 3,
+                no_of_unpaid: 2,
+                no_of_claimed: 2,
+                no_of_unclaimed: 3,
+            },
+        ]);
+
+        const jobOrders = await countAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("countAssignedJobOrders() should send an HTTP status of 404 when no job orders can be summarized", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue([
+            {
+                id: 1,
+                branchId: 1,
+            },
+        ]);
+
+        customMock.jobOrder.groupByDate.mockResolvedValue([]);
+
+        const jobOrders = await countAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("countAssignedJobOrders() should send an HTTP status of 422 when the interval provided is invalid", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "picosecond" });
+
+        const res = mockResponse();
+
+        const jobOrders = await countAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("countAssignedJobOrders() should send an HTTP status of 500 when an error occurs with the database client", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
+
+        const res = mockResponse();
+
+        prismaMock.user.findUnique.mockResolvedValue([
+            {
+                id: 1,
+                branchId: 1,
+            },
+        ]);
+
+        customMock.jobOrder.groupByDate.mockImplementation(() => {
+            throw new Error();
+        });
+
+        const jobOrders = await countAssignedJobOrders(req, res);
 
         expect(res.status).toHaveBeenCalledWith(500);
     });

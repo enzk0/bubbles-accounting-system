@@ -4,34 +4,67 @@ import { IoAddCircle } from "react-icons/io5";
 import CreateModal from "../components/CreateModal";
 import JobOrderView from "../components/JobOrderView";
 
-import { mixedJobOrders } from "../data/mockJobOrders";
+import { privateApi } from "../api/BASApi";
 
 function EmployeeJobOrders() {
-    const jobOrders = mixedJobOrders;
-
     const createModalRef = useRef(null);
+
+    const [refresh, setRefresh] = useState(0);
+
+    const [jobOrders, setJobOrders] = useState([]);
+
     const [visibility, setVisibility] = useState({
         createModal: false,
     });
+
     const [pageRows, setPageRows] = useState(14);
+
+    const handleRefresh = () => {
+        setRefresh((prev) => prev + 1);
+    };
+
+    useEffect(() => {
+        const fetchJobOrder = async () => {
+            try {
+                let response = await privateApi.get("/user/self");
+
+                const user = response.data;
+
+                response = await privateApi.get(`/job-order/assigned`);
+                setJobOrders(response.data);
+            } catch (error) {
+                console.error("Error fetching job orders:", error);
+            }
+        };
+
+        fetchJobOrder();
+    }, [refresh]);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
-            if (
-                createModalRef.current &&
-                !createModalRef.current.contains(e.target)
-            ) {
-                setVisibility((prev) => ({
-                    ...prev,
-                    createModal: false,
-                }));
+            const clickedOutside = {
+                createModal:
+                    createModalRef.current &&
+                    !createModalRef.current.contains(e.target),
+            };
+
+            if (clickedOutside.createModal) {
+                setVisibility((prev) => ({ ...prev, createModal: false }));
+            }
+        };
+
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                setVisibility((prev) => ({ ...prev, createModal: false }));
             }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleKeyDown);
 
         return () => {
-            document.removeEventListener("mouseup", handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("keydown", handleKeyDown);
         };
     }, []);
 
@@ -40,6 +73,7 @@ function EmployeeJobOrders() {
             <CreateModal
                 ref={createModalRef}
                 isVisible={visibility.createModal}
+                refresh={handleRefresh}
             />
             <div className="flex flex-row mb-4 items-baseline">
                 <p className="text-lg font-bold">Job Orders</p>
@@ -59,7 +93,11 @@ function EmployeeJobOrders() {
                     </button>
                 </div>
             </div>
-            <JobOrderView pageRows={pageRows} jobOrders={jobOrders} />
+            <JobOrderView
+                pageRows={pageRows}
+                jobOrders={jobOrders}
+                refresh={handleRefresh}
+            />
         </div>
     );
 }

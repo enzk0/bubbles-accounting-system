@@ -76,6 +76,9 @@ export async function getAllProducts(req, res) {
     try {
         const foundProducts = await prisma.product.findMany({
             where: filter,
+            orderBy: {
+                id: "asc",
+            },
         });
 
         if (

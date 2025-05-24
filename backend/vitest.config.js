@@ -39,7 +39,6 @@ if (process.env.TESTING_TYPE === "integration") {
         test: {
             clearMocks: true,
             environment: "node",
-            globalSetup: "./globalSetup.js",
             setupFiles: [],
             include: ["**/*.integration.test.js"],
             exclude: [

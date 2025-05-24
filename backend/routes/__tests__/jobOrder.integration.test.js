@@ -440,6 +440,8 @@ describe("INTEGRATION TESTS FOR /api/job-order/count GET ROUTE", () => {
         expect(summary).toHaveProperty("no_of_paid");
         expect(summary).toHaveProperty("no_of_claimed");
         expect(summary).toHaveProperty("no_of_unclaimed");
+        expect(summary).toHaveProperty("no_of_completed");
+        expect(summary).toHaveProperty("no_of_ongoing");
     };
 
     test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in daily granularity", async () => {
@@ -493,6 +495,80 @@ describe("INTEGRATION TESTS FOR /api/job-order/count GET ROUTE", () => {
     test("/api/job-order/count GET routes should send an HTTP status code of 422 when interval is invalid", async () => {
         let response = await request(app).get(
             "/api/job-order/count?interval=minute"
+        );
+
+        expect(response.statusCode).toBe(422);
+
+        response = await request(app).get("/api/job-order/count");
+
+        expect(response.statusCode).toBe(422);
+
+        response = await request(app).get(
+            "/api/job-order/count?interval=skibidi"
+        );
+
+        expect(response.statusCode).toBe(422);
+    });
+});
+
+describe("INTEGRATION TESTS FOR /api/job-order/count/assigned GET ROUTE", () => {
+    const assertSummary = (summary) => {
+        expect(summary).toHaveProperty("interval_start");
+        expect(summary).toHaveProperty("total_unpaid");
+        expect(summary).toHaveProperty("no_of_unpaid");
+        expect(summary).toHaveProperty("total_paid");
+        expect(summary).toHaveProperty("total");
+        expect(summary).toHaveProperty("no_of_job_orders");
+        expect(summary).toHaveProperty("no_of_paid");
+        expect(summary).toHaveProperty("no_of_claimed");
+        expect(summary).toHaveProperty("no_of_unclaimed");
+        expect(summary).toHaveProperty("no_of_completed");
+        expect(summary).toHaveProperty("no_of_ongoing");
+    };
+
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in daily granularity", async () => {
+        const response = await request(app).get(
+            "/api/job-order/count/assigned?interval=day"
+        );
+
+        expect(response.statusCode).toBe(200);
+
+        assertSummary(response.body);
+    });
+
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in weekly granularity", async () => {
+        const response = await request(app).get(
+            "/api/job-order/count/assigned?interval=week"
+        );
+
+        expect(response.statusCode).toBe(200);
+
+        assertSummary(response.body);
+    });
+
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in monthly granularity", async () => {
+        const response = await request(app).get(
+            "/api/job-order/count/assigned?interval=month"
+        );
+
+        expect(response.statusCode).toBe(200);
+
+        assertSummary(response.body);
+    });
+
+    test("/api/job-order/count GET routes should send an HTTP status code of 200 and return a summary of job orders in yearly granularity", async () => {
+        const response = await request(app).get(
+            "/api/job-order/count/assigned?interval=year"
+        );
+
+        expect(response.statusCode).toBe(200);
+
+        assertSummary(response.body);
+    });
+
+    test("/api/job-order/count GET routes should send an HTTP status code of 422 when interval is invalid", async () => {
+        let response = await request(app).get(
+            "/api/job-order/count/assigned?interval=minute"
         );
 
         expect(response.statusCode).toBe(422);

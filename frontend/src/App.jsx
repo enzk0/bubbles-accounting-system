@@ -15,43 +15,104 @@ import EmployeeOngoingJobOrders from "./pages/EmployeeOngoingJobOrders";
 import EmployeeCompletedJobOrders from "./pages/EmployeeCompletedJobOrders";
 import EmployeeLayout from "./components/EmployeeLayout";
 import PageNotFound from "./pages/PageNotFound";
+import AuthProvider from "./context/AuthContext";
+import PrivateComponent from "./components/PrivateComponent";
 
 function App() {
     const [count, setCount] = useState(0);
 
     return (
-        <div className="flex flex-row">
-            <Routes>
-                <Route
-                    path="/"
-                    element={<Navigate to="/employee/login" replace />}
-                />
-                <Route path="/employee" element={<EmployeeLayout />}>
-                    <Route index element={<EmployeeHome />} />
-                    <Route path="login" element={<EmployeeLogin />} />
-                    <Route path="job_orders">
-                        <Route index element={<EmployeeJobOrders />} />
+        <AuthProvider>
+            <div className="flex flex-row">
+                <Routes>
+                    <Route
+                        path="/"
+                        element={<Navigate to="/employee/login" replace />}
+                    />
+                    <Route path="/employee" element={<EmployeeLayout />}>
                         <Route
-                            path="ongoing"
-                            element={<EmployeeOngoingJobOrders />}
+                            index
+                            element={
+                                <PrivateComponent defaultRoute="/employee/login">
+                                    <EmployeeHome />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route path="login" element={<EmployeeLogin />} />
+                        <Route path="job_orders">
+                            <Route
+                                index
+                                element={
+                                    <PrivateComponent defaultRoute="/employee/login">
+                                        <EmployeeJobOrders />
+                                    </PrivateComponent>
+                                }
+                            />
+                            <Route
+                                path="ongoing"
+                                element={
+                                    <PrivateComponent defaultRoute="/employee/login">
+                                        <EmployeeOngoingJobOrders />
+                                    </PrivateComponent>
+                                }
+                            />
+                            <Route
+                                path="completed"
+                                element={
+                                    <PrivateComponent defaultRoute="/employee/login">
+                                        <EmployeeCompletedJobOrders />
+                                    </PrivateComponent>
+                                }
+                            />
+                        </Route>
+                    </Route>
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route
+                            index
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminHome />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route path="login" element={<AdminLogin />} />
+                        <Route
+                            path="job_orders"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminJobOrders />
+                                </PrivateComponent>
+                            }
                         />
                         <Route
-                            path="completed"
-                            element={<EmployeeCompletedJobOrders />}
+                            path="employees"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminEmployees />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route
+                            path="branches"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminBranches />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route
+                            path="products"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminProducts />
+                                </PrivateComponent>
+                            }
                         />
                     </Route>
-                </Route>
-                <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<AdminHome />} />
-                    <Route path="login" element={<AdminLogin />} />
-                    <Route path="job_orders" element={<AdminJobOrders />} />
-                    <Route path="employees" element={<AdminEmployees />} />
-                    <Route path="branches" element={<AdminBranches />} />
-                    <Route path="products" element={<AdminProducts />} />
-                </Route>
-                <Route path="*" element={<PageNotFound />} />
-            </Routes>
-        </div>
+                    <Route path="*" element={<PageNotFound />} />
+                </Routes>
+            </div>
+        </AuthProvider>
     );
 }
 

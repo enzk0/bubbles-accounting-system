@@ -5,6 +5,7 @@ import CreateModal from "../components/CreateModal";
 import JobOrderView from "../components/JobOrderView";
 
 import mixedJobOrders from "../data/mockJobOrders";
+import { privateApi } from "../api/BASApi";
 
 function OverviewItem({ title, value, isLast = false }) {
     return (
@@ -19,57 +20,101 @@ function OverviewItem({ title, value, isLast = false }) {
 }
 
 function EmployeeHome() {
-    const jobOrders = mixedJobOrders;
-
     const createModalRef = useRef(null);
-    const [overview, setOverview] = useState({
-        total: 32,
-        ongoing: 8,
-        completed: 24,
-    });
+
+    const [refresh, setRefresh] = useState(0);
+
+    const [jobOrders, setJobOrders] = useState([]);
+
+    const [overview, setOverview] = useState({});
+
     const [visibility, setVisibility] = useState({
         createModal: false,
     });
+
     const [pageRows, setPageRows] = useState(9);
 
+    const handleRefresh = () => {
+        setRefresh((prev) => prev + 1);
+    };
+
+    const handleCloseCreate = () => {
+        setVisibility((prev) => ({ ...prev, createModal: false }));
+    };
+
     useEffect(() => {
+        const fetchJobOrder = async () => {
+            try {
+                let jobOrdeResponse = await privateApi.get(
+                    "/job-order/assigned"
+                );
+                setJobOrders(jobOrdeResponse.data);
+
+                let overviewResponse = await privateApi.get(
+                    "/job-order/count/assigned?interval=day"
+                );
+                setOverview(overviewResponse.data);
+            } catch (error) {
+                console.error("Error fetching job orders:", error);
+            }
+        };
+
+        fetchJobOrder();
+    }, [refresh]);
+
+    useEffect(() => {
+        console.log(process.env.NODE_ENV);
         const handleClickOutside = (e) => {
-            console.log(createModalRef.current);
-            if (
-                createModalRef.current &&
-                !createModalRef.current.contains(e.target)
-            ) {
-                setVisibility((prev) => ({
-                    ...prev,
-                    createModal: false,
-                }));
+            const clickedOutside = {
+                createModal:
+                    createModalRef.current &&
+                    !createModalRef.current.contains(e.target),
+            };
+
+            if (clickedOutside.createModal) {
+                setVisibility((prev) => ({ ...prev, createModal: false }));
+            }
+        };
+
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                setVisibility((prev) => ({ ...prev, createModal: false }));
             }
         };
 
         document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleKeyDown);
 
         return () => {
-            document.removeEventListener("mouseup", handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("keydown", handleKeyDown);
         };
     }, []);
+
+    console.log(jobOrders);
 
     return (
         <div className="p-8 pt-2">
             <CreateModal
                 isVisible={visibility.createModal}
                 ref={createModalRef}
+                refresh={handleRefresh}
+                close={handleCloseCreate}
             />
             <div className="mb-8">
                 <p className="text-lg mb-2 font-bold">Overview</p>
                 <div className="flex flex-row p-2 rounded-lg border-1 border-slate-300 bg-white">
-                    <OverviewItem title="Job Orders" value={overview.total} />
+                    <OverviewItem
+                        title="Job Orders"
+                        value={overview.no_of_job_orders}
+                    />
                     <OverviewItem
                         title="Ongoing Job Orders"
-                        value={overview.ongoing}
+                        value={overview.no_of_ongoing}
                     />
                     <OverviewItem
                         title="Completed Job Orders"
-                        value={overview.completed}
+                        value={overview.no_of_completed}
                         isLast={true}
                     />
                 </div>
@@ -93,7 +138,11 @@ function EmployeeHome() {
                         </button>
                     </div>
                 </div>
-                <JobOrderView pageRows={pageRows} jobOrders={jobOrders} />
+                <JobOrderView
+                    pageRows={pageRows}
+                    jobOrders={jobOrders}
+                    refresh={handleRefresh}
+                />
             </div>
         </div>
     );

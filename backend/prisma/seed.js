@@ -8,7 +8,6 @@ async function seed() {
         "postgresql://prisma:prisma@localhost:5433/tests?schema=public"
     ) {
         console.log("Cannot seed in a non-testing database.");
-        return;
     }
 
     const prisma = new PrismaClient();

@@ -17,7 +17,11 @@ const queryContents = `
 
     COUNT(DISTINCT ("JobOrder"."idCode", "JobOrder"."idNumber")) FILTER (WHERE "JobOrder"."isClaimed" = true) AS no_of_claimed,
 
-    COUNT(DISTINCT ("JobOrder"."idCode", "JobOrder"."idNumber")) FILTER (WHERE "JobOrder"."isClaimed" = false) AS no_of_unclaimed
+    COUNT(DISTINCT ("JobOrder"."idCode", "JobOrder"."idNumber")) FILTER (WHERE "JobOrder"."isClaimed" = false) AS no_of_unclaimed,
+
+    COUNT(DISTINCT ("JobOrder"."idCode", "JobOrder"."idNumber")) FILTER (WHERE "JobOrder"."isClaimed" = true AND "JobOrder"."isPaid" = true) AS no_of_completed,
+
+    COUNT(DISTINCT ("JobOrder"."idCode", "JobOrder"."idNumber")) FILTER (WHERE "JobOrder"."isClaimed" = false OR "JobOrder"."isPaid" = false) AS no_of_ongoing
 `;
 
 const custom = new PrismaClient().$extends({

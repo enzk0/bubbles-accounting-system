@@ -1,0 +1,40 @@
+services:
+  # Managed PostgreSQL — recommended instead of self-hosted DB
+  - type: pserv
+    name: backend
+    env: docker
+    repo: https://github.com/2402-XU-CSCC22A/groupG
+    dockerfilePath: ./backend/Dockerfile
+    buildFilter:
+      paths:
+        - backend/**
+    envVars:
+      - fromGroup: backend-env
+
+  - type: web
+    name: frontend
+    env: docker
+    repo: https://github.com/2402-XU-CSCC22A/groupG
+    dockerfilePath: ./frontend/Dockerfile
+    buildFilter:
+      paths:
+        - frontend/**
+    envVars:
+      - fromGroup: frontend-env
+
+  - type: web
+    name: nginx
+    env: docker
+    repo: https://github.com/2402-XU-CSCC22A/groupG
+    dockerfilePath: ./nginx/Dockerfile
+    buildFilter:
+      paths:
+        - nginx/**
+    envVars:
+      - fromGroup: nginx-env
+    plan: starter  # Or use standard if you need autoscaling
+    routes:
+      - type: rewrite
+        source: /
+        destination: /
+

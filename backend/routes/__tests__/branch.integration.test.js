@@ -15,9 +15,9 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe("INTEGRATION TESTS FOR /api/branch/ POST ROUTE", () => {
-    test("/api/branch/ POST route should create a branch in the database and send an HTTP status code of 200 along with a message", async () => {
-        const response = await request(app).post("/api/branch/").send({
+describe("INTEGRATION TESTS FOR /branch/ POST ROUTE", () => {
+    test("/branch/ POST route should create a branch in the database and send an HTTP status code of 200 along with a message", async () => {
+        const response = await request(app).post("/branch/").send({
             code: "LA",
             name: "Lala Land",
             address: "Lala Land",
@@ -28,8 +28,8 @@ describe("INTEGRATION TESTS FOR /api/branch/ POST ROUTE", () => {
         expect(response.statusCode).toBe(201);
     });
 
-    test("/api/branch/ POST route should send an HTTP status code of 500 and send an error message when attempting to create a non-unique branch ", async () => {
-        const response = await request(app).post("/api/branch/").send({
+    test("/branch/ POST route should send an HTTP status code of 500 and send an error message when attempting to create a non-unique branch ", async () => {
+        const response = await request(app).post("/branch/").send({
             code: "LA",
             name: "Lala Land",
             address: "Lala Land",
@@ -38,9 +38,9 @@ describe("INTEGRATION TESTS FOR /api/branch/ POST ROUTE", () => {
         expect(response.statusCode).toBe(500);
     });
 
-    test("/api/branch/ POST route should send an HTTP status code of 422 and send an error message when information provided to create a branch is incomplete", async () => {
+    test("/branch/ POST route should send an HTTP status code of 422 and send an error message when information provided to create a branch is incomplete", async () => {
         const response = await request(app)
-            .post("/api/branch/")
+            .post("/branch/")
             .send({
                 requester: { id: 1 },
                 branch: { code: "", name: "", address: "" },
@@ -50,30 +50,30 @@ describe("INTEGRATION TESTS FOR /api/branch/ POST ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/branch/:id GET ROUTE", () => {
-    test("/api/branch/:id GET route should get the queried branch from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/api/branch/1");
+describe("INTEGRATION TESTS FOR /branch/:id GET ROUTE", () => {
+    test("/branch/:id GET route should get the queried branch from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/branch/1");
 
         expect(response.statusCode).toBe(200);
         expect(response.body.id).toBe(1);
     });
 
-    test("/api/branch/:id GET route should send an HTTP status code of 422 if the provided branchId in the query is null or undefined", async () => {
-        const response = await request(app).get("/api/branch/0");
+    test("/branch/:id GET route should send an HTTP status code of 422 if the provided branchId in the query is null or undefined", async () => {
+        const response = await request(app).get("/branch/0");
 
         expect(response.statusCode).toBe(422);
     });
 
-    test("/api/branch/:id GET route should send an HTTP status code of 404 if the provided branchId in the query is null or undefined", async () => {
-        const response = await request(app).get("/api/branch/2077");
+    test("/branch/:id GET route should send an HTTP status code of 404 if the provided branchId in the query is null or undefined", async () => {
+        const response = await request(app).get("/branch/2077");
 
         expect(response.statusCode).toBe(404);
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/branch/all GET ROUTE", () => {
-    test("/api/branch/all GET route should get all branches from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/api/branch/all");
+describe("INTEGRATION TESTS FOR /branch/all GET ROUTE", () => {
+    test("/branch/all GET route should get all branches from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/branch/all");
 
         expect(response.statusCode).toBe(200);
 
@@ -93,10 +93,8 @@ describe("INTEGRATION TESTS FOR /api/branch/all GET ROUTE", () => {
         expect(response.body.length).toEqual(branches.length);
     });
 
-    test("/api/branch/all GET route should get all active branches from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get(
-            "/api/branch/all?isActive=true"
-        );
+    test("/branch/all GET route should get all active branches from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/branch/all?isActive=true");
 
         expect(response.statusCode).toBe(200);
 
@@ -111,10 +109,8 @@ describe("INTEGRATION TESTS FOR /api/branch/all GET ROUTE", () => {
         expect(response.body.length).toEqual(branches.length);
     });
 
-    test("/api/branch/all GET route should get all inactive branches from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get(
-            "/api/branch/all?isActive=false"
-        );
+    test("/branch/all GET route should get all inactive branches from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/branch/all?isActive=false");
 
         expect(response.statusCode).toBe(200);
 
@@ -130,9 +126,9 @@ describe("INTEGRATION TESTS FOR /api/branch/all GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/branch/:id PATCH ROUTE", () => {
-    test("/api/branch/:id PATCH route should edit the specified branch and send an HTTP status code of 200", async () => {
-        const response = await request(app).patch("/api/branch/1").send({
+describe("INTEGRATION TESTS FOR /branch/:id PATCH ROUTE", () => {
+    test("/branch/:id PATCH route should edit the specified branch and send an HTTP status code of 200", async () => {
+        const response = await request(app).patch("/branch/1").send({
             name: "Ambrosia",
             address: "Somewhere City",
         });
@@ -151,8 +147,8 @@ describe("INTEGRATION TESTS FOR /api/branch/:id PATCH ROUTE", () => {
         expect(branch.address).toEqual("Somewhere City");
     });
 
-    test("/api/branch/:id PATCH route should send an HTTP status code of 422 when some the fields are either invalid or empty", async () => {
-        const response = await request(app).patch("/api/branch/1").send({
+    test("/branch/:id PATCH route should send an HTTP status code of 422 when some the fields are either invalid or empty", async () => {
+        const response = await request(app).patch("/branch/1").send({
             name: "Ambrosia",
             address: "",
         });
@@ -161,9 +157,9 @@ describe("INTEGRATION TESTS FOR /api/branch/:id PATCH ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/branch/:id DELETE ROUTE", () => {
-    test("/api/branch/:id DELETE route should deactivate the specified branch and send an HTTP status code of 200", async () => {
-        const response = await request(app).delete("/api/branch/1");
+describe("INTEGRATION TESTS FOR /branch/:id DELETE ROUTE", () => {
+    test("/branch/:id DELETE route should deactivate the specified branch and send an HTTP status code of 200", async () => {
+        const response = await request(app).delete("/branch/1");
 
         expect(response.statusCode).toBe(200);
 
@@ -176,8 +172,8 @@ describe("INTEGRATION TESTS FOR /api/branch/:id DELETE ROUTE", () => {
         expect(branch.isActive).toEqual(false);
     });
 
-    test("/api/branch/id DELETE route should send an HTTP status code of 422 when an invalid branch id is provided", async () => {
-        const response = await request(app).delete("/api/branch/0");
+    test("/branch/id DELETE route should send an HTTP status code of 422 when an invalid branch id is provided", async () => {
+        const response = await request(app).delete("/branch/0");
 
         expect(response.statusCode).toBe(422);
     });

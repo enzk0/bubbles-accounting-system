@@ -15,9 +15,9 @@ vi.mock("../../middleware/accessControl", () => ({
     },
 }));
 
-describe("INTEGRATION TESTS FOR /api/product/ POST ROUTE", () => {
-    test("/api/product/ POST route should create a product in the database and send an HTTP status code of 201 along with a message", async () => {
-        const response = await request(app).post("/api/product/").send({
+describe("INTEGRATION TESTS FOR /product/ POST ROUTE", () => {
+    test("/product/ POST route should create a product in the database and send an HTTP status code of 201 along with a message", async () => {
+        const response = await request(app).post("/product/").send({
             name: "WASHING",
             price: 60.0,
         });
@@ -25,8 +25,8 @@ describe("INTEGRATION TESTS FOR /api/product/ POST ROUTE", () => {
         expect(response.statusCode).toBe(201);
     });
 
-    test("/api/product/ POST route should send an HTTP status code of 422 and send an error message when information provided to create a product is incomplete", async () => {
-        const response = await request(app).post("/api/product/").send({
+    test("/product/ POST route should send an HTTP status code of 422 and send an error message when information provided to create a product is incomplete", async () => {
+        const response = await request(app).post("/product/").send({
             name: "",
             price: 60.0,
         });
@@ -34,8 +34,8 @@ describe("INTEGRATION TESTS FOR /api/product/ POST ROUTE", () => {
         expect(response.statusCode).toBe(422);
     });
 
-    test("/api/product/ POST route should send an HTTP status code of 500 and send an error message when attempting to create a non-unique branch ", async () => {
-        const response = await request(app).post("/api/product/").send({
+    test("/product/ POST route should send an HTTP status code of 500 and send an error message when attempting to create a non-unique branch ", async () => {
+        const response = await request(app).post("/product/").send({
             name: "WASH",
             price: 60.0,
         });
@@ -44,30 +44,30 @@ describe("INTEGRATION TESTS FOR /api/product/ POST ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/product/ GET ROUTE", () => {
-    test("/api/product/ GET route should get the queried product from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/api/product/1");
+describe("INTEGRATION TESTS FOR /product/ GET ROUTE", () => {
+    test("/product/ GET route should get the queried product from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/product/1");
 
         expect(response.statusCode).toBe(200);
         expect(response.body.id).toBe(1);
     });
 
-    test("/api/product/ GET route should send an HTTP status code of 422 if the provided productId in the query is null or undefined", async () => {
-        const response = await request(app).get("/api/product/-1");
+    test("/product/ GET route should send an HTTP status code of 422 if the provided productId in the query is null or undefined", async () => {
+        const response = await request(app).get("/product/-1");
 
         expect(response.statusCode).toBe(422);
     });
 
-    test("/api/product/ GET route should send an HTTP status code of 404 if the queried product cannot be found", async () => {
-        const response = await request(app).get("/api/product/2077");
+    test("/product/ GET route should send an HTTP status code of 404 if the queried product cannot be found", async () => {
+        const response = await request(app).get("/product/2077");
 
         expect(response.statusCode).toBe(404);
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/product/all GET ROUTE", () => {
-    test("/api/product/all GET route should get all products from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get("/api/product/all");
+describe("INTEGRATION TESTS FOR /product/all GET ROUTE", () => {
+    test("/product/all GET route should get all products from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/product/all");
 
         expect(response.statusCode).toBe(200);
 
@@ -85,10 +85,8 @@ describe("INTEGRATION TESTS FOR /api/product/all GET ROUTE", () => {
         expect(response.body.length).toEqual(products.length);
     });
 
-    test("/api/product/all GET route should get all active products from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get(
-            "/api/product/all?isActive=true"
-        );
+    test("/product/all GET route should get all active products from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/product/all?isActive=true");
 
         expect(response.statusCode).toBe(200);
 
@@ -101,10 +99,8 @@ describe("INTEGRATION TESTS FOR /api/product/all GET ROUTE", () => {
         expect(response.body.length).toEqual(products.length);
     });
 
-    test("/api/product/all GET route should get all inactive products from the database and send an HTTP status code of 200", async () => {
-        const response = await request(app).get(
-            "/api/product/all?isActive=false"
-        );
+    test("/product/all GET route should get all inactive products from the database and send an HTTP status code of 200", async () => {
+        const response = await request(app).get("/product/all?isActive=false");
 
         expect(response.statusCode).toBe(200);
 
@@ -118,9 +114,9 @@ describe("INTEGRATION TESTS FOR /api/product/all GET ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/product/ PATCH ROUTE", () => {
-    test("/api/product/ PATCH route should edit the specified product and send an HTTP status code of 200", async () => {
-        const response = await request(app).patch("/api/product/1").send({
+describe("INTEGRATION TESTS FOR /product/ PATCH ROUTE", () => {
+    test("/product/ PATCH route should edit the specified product and send an HTTP status code of 200", async () => {
+        const response = await request(app).patch("/product/1").send({
             name: "WASH",
             price: 90.0,
         });
@@ -138,8 +134,8 @@ describe("INTEGRATION TESTS FOR /api/product/ PATCH ROUTE", () => {
         expect(product.price).toEqual(90.0);
     });
 
-    test("/api/product/ PATCH route should send an HTTP status code of 422 when some the fields are either invalid or empty", async () => {
-        const response = await request(app).patch("/api/product/1").send({
+    test("/product/ PATCH route should send an HTTP status code of 422 when some the fields are either invalid or empty", async () => {
+        const response = await request(app).patch("/product/1").send({
             name: "",
             price: null,
         });
@@ -148,17 +144,15 @@ describe("INTEGRATION TESTS FOR /api/product/ PATCH ROUTE", () => {
     });
 });
 
-describe("INTEGRATION TESTS FOR /api/product/ DELETE ROUTE", () => {
-    test("/api/product/ DELETE route should deactivate the specified product and send an HTTP status code of 200", async () => {
+describe("INTEGRATION TESTS FOR /product/ DELETE ROUTE", () => {
+    test("/product/ DELETE route should deactivate the specified product and send an HTTP status code of 200", async () => {
         let product = await prisma.product.findUnique({
             where: {
                 name: "WASHING",
             },
         });
 
-        const response = await request(app).delete(
-            `/api/product/${product.id}`
-        );
+        const response = await request(app).delete(`/product/${product.id}`);
 
         expect(response.statusCode).toBe(200);
 
@@ -171,8 +165,8 @@ describe("INTEGRATION TESTS FOR /api/product/ DELETE ROUTE", () => {
         expect(product.isActive).toEqual(false);
     });
 
-    test("/api/product/ DELETE route should send an HTTP status code of 422 when an invalid product id is provided", async () => {
-        const response = await request(app).delete(`/api/product/-1`);
+    test("/product/ DELETE route should send an HTTP status code of 422 when an invalid product id is provided", async () => {
+        const response = await request(app).delete(`/product/-1`);
 
         expect(response.statusCode).toBe(422);
     });

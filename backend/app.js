@@ -14,15 +14,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-const apiRouter = express.Router();
-
-apiRouter.use("/api", salesRoutes);
-apiRouter.use("/user", userRoutes);
-apiRouter.use("/job-order", jobOrderRoutes);
-apiRouter.use("/branch", branchRoutes);
-apiRouter.use("/product", productRoutes);
-apiRouter.use("/auth", authRoutes);
-
-app.use("/api", apiRouter);
+app.use("/api", salesRoutes);
+app.use("/user", userRoutes);
+app.use("/job-order", jobOrderRoutes);
+app.use("/branch", branchRoutes);
+app.use("/product", productRoutes);
+app.use("/auth", authRoutes);
 
 export default app;

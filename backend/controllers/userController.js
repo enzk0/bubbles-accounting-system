@@ -66,7 +66,8 @@ export async function deactivateUser(req, res) {
 
 export async function editUser(req, res) {
     const { id: rawId } = req.params;
-    const { username, firstName, lastName, roleId, branchId } = req.body;
+    const { username, firstName, lastName, roleId, branchId, isActive } =
+        req.body;
 
     const id = parseInt(rawId);
 
@@ -77,15 +78,23 @@ export async function editUser(req, res) {
     }
 
     try {
-        if (roleId && branchId) {
+        if (branchId) {
+            await prisma.user.update({
+                where: { id: id },
+                data: {
+                    branch: {
+                        connect: { id: branchId },
+                    },
+                },
+            });
+        }
+
+        if (roleId) {
             await prisma.user.update({
                 where: { id: id },
                 data: {
                     role: {
                         connect: { id: roleId },
-                    },
-                    branch: {
-                        connect: { id: branchId },
                     },
                 },
             });
@@ -97,6 +106,7 @@ export async function editUser(req, res) {
                 username: username,
                 firstName: firstName,
                 lastName: lastName,
+                isActive: isActive,
             },
         });
 
@@ -281,6 +291,13 @@ export async function getAllUsers(req, res) {
     try {
         const found = await prisma.user.findMany({
             where: filter,
+            include: {
+                branch: true,
+                role: true,
+            },
+            orderBy: {
+                id: "asc",
+            },
         });
 
         console.log(found);

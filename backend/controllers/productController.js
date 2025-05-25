@@ -107,7 +107,7 @@ export async function editProduct(req, res) {
     const { id: rawId } = req.params;
     const id = parseInt(rawId);
 
-    const { name, price } = req.body;
+    const { name, price, isActive } = req.body;
 
     if (id === null || id === undefined || id < 1) {
         return res.status(422).send({ message: "Product id is not provided." });
@@ -127,6 +127,7 @@ export async function editProduct(req, res) {
             data: {
                 name: name,
                 price: price,
+                isActive: isActive,
             },
         });
 

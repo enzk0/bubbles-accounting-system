@@ -318,6 +318,9 @@ export async function getAllJobOrders(req, res) {
                 },
                 jobOrderItems: true,
             },
+            orderBy: {
+                createdAt: "desc",
+            },
         });
 
         if (found.length === 0 || found === null || found === undefined) {

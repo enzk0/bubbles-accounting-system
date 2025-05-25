@@ -1,6 +1,6 @@
 services:
   # Managed PostgreSQL — recommended instead of self-hosted DB
-  - type: pserv
+  - type: web
     name: backend
     env: docker
     repo: https://github.com/2402-XU-CSCC22A/groupG

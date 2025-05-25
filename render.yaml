@@ -33,8 +33,4 @@ services:
     envVars:
       - fromGroup: nginx-env
     plan: starter  # Or use standard if you need autoscaling
-    routes:
-      - type: rewrite
-        source: /
-        destination: /
 

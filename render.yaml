@@ -28,10 +28,10 @@ services:
     name: nginx
     env: docker
     repo: https://github.com/2402-XU-CSCC22A/groupG
-    dockerfilePath: ./nginx/Dockerfile
+    dockerfilePath: ./nginx_prod/Dockerfile
     buildFilter:
       paths:
-        - nginx/**
+        - nginx_prod/**
     envVars:
       - fromGroup: groupg-nginx-env
     plan: free  # Or use standard if you need autoscaling

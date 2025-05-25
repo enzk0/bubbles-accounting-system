@@ -9,7 +9,7 @@ services:
       paths:
         - backend/**
     envVars:
-      - fromGroup: backend-env
+      - fromGroup: groupg-backend-env
     plan: free  # Or use standard if you need autoscaling
 
   - type: web
@@ -21,7 +21,7 @@ services:
       paths:
         - frontend/**
     envVars:
-      - fromGroup: frontend-env
+      - fromGroup: groupg-frontend-env
     plan: free  # Or use standard if you need autoscaling
 
   - type: web
@@ -33,6 +33,6 @@ services:
       paths:
         - nginx/**
     envVars:
-      - fromGroup: nginx-env
+      - fromGroup: groupg-nginx-env
     plan: free  # Or use standard if you need autoscaling
 

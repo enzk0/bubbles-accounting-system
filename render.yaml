@@ -32,5 +32,5 @@ services:
         - nginx/**
     envVars:
       - fromGroup: nginx-env
-    plan: starter  # Or use standard if you need autoscaling
+    plan: free  # Or use standard if you need autoscaling
 

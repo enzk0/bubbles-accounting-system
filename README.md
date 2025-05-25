@@ -1,6 +1,49 @@
 # Group G
 This is the official repo for CSCC22 Group G.
 
+## Staging Environment
+
+This section contains information about the staging environment utilized in the project
+
+### Frontend
+
+Summary of Technologies Used:
+1. HTML, CSS, and JS
+2. React (Frontend Library)
+3. TailwindCSS (CSS and Styling)
+4. Axios (HTTP Client)
+5. Vite (Build Tool)
+6. Nginx (Web Server)
+7. Docker
+
+The frontend of the software system will be a Single Page Application (SPA) implemented in HTML, CSC, and JS via React and TailwindCSS and will be built using Vite. In addition, the Axios library will be used to provide the HTTP Client for making API requests. The built SPA will then be served through the use of Nginx, a web server which will be run inside a Docker Container.
+
+
+### Backend
+
+Summary of Technologies Used
+1. Node.js (Runtime)
+2. Express.js (Application Framework for RESTful APIs)
+3. Json Web Token (Authentication and Session Management)
+4. Prisma ORM (Database Migrations and Database Queries)
+5. Docker
+
+
+The backend will be using the Node.js JavaScript runtime and Express.js which is an application framework for building RESTful APIs and will be run inside a Docker Container.
+
+For authentication, Json Web Token (JWT) will be used for Authentication and Session Management.
+
+For database access and database models, Prisma ORM will be used to perform database migrations and database queries.
+
+### Database
+
+Summary of Technologies Used
+1. PostgreSQL
+
+The database that is used by the software system is PostgreSQL and will be managed through Render’s PostgreSQL Database service.
+
+</br>
+
 ## Testing Guide
 
 ### Testing Templates

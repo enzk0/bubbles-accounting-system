@@ -77,7 +77,7 @@ function Navbar() {
             <div className="flex flex-row grow justify-end items-center gap-4">
                 <div>
                     <div className="text-md text-right font-bold">
-                        {`${user.firstName ? user.firstName : "First"} ${user.lastName ? user.lastName : "Last"}`}
+                        {`${user.firstName ? user.firstName : ""} ${user.lastName ? user.lastName : ""}`}
                     </div>
                     <div className="text-sm text-right">
                         {user.username ? user.username : "username"}

@@ -6,7 +6,7 @@ import axios from "axios";
 
 import { AuthContext } from "../context/AuthContext";
 import TextField from "../components/TextField";
-import { publicApi } from "../api/BASApi";
+import { privateApi, publicApi } from "../api/BASApi";
 import { useEffect } from "react";
 
 function EmployeeLogin() {
@@ -68,9 +68,27 @@ function EmployeeLogin() {
     useEffect(() => {
         const token = localStorage.getItem("token");
 
-        if (token) {
-            navigate("/employee/");
+        if (!token) {
+            return;
         }
+
+        const fetchUser = async () => {
+            try {
+                const response = await privateApi.get("/user/self");
+                const user = response.data;
+
+                if (user.roleId === 1) {
+                    navigate("/admin/");
+                }
+                if (user.roleId === 2) {
+                    navigate("/employee/");
+                }
+            } catch (error) {
+                console.error("Error fetching current user:", error);
+            }
+        };
+
+        fetchUser();
     }, []);
 
     return (

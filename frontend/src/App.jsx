@@ -1,35 +1,119 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
+import AdminProducts from "./pages/AdminProducts";
+import AdminBranches from "./pages/AdminBranches";
+import AdminEmployees from "./pages/AdminEmployees";
+import AdminJobOrders from "./pages/AdminJobOrders";
+import AdminLogin from "./pages/AdminLogin";
+import AdminLayout from "./components/AdminLayout";
+import AdminHome from "./pages/AdminHome";
+import EmployeeLogin from "./pages/EmployeeLogin";
+import EmployeeHome from "./pages/EmployeeHome";
+import EmployeeJobOrders from "./pages/EmployeeJobOrders";
+import EmployeeOngoingJobOrders from "./pages/EmployeeOngoingJobOrders";
+import EmployeeCompletedJobOrders from "./pages/EmployeeCompletedJobOrders";
+import EmployeeLayout from "./components/EmployeeLayout";
+import PageNotFound from "./pages/PageNotFound";
+import AuthProvider from "./context/AuthContext";
+import PrivateComponent from "./components/PrivateComponent";
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [count, setCount] = useState(0);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    return (
+        <AuthProvider>
+            <div className="flex flex-row">
+                <Routes>
+                    <Route
+                        path="/"
+                        element={<Navigate to="/employee/login" replace />}
+                    />
+                    <Route path="/employee" element={<EmployeeLayout />}>
+                        <Route
+                            index
+                            element={
+                                <PrivateComponent defaultRoute="/employee/login">
+                                    <EmployeeHome />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route path="login" element={<EmployeeLogin />} />
+                        <Route path="job_orders">
+                            <Route
+                                index
+                                element={
+                                    <PrivateComponent defaultRoute="/employee/login">
+                                        <EmployeeJobOrders />
+                                    </PrivateComponent>
+                                }
+                            />
+                            <Route
+                                path="ongoing"
+                                element={
+                                    <PrivateComponent defaultRoute="/employee/login">
+                                        <EmployeeOngoingJobOrders />
+                                    </PrivateComponent>
+                                }
+                            />
+                            <Route
+                                path="completed"
+                                element={
+                                    <PrivateComponent defaultRoute="/employee/login">
+                                        <EmployeeCompletedJobOrders />
+                                    </PrivateComponent>
+                                }
+                            />
+                        </Route>
+                    </Route>
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route
+                            index
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminHome />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route path="login" element={<AdminLogin />} />
+                        <Route
+                            path="job_orders"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminJobOrders />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route
+                            path="employees"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminEmployees />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route
+                            path="branches"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminBranches />
+                                </PrivateComponent>
+                            }
+                        />
+                        <Route
+                            path="products"
+                            element={
+                                <PrivateComponent defaultRoute="/admin/login">
+                                    <AdminProducts />
+                                </PrivateComponent>
+                            }
+                        />
+                    </Route>
+                    <Route path="*" element={<PageNotFound />} />
+                </Routes>
+            </div>
+        </AuthProvider>
+    );
 }
 
-export default App
+export default App;

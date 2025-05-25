@@ -1,18 +1,26 @@
 import { PrismaClient } from "@prisma/client";
 import { mockDeep, mockReset } from "vitest-mock-extended";
 import { beforeEach, vi } from "vitest";
-import prisma from "./client";
+import prisma, { custom } from "./client";
 
 console.log("Setting up singleton for mocking");
 
 vi.mock("./client.js", () => ({
-  __esModule: true,
-  default: mockDeep(),
+    __esModule: true,
+    custom: mockDeep(),
+    prisma: mockDeep(),
+    default: mockDeep(),
 }));
 
 beforeEach(() => {
-  mockReset(prismaMock);
+    mockReset(prismaMock);
+    mockReset(customMock);
 });
 
 /** @type {import('vitest-mock-extended').DeepMockProxy<PrismaClient>} */
-export const prismaMock = prisma;
+const prismaMock = prisma;
+
+/** @type {import('vitest-mock-extended').DeepMockProxy<PrismaClient>} */
+const customMock = custom;
+
+export { prismaMock, customMock };

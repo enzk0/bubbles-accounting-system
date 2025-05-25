@@ -8,4 +8,8 @@ RUN npm ci --verbose
 
 COPY . .
 
-CMD ["npm", "run", "dev"]
+RUN npx prisma generate
+
+EXPOSE 3000
+
+CMD ["npm", "start"]

@@ -1,0 +1,559 @@
+import { test, expect, describe, vi } from "vitest";
+import {
+    countAssignedJobOrders,
+    countJobOrders,
+    createJobOrder,
+    editJobOrderStatus,
+    getAllJobOrders,
+    getAssignedJobOrders,
+    getJobOrder,
+} from "../jobOrderController";
+import prisma from "../../client";
+
+const mockRequest = (body, user, params, query) => ({
+    body: body,
+    user: user,
+    params: params,
+    query: query,
+});
+
+const mockResponse = () => {
+    const res = {};
+
+    res.status = vi.fn().mockReturnValue(res);
+    res.json = vi.fn().mockReturnValue(res);
+    res.send = vi.fn().mockReturnValue(res);
+
+    return res;
+};
+
+const mockRequestBody = {
+    // requester: { id: 1 },
+    branch: {
+        id: 1,
+    },
+    customer: {
+        firstName: "Vivian",
+        lastName: "Banshee",
+        address: "Sixth Street",
+        phoneNumber: "973 995 4609",
+    },
+    jobOrder: {
+        items: [
+            {
+                productId: 1,
+                productName: "WASH",
+                productPrice: 60.0,
+                productQuantity: 0,
+            },
+            {
+                productId: 2,
+                productName: "DRY",
+                productPrice: 70.0,
+                productQuantity: 0,
+            },
+            {
+                productId: 3,
+                productName: "DETERGENT",
+                productPrice: 15.0,
+                productQuantity: 0,
+            },
+            {
+                productId: 4,
+                productName: "FABCON",
+                productPrice: 15.0,
+                productQuantity: 0,
+            },
+            {
+                productId: 5,
+                productName: "LOAD",
+                productPrice: 20.0,
+                productQuantity: 0,
+            },
+            {
+                productId: 6,
+                productName: "FOLD",
+                productPrice: 20.0,
+                productQuantity: 0,
+            },
+            {
+                productId: 7,
+                productName: "DROPOFF",
+                productPrice: 180.0,
+                productQuantity: 0,
+            },
+        ],
+    },
+};
+
+describe("INTEGRATION TESTS FOR 'createJobOrder()' CONTROLLER", () => {
+    test("createJobOrder() should create a jobOrder in the database and send an HTTP status code of 201", async () => {
+        const req = mockRequest(mockRequestBody, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(201);
+        expect(typeof jobOrder).toBe("object");
+
+        jobOrder = await prisma.jobOrder.findUnique({
+            where: {
+                idCode_idNumber: {
+                    idCode: jobOrder.idCode,
+                    idNumber: jobOrder.idNumber,
+                },
+            },
+            include: {
+                jobOrderItems: true,
+                customer: true,
+            },
+        });
+
+        expect(jobOrder.jobOrderItems.length).toEqual(7);
+    });
+
+    test("createJobOrder() should send an HTTP status code of 403 when branch information provided points to a inactive branch", async () => {
+        const req = mockRequest(
+            {
+                ...mockRequestBody,
+                branch: { id: 8 },
+            },
+            { id: 1 },
+            {},
+            {}
+        );
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    test("createJobOrder() should send an HTTP status code of 403 when any of the job order items are inactive", async () => {
+        const req = mockRequest(
+            {
+                ...mockRequestBody,
+                jobOrder: {
+                    items: [
+                        {
+                            productId: 1,
+                            productName: "WASH",
+                            productPrice: 60.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 2,
+                            productName: "DRY",
+                            productPrice: 70.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 3,
+                            productName: "DETERGENT",
+                            productPrice: 15.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 4,
+                            productName: "FABCON",
+                            productPrice: 15.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 5,
+                            productName: "LOAD",
+                            productPrice: 20.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 8,
+                            productName: "PERFUME",
+                            productPrice: 50.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 9,
+                            productName: "IRON",
+                            productPrice: 60.0,
+                            productQuantity: 0,
+                        },
+                    ],
+                },
+            },
+            { id: 1 },
+            {},
+            {}
+        );
+
+        console.log(req.body);
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(403);
+    });
+
+    test("createJobOrder() should send an HTTP status code of 404 when branch information provided points to a branch that does not exist", async () => {
+        const req = mockRequest(
+            {
+                ...mockRequestBody,
+                branch: { id: 420 },
+            },
+            { id: 1 },
+            {},
+            {}
+        );
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+
+    test("createJobOrder() should send an HTTP status code of 422 when there are less than 7 job order items", async () => {
+        const req = mockRequest(
+            {
+                ...mockRequestBody,
+                jobOrder: {
+                    items: [
+                        {
+                            productId: 1,
+                            productName: "WASH",
+                            productPrice: 60.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 2,
+                            productName: "DRY",
+                            productPrice: 70.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 3,
+                            productName: "DETERGENT",
+                            productPrice: 15.0,
+                            productQuantity: 0,
+                        },
+                        {
+                            productId: 4,
+                            productName: "FABCON",
+                            productPrice: 15.0,
+                            productQuantity: 0,
+                        },
+                    ],
+                },
+            },
+            { id: 1 },
+            {},
+            {}
+        );
+
+        console.log(req.body);
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+
+    test("createJobOrder() should send an HTTP status code of 422 when customer information is incomplete", async () => {
+        const req = mockRequest(
+            { ...mockRequestBody, customer: {} },
+            { id: 1 },
+            {},
+            {}
+        );
+
+        const res = mockResponse();
+
+        let jobOrder = await createJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'getJobOrder()' CONTROLLER", () => {
+    test("getJobOrder() should send an HTTP status of 200 and send the specified job order from the database", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1 }
+        );
+
+        const res = mockResponse();
+
+        const jobOrder = await getJobOrder(req, res);
+
+        console.log(jobOrder);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(jobOrder.idCode).toEqual("AB");
+        expect(jobOrder.idNumber).toEqual(1);
+    });
+
+    test("getJobOrder() should send an HTTP status of 404 when no job order can be found", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { idCode: "AD", idNumber: 69420 }
+        );
+
+        const res = mockResponse();
+
+        await getJobOrder(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(404);
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'getAllJobOrders()' CONTROLLER", () => {
+    const assertJobOrder = (jobOrder) => {
+        expect(jobOrder).toHaveProperty("idCode");
+        expect(jobOrder).toHaveProperty("idNumber");
+        expect(jobOrder).toHaveProperty("createdAt");
+        expect(jobOrder).toHaveProperty("updatedAt");
+        expect(jobOrder).toHaveProperty("isPaid");
+        expect(jobOrder).toHaveProperty("isClaimed");
+        expect(jobOrder).toHaveProperty("isHidden");
+    };
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+        });
+    });
+
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders with branchId of 1 from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { branchId: "1" });
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.branchId).toEqual(1);
+        });
+    });
+
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders with userId of 1 from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { userId: "1" });
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.userId).toEqual(1);
+        });
+    });
+
+    test("getAllJobOrders() should send an HTTP status of 200 and send an array of all job orders where isPaid, isClaimed, and isHidden is false from the database", async () => {
+        const req = mockRequest(
+            {},
+            { id: 1 },
+            {},
+            { isPaid: "false", isClaimed: "false", isHidden: "false" }
+        );
+
+        const res = mockResponse();
+
+        const jobOrders = await getAllJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        jobOrders.forEach((jobOrder) => {
+            assertJobOrder(jobOrder);
+            expect(jobOrder.isPaid).toEqual(false);
+            expect(jobOrder.isClaimed).toEqual(false);
+            expect(jobOrder.isHidden).toEqual(false);
+        });
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'getAssignedJobOrders()' CONTROLLER", () => {
+    const assertJobOrder = (jobOrder) => {
+        expect(jobOrder).toHaveProperty("idCode");
+        expect(jobOrder).toHaveProperty("idNumber");
+        expect(jobOrder).toHaveProperty("createdAt");
+        expect(jobOrder).toHaveProperty("updatedAt");
+        expect(jobOrder).toHaveProperty("isPaid");
+        expect(jobOrder).toHaveProperty("isClaimed");
+        expect(jobOrder).toHaveProperty("isHidden");
+    };
+
+    test("getAssignedJobOrders() should send an HTTP status of 200 and send an array of job orders assigned to the user from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        const jobOrders = await getAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: 1,
+            },
+        });
+
+        jobOrders.forEach((jobOrder) => {
+            console.log(jobOrder);
+            assertJobOrder(jobOrder);
+            expect(jobOrder.userId).toEqual(user.id);
+            expect(jobOrder.branchId).toEqual(user.branchId);
+        });
+    });
+
+    test("getAssignedJobOrders() should send an HTTP status of 200 and send an array of all ongoing job orders assigned to the user from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, {});
+
+        const res = mockResponse();
+
+        const jobOrders = await getAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                id: 1,
+            },
+        });
+
+        jobOrders.forEach((jobOrder) => {
+            console.log(jobOrder);
+            assertJobOrder(jobOrder);
+            expect(jobOrder.userId).toEqual(user.id);
+            expect(jobOrder.branchId).toEqual(user.branchId);
+            expect(jobOrder.isPaid).toEqual(false);
+            expect(jobOrder.isClaimed).toEqual(false);
+        });
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'countJobOrders()' CONTROLLER", () => {
+    const assertSummary = (summary) => {
+        expect(summary).toHaveProperty("interval_start");
+        expect(summary).toHaveProperty("total_unpaid");
+        expect(summary).toHaveProperty("no_of_unpaid");
+        expect(summary).toHaveProperty("total_paid");
+        expect(summary).toHaveProperty("total");
+        expect(summary).toHaveProperty("no_of_job_orders");
+        expect(summary).toHaveProperty("no_of_paid");
+        expect(summary).toHaveProperty("no_of_claimed");
+        expect(summary).toHaveProperty("no_of_unclaimed");
+        expect(summary).toHaveProperty("no_of_completed");
+        expect(summary).toHaveProperty("no_of_ongoing");
+    };
+
+    test("countJobOrders() should send an HTTP status of 200 and send an array of job order grouped by interval from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
+
+        const res = mockResponse();
+
+        let summaries = await countJobOrders(req, res);
+
+        console.log(summaries);
+
+        summaries.forEach((summary) => {
+            assertSummary(summary);
+        });
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("countJobOrders() should send an HTTP status of 422 when an invalid interval is provided", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "betasecond" });
+
+        const res = mockResponse();
+
+        let summaries = await countJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'editJobOrderStatus()' CONTROLLER", () => {
+    test("getJobOrder() should send an HTTP status of 200 when job order status has been successfully modified in the database", async () => {
+        const req = mockRequest(
+            { isPaid: true, isClaimed: true },
+            { id: 1 },
+            {},
+            { idCode: "AB", idNumber: 1 }
+        );
+
+        const res = mockResponse();
+
+        const jobOrder = await editJobOrderStatus(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+
+        const found = await prisma.jobOrder.findUnique({
+            where: {
+                idCode_idNumber: {
+                    idCode: "AB",
+                    idNumber: 1,
+                },
+            },
+        });
+
+        expect(jobOrder.isPaid).toEqual(found.isPaid);
+    });
+});
+
+describe("INTEGRATION TESTS FOR 'countAssignedJobOrders()' CONTROLLER", () => {
+    const assertSummary = (summary) => {
+        expect(summary).toHaveProperty("interval_start");
+        expect(summary).toHaveProperty("total_unpaid");
+        expect(summary).toHaveProperty("no_of_unpaid");
+        expect(summary).toHaveProperty("total_paid");
+        expect(summary).toHaveProperty("total");
+        expect(summary).toHaveProperty("no_of_job_orders");
+        expect(summary).toHaveProperty("no_of_paid");
+        expect(summary).toHaveProperty("no_of_claimed");
+        expect(summary).toHaveProperty("no_of_unclaimed");
+        expect(summary).toHaveProperty("no_of_completed");
+        expect(summary).toHaveProperty("no_of_ongoing");
+    };
+
+    test("countAssignedJobOrders() should send an HTTP status of 200 and send an array of job order assigned to the user that is grouped by interval from the database", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "day" });
+
+        const res = mockResponse();
+
+        let summary = await countAssignedJobOrders(req, res);
+
+        assertSummary(summary);
+
+        expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    test("countAssignedJobOrders() should send an HTTP status of 422 when an invalid interval is provided", async () => {
+        const req = mockRequest({}, { id: 1 }, {}, { interval: "lightyear" });
+
+        const res = mockResponse();
+
+        let summaries = await countAssignedJobOrders(req, res);
+
+        expect(res.status).toHaveBeenCalledWith(422);
+    });
+});

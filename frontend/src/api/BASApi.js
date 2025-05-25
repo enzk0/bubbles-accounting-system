@@ -1,6 +1,6 @@
 import axios from "axios";
 
-let baseURL = "/api";
+let baseURL = "https://backend-azln.onrender.com";
 // let baseURL = "http://localhost:3000/api";
 
 const publicApi = axios.create({

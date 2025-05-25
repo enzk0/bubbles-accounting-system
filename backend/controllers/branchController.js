@@ -83,7 +83,10 @@ export async function getAllBranches(req, res) {
     }
 
     try {
-        const foundBranches = await prisma.branch.findMany({ where: filter });
+        const foundBranches = await prisma.branch.findMany({
+            where: filter,
+            orderBy: { id: "asc" },
+        });
 
         if (foundBranches.length === 0) {
             res.json([]);
@@ -91,6 +94,8 @@ export async function getAllBranches(req, res) {
                 .status(404)
                 .send({ message: "No branches can be found in the database" });
         }
+
+        console.log("Request All Branches");
 
         res.status(200);
         res.json(foundBranches);
@@ -108,7 +113,7 @@ export async function editBranch(req, res) {
     const { id: rawId } = req.params;
     const id = parseInt(rawId);
 
-    const { name, address } = req.body;
+    const { name, address, isActive } = req.body;
 
     if (!name || !address) {
         return res
@@ -124,6 +129,7 @@ export async function editBranch(req, res) {
             data: {
                 name: name,
                 address: address,
+                isActive: isActive,
             },
         });
 

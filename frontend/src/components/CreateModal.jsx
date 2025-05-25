@@ -4,7 +4,6 @@ import Modal from "../components/Modal";
 import TextField from "../components/TextField";
 import NumberField from "../components/NumberField";
 import { useAuth } from "../hooks/UseAuth";
-import axios from "axios";
 import { privateApi } from "../api/BASApi";
 
 function Table({ products, entries, total, increment, decrement }) {

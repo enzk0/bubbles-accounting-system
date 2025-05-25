@@ -13,7 +13,7 @@ import { FiShoppingBag } from "react-icons/fi";
 
 import Sidebar from "./Sidebar";
 import SidebarItem from "./SidebarItem";
-import Navbar from "./AdminNavbar";
+import Navbar from "./Navbar";
 
 function AdminLayout() {
     const location = useLocation();

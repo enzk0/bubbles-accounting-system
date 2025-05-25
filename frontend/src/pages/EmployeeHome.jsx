@@ -63,7 +63,6 @@ function EmployeeHome() {
     }, [refresh]);
 
     useEffect(() => {
-        console.log(process.env.NODE_ENV);
         const handleClickOutside = (e) => {
             const clickedOutside = {
                 createModal:

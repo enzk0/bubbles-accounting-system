@@ -23,6 +23,10 @@ function EmployeeJobOrders() {
         setRefresh((prev) => prev + 1);
     };
 
+    const handleCloseCreate = () => {
+        setVisibility((prev) => ({ ...prev, createModal: false }));
+    };
+
     useEffect(() => {
         const fetchJobOrder = async () => {
             try {
@@ -74,6 +78,7 @@ function EmployeeJobOrders() {
                 ref={createModalRef}
                 isVisible={visibility.createModal}
                 refresh={handleRefresh}
+                close={handleCloseCreate}
             />
             <div className="flex flex-row mb-4 items-baseline">
                 <p className="text-lg font-bold">Job Orders</p>

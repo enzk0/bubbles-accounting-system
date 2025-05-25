@@ -155,7 +155,7 @@ function JobOrderView({ pageRows, jobOrders, refresh }) {
             />
             {jobOrders.length === 0 ? (
                 <div className="text-slate-400 text-center pt-8 pb-4 font-bold">
-                    No Completed Job Orders Found
+                    No Job Orders Found
                 </div>
             ) : (
                 ""

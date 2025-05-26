@@ -22,7 +22,6 @@ function Navbar() {
     });
 
     const handleProfileClick = (e) => {
-        console.log("Clieck");
         setVisisibility((prev) => ({
             ...prev,
             profileDropdown: !prev.profileDropdown,
@@ -49,7 +48,6 @@ function Navbar() {
 
     useEffect(() => {
         const handleClickOutside = (e) => {
-            console.log(dropdownRef.current);
             if (
                 dropdownRef.current &&
                 !dropdownRef.current.contains(e.target) &&

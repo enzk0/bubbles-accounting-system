@@ -1,38 +1,70 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Modal from "../components/Modal";
 import TextField from "../components/TextField";
 import { privateApi } from "../api/BASApi";
+import ErrorMessage from "./ErrorMessage";
+import ProcessingMessage from "./ProcessingMessage";
 
 function CreateProductModal({ isVisible, ref, refresh, close }) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [form, setForm] = useState({
         name: "",
         price: "",
     });
 
-    const [error, setError] = useState(false);
+    const [errors, setErrors] = useState({
+        incompleteFields: false,
+        notUniqueName: false,
+        generalError: false,
+    });
 
     const handleChange = (field) => (e) => {
-        setForm((prev) => ({ ...prev, [field]: e.target.value }));
-        setError(false);
+        const { value } = e.target;
+
+        if (!/^\d*$/.test(value) && field === "price") {
+            return;
+        }
+
+        let final = value;
+
+        if (field === "name") {
+            final = final.toUpperCase();
+        }
+
+        setForm((prev) => ({ ...prev, [field]: final }));
+        setErrors(false);
     };
 
     const handleReset = () => {
         setForm({ name: "", price: "" });
-        setError(false);
+        setIsProcessing(false);
+        setErrors(false);
+    };
+
+    const handleErrorReset = () => {
+        setErrors({
+            incompleteFields: false,
+            notUniqueName: false,
+            generalError: false,
+        });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        handleErrorReset();
+
         const { name, price } = form;
 
         if (!name || isNaN(parseFloat(price)) || parseFloat(price) < 0) {
-            setError(true);
+            setErrors((prev) => ({ ...prev, incompleteFields: true }));
             return;
         }
 
         try {
+            setIsProcessing(true);
             await privateApi.post("/product", {
                 name: name.trim(),
                 price: parseFloat(price),
@@ -43,19 +75,38 @@ function CreateProductModal({ isVisible, ref, refresh, close }) {
             refresh();
             close();
         } catch (err) {
+            setIsProcessing(false);
             console.error("Error creating product:", err);
+            if (errors.response?.status == 500) {
+                const errorCode = errors.response?.data.error.code;
+                if (errorCode === "P2002") {
+                    setErrors((prev) => ({ ...prev, notUniqueName: true }));
+                    return;
+                }
+                setErrors((prev) => ({ ...prev, generalError: true }));
+            }
         }
     };
+
+    useEffect(() => {
+        handleReset();
+    }, [isVisible]);
 
     return (
         <Modal isVisible={isVisible} ref={ref}>
             <div className="flex flex-col gap-4">
-                {error && (
-                    <div className="p-2 rounded font-bold text-red-600 bg-red-200 text-center">
-                        All fields are required and price must be a valid
-                        number!
-                    </div>
-                )}
+                <ErrorMessage error={errors.incompleteFields}>
+                    All Fields are Required!
+                </ErrorMessage>
+                <ErrorMessage error={errors.notUniqueName}>
+                    Product Name is NOT Unique!
+                </ErrorMessage>
+                <ErrorMessage error={errors.generalError}>
+                    Error Creating Product!
+                </ErrorMessage>
+                <ProcessingMessage state={isProcessing}>
+                    Creating Product...
+                </ProcessingMessage>
 
                 <TextField
                     label="Product Name"
@@ -67,7 +118,7 @@ function CreateProductModal({ isVisible, ref, refresh, close }) {
                 <TextField
                     label="Product Price"
                     placeholder="Enter Product Price"
-                    type="number"
+                    type="text"
                     value={form.price}
                     onChange={handleChange("price")}
                 />

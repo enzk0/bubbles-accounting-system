@@ -4,8 +4,11 @@ import Modal from "../components/Modal";
 import TextField from "../components/TextField";
 import { privateApi } from "../api/BASApi";
 import { useAuth } from "../hooks/UseAuth";
+import ErrorMessage from "./ErrorMessage";
+import ProcessingMessage from "./ProcessingMessage";
 
 function CreateUserModal({ isVisible, ref, refresh, close }) {
+    const [isProcessing, setIsProcessing] = useState(false);
     const [token, setToken] = useAuth();
 
     const [form, setForm] = useState({
@@ -17,14 +20,28 @@ function CreateUserModal({ isVisible, ref, refresh, close }) {
         roleId: "",
     });
 
-    const [error, setError] = useState(false);
+    const [errors, setErrors] = useState({
+        incompleteFields: false,
+        noUniqueUsername: false,
+        invalidBranchRole: false,
+        generalError: false,
+    });
 
     const handleChange = (field) => (e) => {
         setForm((prev) => ({
             ...prev,
             [field]: e.target.value,
         }));
-        setError(false);
+        handleErrorReset();
+    };
+
+    const handleErrorReset = () => {
+        setErrors({
+            incompleteFields: false,
+            noUniqueUsername: false,
+            invalidBranchRole: false,
+            generalError: false,
+        });
     };
 
     const handleReset = () => {
@@ -36,11 +53,14 @@ function CreateUserModal({ isVisible, ref, refresh, close }) {
             branchId: "",
             roleId: "",
         });
-        setError(false);
+        setIsProcessing(false);
+        handleErrorReset();
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        handleErrorReset();
 
         const { username, firstName, lastName, password, branchId, roleId } =
             form;
@@ -53,11 +73,12 @@ function CreateUserModal({ isVisible, ref, refresh, close }) {
             !branchId ||
             !roleId
         ) {
-            setError(true);
+            setErrors((prev) => ({ ...prev, incompleteFields: true }));
             return;
         }
 
         try {
+            setIsProcessing(true);
             await privateApi.post("/user", {
                 user: {
                     username: username.trim(),
@@ -73,20 +94,48 @@ function CreateUserModal({ isVisible, ref, refresh, close }) {
             handleReset();
             refresh();
             close();
-        } catch (err) {
-            console.error("Error creating employee:", err);
+        } catch (error) {
+            setIsProcessing(false);
+            console.error("Error creating employee:", error);
+            if (error.response?.status == 500) {
+                const errorCode = error.response?.data.error.code;
+                if (errorCode === "P2002") {
+                    setErrors((prev) => ({ ...prev, noUniqueUsername: true }));
+                    return;
+                }
+                if (errorCode === "P2003") {
+                    setErrors((prev) => ({ ...prev, invalidBranchRole: true }));
+                    return;
+                }
+                setErrors((prev) => ({ ...prev, generalError: true }));
+            }
         }
     };
 
+    useEffect(() => {
+        handleReset();
+    }, [isVisible]);
+
     return (
         <Modal isVisible={isVisible} ref={ref}>
+            <div>
+                <ErrorMessage error={errors.incompleteFields}>
+                    All Fields are Required!
+                </ErrorMessage>
+                <ErrorMessage error={errors.noUniqueUsername}>
+                    Username is not Unique!
+                </ErrorMessage>
+                <ErrorMessage error={errors.invalidBranchRole}>
+                    Branch or Role is Invalid!
+                </ErrorMessage>
+                <ErrorMessage error={errors.generalError}>
+                    Error Creating User!
+                </ErrorMessage>
+                <ProcessingMessage state={isProcessing}>
+                    Creating User...
+                </ProcessingMessage>
+            </div>
             <div className="flex flex-col gap-4">
-                {error && (
-                    <div className="p-2 rounded font-bold text-red-600 bg-red-200 text-center">
-                        All fields are required!
-                    </div>
-                )}
-
                 <TextField
                     label="Username"
                     placeholder="Enter Username"

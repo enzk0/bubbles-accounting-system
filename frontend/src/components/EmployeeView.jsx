@@ -46,15 +46,24 @@ function EmployeeView({ pageRows, employees, refresh }) {
     });
 
     const handleOpenEdit = (id) => {
-        setEditModalData(id);
+        setEditModalData(null);
+        setTimeout(() => {
+            setEditModalData(id);
+        }, 0);
     };
 
     const handleOpenEditStatus = (id) => {
-        setEditStatusModalData(id);
+        setEditStatusModalData(null);
+        setTimeout(() => {
+            setEditStatusModalData(id);
+        }, 0);
     };
 
     const handleOpenEditBranch = (id) => {
-        setEditBranchModalData(id);
+        setEditBranchModalData(null);
+        setTimeout(() => {
+            setEditBranchModalData(id);
+        }, 0);
     };
 
     const handleCloseChangePassword = () => {
@@ -71,7 +80,7 @@ function EmployeeView({ pageRows, employees, refresh }) {
 
     const nextPage = () => {
         setPage((prev) =>
-            Math.min(prev + 1, Math.ceil(products.length / pageRows))
+            Math.min(prev + 1, Math.ceil(employees.length / pageRows))
         );
     };
 

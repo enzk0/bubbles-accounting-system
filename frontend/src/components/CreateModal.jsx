@@ -6,6 +6,9 @@ import NumberField from "../components/NumberField";
 import { useAuth } from "../hooks/UseAuth";
 import { privateApi } from "../api/BASApi";
 
+import ErrorMessage from "./ErrorMessage";
+import ProcessingMessage from "./ProcessingMessage";
+
 function Table({ products, entries, total, increment, decrement }) {
     const ProductRow = ({ product, entry, increment, decrement }) => (
         <tr className="border-y-1 border-y-slate-300">
@@ -59,6 +62,7 @@ function Table({ products, entries, total, increment, decrement }) {
 }
 
 function CreateModal({ isVisible, ref, refresh, close }) {
+    const [isProcessing, setIsProcessing] = useState(false);
     const [token, setToken] = useAuth();
 
     const [errors, setErrors] = useState({
@@ -89,6 +93,8 @@ function CreateModal({ isVisible, ref, refresh, close }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        handleErrorReset();
+
         if (!form.jobOrder.tagNo || Number(form.jobOrder.tagNo) === NaN) {
             setErrors((prev) => ({ ...prev, tagError: true }));
             return;
@@ -100,6 +106,7 @@ function CreateModal({ isVisible, ref, refresh, close }) {
         }
 
         try {
+            setIsProcessing(true);
             let response = await privateApi.get("/user/self");
 
             const user = response.data;
@@ -131,6 +138,7 @@ function CreateModal({ isVisible, ref, refresh, close }) {
             refresh();
             close();
         } catch (error) {
+            setIsProcessing(false);
             console.error("Error submitting job order:", error);
         }
     };
@@ -172,6 +180,7 @@ function CreateModal({ isVisible, ref, refresh, close }) {
             };
         });
     };
+
     const handleReset = () => {
         const reset = Object.fromEntries(
             Object.entries(entries).map(([key, value]) => [
@@ -191,6 +200,7 @@ function CreateModal({ isVisible, ref, refresh, close }) {
                 phoneNumber: "",
             },
         });
+        setIsProcessing(false);
         handleErrorReset();
     };
 
@@ -219,6 +229,7 @@ function CreateModal({ isVisible, ref, refresh, close }) {
                 console.error("Error fetching job orders:", error);
             }
         };
+        handleReset();
         fetchProducts();
     }, []);
 
@@ -233,16 +244,15 @@ function CreateModal({ isVisible, ref, refresh, close }) {
             <div></div>
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2 text-center">
-                    <div
-                        className={`p-2 rounded font-bold text-red-600 bg-red-200 ${errors.tagError ? "" : "hidden"}`}
-                    >
+                    <ErrorMessage error={errors.tagError}>
                         Invalid Tag Number!
-                    </div>
-                    <div
-                        className={`p-2 rounded font-bold text-red-600 bg-red-200 ${errors.customerError ? "" : "hidden"}`}
-                    >
+                    </ErrorMessage>
+                    <ErrorMessage error={errors.customerError}>
                         Customer Name is Empty!
-                    </div>
+                    </ErrorMessage>
+                    <ProcessingMessage state={isProcessing}>
+                        Creating Job Order...
+                    </ProcessingMessage>
                 </div>
                 <div>
                     <TextField

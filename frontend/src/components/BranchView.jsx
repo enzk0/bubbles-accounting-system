@@ -37,7 +37,10 @@ function BranchView({ pageRows, branches, refresh }) {
     });
 
     const handleOpenEdit = (id) => {
-        setEditModalData(id);
+        setEditModalData(null);
+        setTimeout(() => {
+            setEditModalData(id);
+        }, 0);
     };
 
     const prevPage = () => {
@@ -51,7 +54,6 @@ function BranchView({ pageRows, branches, refresh }) {
     };
 
     useEffect(() => {
-        console.log("Detected Open", editModalData);
         if (editModalData) {
             setVisibility((prev) => ({ ...prev, editModal: true }));
         }

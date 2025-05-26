@@ -5,7 +5,6 @@ import { useLocation } from "react-router-dom";
 
 function Sidebar({ children }) {
     const [isExpanded, setIsExpanded] = useState(true);
-    const location = useLocation;
 
     return (
         <aside className="h-screen flex-col p-4 gap-4 border-r-1 border-r-slate-300 bg-white top-0 hidden sm:flex sticky">
@@ -18,7 +17,7 @@ function Sidebar({ children }) {
                             <FaCircle />
                         </div>
                         <div>
-                            <p className="text-xl font-bold">Bubbles Launrdy</p>
+                            <p className="text-xl font-bold">Bubbles Laundry</p>
                             <p>Accounting System</p>
                         </div>
                     </div>

@@ -4,8 +4,11 @@ import { useAuth } from "../hooks/UseAuth";
 import { AuthContext } from "../context/AuthContext";
 import TextField from "../components/TextField";
 import { publicApi } from "../api/BASApi";
+import ErrorMessage from "../components/ErrorMessage";
+import ProcessingMessage from "../components/ProcessingMessage";
 
 function AdminLogin() {
+    const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate();
     const [token, setToken] = useAuth(AuthContext);
 
@@ -13,7 +16,7 @@ function AdminLogin() {
         incorrectCredentials: false,
         noCredentials: false,
         invalidUser: false,
-        invalidAccountType: false,
+        notAllowed: false,
     });
 
     const [form, setForm] = useState({
@@ -34,9 +37,9 @@ function AdminLogin() {
 
         setErrors((prev) => ({
             incorrectCredentials: false,
-            invalidUser: false,
             noCredentials: false,
-            invalidAccountType: false,
+            invalidUser: false,
+            notAllowed: false,
         }));
 
         if (!form.username || !form.password) {
@@ -45,6 +48,7 @@ function AdminLogin() {
         }
 
         try {
+            setIsProcessing(true);
             const response = await publicApi.post("/auth/login/admin", {
                 username: form.username,
                 password: form.password,
@@ -52,14 +56,16 @@ function AdminLogin() {
 
             setToken(response.data.accessToken);
 
+            setIsProcessing(false);
             navigate("/admin");
         } catch (error) {
+            setIsProcessing(false);
             console.error("Error submitting form:", error);
             if (error.response?.status === 401) {
                 setErrors((prev) => ({ ...prev, incorrectCredentials: true }));
             }
             if (error.response?.status === 403) {
-                setErrors((prev) => ({ ...prev, invalidAccountType: true }));
+                setErrors((prev) => ({ ...prev, notAllowed: true }));
             }
             if (error.response?.status === 404) {
                 setErrors((prev) => ({ ...prev, invalidUser: true }));
@@ -82,26 +88,22 @@ function AdminLogin() {
                 method="POST"
                 className="flex flex-col gap-6 p-6 rounded-xl border-1 border-slate-300 bg-white"
             >
-                <div
-                    className={`p-2 rounded text-center text-red-600 font-bold bg-red-200 ${errors.incorrectCredentials ? "" : "hidden"}`}
-                >
+                <ErrorMessage error={errors.incorrectCredentials}>
                     Incorrect Credentials!
-                </div>
-                <div
-                    className={`p-2 rounded text-center text-red-600 font-bold bg-red-200 ${errors.invalidUser ? "" : "hidden"}`}
-                >
+                </ErrorMessage>
+                <ErrorMessage error={errors.invalidUser}>
                     Not a User!
-                </div>
-                <div
-                    className={`p-2 rounded text-center text-red-600 font-bold bg-red-200 ${errors.noCredentials ? "" : "hidden"}`}
-                >
+                </ErrorMessage>
+                <ErrorMessage error={errors.noCredentials}>
                     No Credentials Entered!
-                </div>
-                <div
-                    className={`p-2 rounded text-center text-red-600 font-bold bg-red-200 ${errors.invalidAccountType ? "" : "hidden"}`}
-                >
-                    Admin Account Only!
-                </div>
+                </ErrorMessage>
+                <ErrorMessage error={errors.notAllowed}>
+                    Logging In with this User is not allowed!
+                </ErrorMessage>
+                <ProcessingMessage state={isProcessing}>
+                    Logging In
+                </ProcessingMessage>
+
                 <p className="text-center text-lg font-bold">Admin Login</p>
                 <TextField
                     label={"Username"}

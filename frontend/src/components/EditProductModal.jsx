@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { privateApi } from "../api/BASApi";
+import ProcessingMessage from "./ProcessingMessage";
 
 function ProductInfo({ product }) {
     return (
@@ -25,6 +26,8 @@ function ProductInfo({ product }) {
 }
 
 function EditProductModal({ id, isVisible, ref, refresh }) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [product, setProduct] = useState({
         id: "",
         name: "",
@@ -41,6 +44,7 @@ function EditProductModal({ id, isVisible, ref, refresh }) {
         e.preventDefault();
 
         try {
+            setIsProcessing(true);
             const response = await privateApi.patch(`/product/${id}`, {
                 name: product.name,
                 price: product.price,
@@ -49,8 +53,10 @@ function EditProductModal({ id, isVisible, ref, refresh }) {
 
             setProduct((prev) => ({ ...prev, [status]: !product[status] }));
 
+            setIsProcessing(false);
             refresh();
         } catch (error) {
+            setIsProcessing(false);
             console.log("Error updating the branch status: ", error);
         }
     };
@@ -75,6 +81,11 @@ function EditProductModal({ id, isVisible, ref, refresh }) {
 
     return (
         <Modal isVisible={isVisible} ref={ref} width={"min-w-lg"}>
+            <div>
+                <ProcessingMessage state={isProcessing}>
+                    Updating Product...
+                </ProcessingMessage>
+            </div>
             <div className="flex flex-col gap-4">
                 <ProductInfo product={product} />
                 <div className="flex flex-row gap-4">

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { privateApi } from "../api/BASApi";
 
+import ProcessingMessage from "./ProcessingMessage";
+
 function ItemsTableRow({ item }) {
     const amount = item.productPrice * item.productQuantity;
     return (
@@ -93,6 +95,8 @@ function JobOrderInfo({ jobOrder }) {
 }
 
 function EditModal({ idCode, idNumber, isVisible, ref, refresh }) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [jobOrder, setJobOrder] = useState({
         idCode: "",
         idNumber: 0,
@@ -136,6 +140,7 @@ function EditModal({ idCode, idNumber, isVisible, ref, refresh }) {
         }
 
         try {
+            setIsProcessing(true);
             await privateApi.patch(
                 `/job-order/status?idCode=${jobOrder.idCode}&idNumber=${jobOrder.idNumber}`,
                 {
@@ -145,8 +150,10 @@ function EditModal({ idCode, idNumber, isVisible, ref, refresh }) {
 
             setJobOrder((prev) => ({ ...prev, [status]: !jobOrder[status] }));
 
+            setIsProcessing(false);
             refresh();
         } catch (error) {
+            setIsProcessing(false);
             console.log("Error updating the job order status: ", error);
         }
     };
@@ -157,6 +164,7 @@ function EditModal({ idCode, idNumber, isVisible, ref, refresh }) {
         }
 
         setDisabled(false);
+        setIsProcessing(false);
 
         try {
             const fetchJobOrder = async () => {
@@ -176,6 +184,11 @@ function EditModal({ idCode, idNumber, isVisible, ref, refresh }) {
 
     return (
         <Modal isVisible={isVisible} ref={ref} width={"min-w-lg"}>
+            <div>
+                <ProcessingMessage state={isProcessing}>
+                    Updating Job Order...
+                </ProcessingMessage>
+            </div>
             <div className="flex flex-col gap-4">
                 <JobOrderInfo jobOrder={jobOrder} />
                 <CustomerInfo customer={jobOrder.customer} />

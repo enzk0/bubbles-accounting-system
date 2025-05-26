@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { privateApi } from "../api/BASApi";
 import TextField from "./TextField";
+import ErrorMessage from "./ErrorMessage";
+import ProcessingMessage from "./ProcessingMessage";
 
 function UserInfo({ user }) {
     return (
@@ -26,6 +28,8 @@ function UserInfo({ user }) {
 }
 
 function EditUserBranchModal({ id, isVisible, ref, refresh, close }) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [user, setUser] = useState({
         id: "",
         username: "",
@@ -37,8 +41,22 @@ function EditUserBranchModal({ id, isVisible, ref, refresh, close }) {
         branchId: "",
     });
 
+    const [errors, setErrors] = useState({
+        branchNotFound: false,
+        noInput: false,
+    });
+
+    const handleErrorReset = () => {
+        setErrors({ branchNotFound: false, noInput: false });
+    };
+
     const handleFormChange = (field) => (e) => {
         const { value } = e.target;
+
+        if (!/^\d*$/.test(value)) {
+            return;
+        }
+
         setForm((prev) => ({
             ...prev,
             [field]: value,
@@ -46,12 +64,16 @@ function EditUserBranchModal({ id, isVisible, ref, refresh, close }) {
     };
 
     const handleSubmit = async () => {
-        if (!form.branchId) {
+        handleErrorReset();
+
+        if (!form.branchId || Number(branchId) == NaN) {
             console.error("No Branch ID Provided!");
+            setErrors((prev) => ({ ...prev, noInput: true }));
             return;
         }
 
         try {
+            setIsProcessing(true);
             await privateApi.patch(`/user/${id}`, {
                 username: user.username,
                 firstName: user.firstName,
@@ -67,40 +89,59 @@ function EditUserBranchModal({ id, isVisible, ref, refresh, close }) {
             refresh();
             handleReset();
         } catch (error) {
+            setIsProcessing(false);
             console.error("Error changing branch ID:", error);
+            if (error.response?.status === 404) {
+                setErrors((prev) => ({ ...prev, branchNotFound: true }));
+            }
         }
     };
 
     const handleReset = () => {
         setForm({ branchId: "" });
+        setIsProcessing(false);
+        handleErrorReset();
         close();
     };
 
     useEffect(() => {
         if (!id) return;
 
-        const fetchUser = async () => {
-            try {
+        try {
+            const fetchUser = async () => {
                 const response = await privateApi.get(`/user/${id}`);
                 console.log(response.data);
                 setUser(response.data);
-            } catch (error) {
-                console.error("Error fetching user: ", error);
-            }
-        };
+            };
 
-        fetchUser();
+            fetchUser();
+        } catch (error) {
+            console.error("Error fetching user: ", error);
+        }
+
+        handleReset();
     }, [id]);
 
     return (
         <Modal isVisible={isVisible} ref={ref} width={"min-w-lg"}>
+            <div>
+                <ErrorMessage error={errors.noInput}>
+                    No Branch ID Entered!
+                </ErrorMessage>
+                <ErrorMessage error={errors.branchNotFound}>
+                    No Branch with entered Branch ID Found!
+                </ErrorMessage>
+                <ProcessingMessage state={isProcessing}>
+                    Updating User Branch Assignment...
+                </ProcessingMessage>
+            </div>
             <div className="flex flex-col gap-4">
                 <UserInfo user={user} />
 
                 <TextField
                     label="New Branch ID"
                     placeholder="Enter Branch ID"
-                    type="number"
+                    type="text"
                     name="branchId"
                     value={form.branchId}
                     onChange={handleFormChange("branchId")}

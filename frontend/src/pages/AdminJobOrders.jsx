@@ -38,6 +38,11 @@ function AdminJobOrders() {
     const [jobOrders, setJobOrders] = useState([]);
     const [active, setActive] = useState(0);
     const [branches, setBranches] = useState({});
+    const [refresh, setRefresh] = useState(0);
+
+    const handleRefresh = () => {
+        setRefresh((prev) => prev + 1);
+    };
 
     useEffect(() => {
         const fetchJobOrders = async () => {
@@ -51,8 +56,6 @@ function AdminJobOrders() {
                 query = `?branchId=${active}`;
             }
 
-            console.log(query);
-
             try {
                 let response = await privateApi.get(`/job-order/all${query}`);
 
@@ -65,7 +68,7 @@ function AdminJobOrders() {
         };
 
         fetchJobOrders();
-    }, [active]);
+    }, [active, refresh]);
 
     useEffect(() => {
         const fetchBranches = async () => {
@@ -78,8 +81,6 @@ function AdminJobOrders() {
                 branches.forEach((branch) => {
                     branchSelection[branch.name] = branch.id;
                 });
-
-                console.log(branches);
 
                 setBranches({ All: 0, ...branchSelection });
             } catch (error) {
@@ -98,7 +99,11 @@ function AdminJobOrders() {
             <div className="flex flex-row mb-2">
                 <p className="text-lg font-bold">Job Orders</p>
             </div>
-            <JobOrderView pageRows={pageRows} jobOrders={jobOrders} />
+            <JobOrderView
+                pageRows={pageRows}
+                jobOrders={jobOrders}
+                refresh={handleRefresh}
+            />
         </div>
     );
 }

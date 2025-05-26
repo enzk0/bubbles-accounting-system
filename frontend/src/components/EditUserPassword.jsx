@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { privateApi } from "../api/BASApi";
 import TextField from "./TextField";
+import ErrorMessage from "./ErrorMessage";
+import ProcessingMessage from "./ProcessingMessage";
 
 function UserInfo({ user }) {
     return (
@@ -26,6 +28,8 @@ function UserInfo({ user }) {
 }
 
 function EditPasswordModal({ id, isVisible, ref, refresh, close }) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [user, setUser] = useState({
         id: "",
         username: "",
@@ -38,13 +42,32 @@ function EditPasswordModal({ id, isVisible, ref, refresh, close }) {
         confirm: "",
     });
 
+    const [errors, setErrors] = useState({
+        noInputError: false,
+        confirmError: false,
+    });
+
+    const handleResetErrors = () => {
+        setErrors({ noInputError: false, confirmError: false });
+    };
+
     const handleSubmit = async () => {
+        handleResetErrors();
+
         if (!form.password || !form.confirm) {
             console.error("No Password or Confirm Provided!");
+            setErrors((prev) => ({ ...prev, noInputError: true }));
+            return;
+        }
+
+        if (form.password != form.confirm) {
+            console.error("Entered password does not match confirm password!");
+            setErrors((prev) => ({ ...prev, confirmError: true }));
             return;
         }
 
         try {
+            setIsProcessing(true);
             const response = await privateApi.patch(`/user/password/${id}`, {
                 password: form.password,
             });
@@ -54,11 +77,14 @@ function EditPasswordModal({ id, isVisible, ref, refresh, close }) {
             handleReset();
         } catch (error) {
             console.error("Error changing password:", error);
+            setIsProcessing(false);
         }
     };
 
     const handleReset = () => {
         setForm({ password: "", confirm: "" });
+        setIsProcessing(false);
+        handleResetErrors();
         close();
     };
 
@@ -84,18 +110,32 @@ function EditPasswordModal({ id, isVisible, ref, refresh, close }) {
 
             fetchUser();
         } catch (error) {
-            console.error("Error fetching job order: ", error);
+            console.error("Error fetching user information: ", error);
         }
+
+        handleReset();
     }, [id]);
 
     return (
         <Modal isVisible={isVisible} ref={ref} width={"min-w-lg"}>
+            <div>
+                <ErrorMessage error={errors.noInputError}>
+                    No Password Entered!
+                </ErrorMessage>
+                <ErrorMessage error={errors.confirmError}>
+                    Password does not match Confirm Password!
+                </ErrorMessage>
+
+                <ProcessingMessage state={isProcessing}>
+                    Updating User Password...
+                </ProcessingMessage>
+            </div>
             <div className="flex flex-col gap-4">
                 <UserInfo user={user} />
                 <TextField
                     label="New Password"
                     placeholder="Enter New Password"
-                    type="text"
+                    type="password"
                     name="password"
                     value={form.password}
                     onChange={handleFormChange("password")}
@@ -104,7 +144,7 @@ function EditPasswordModal({ id, isVisible, ref, refresh, close }) {
                 <TextField
                     label="Confirm Password"
                     placeholder="Enter Confirmed Password"
-                    type="text"
+                    type="password"
                     name="confim"
                     value={form.confirm}
                     onChange={handleFormChange("confirm")}

@@ -38,7 +38,10 @@ function ProductView({ pageRows, products, refresh }) {
     });
 
     const handleOpenEdit = (id) => {
-        setEditModalData(id);
+        setEditModalData(null);
+        setTimeout(() => {
+            setEditModalData(id);
+        }, 0);
     };
 
     const prevPage = () => {
@@ -52,7 +55,6 @@ function ProductView({ pageRows, products, refresh }) {
     };
 
     useEffect(() => {
-        console.log("Detected Open", editModalData);
         if (editModalData) {
             setVisibility((prev) => ({ ...prev, editModal: true }));
         }

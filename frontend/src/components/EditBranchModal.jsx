@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { privateApi } from "../api/BASApi";
+import ProcessingMessage from "./ProcessingMessage";
 
 function BranchInfo({ branch }) {
     return (
@@ -27,6 +28,8 @@ function BranchInfo({ branch }) {
 }
 
 function EditBranchModal({ id, isVisible, ref, refresh }) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [branch, setBranch] = useState({
         id: "",
         code: "",
@@ -44,6 +47,7 @@ function EditBranchModal({ id, isVisible, ref, refresh }) {
         e.preventDefault();
 
         try {
+            setIsProcessing(true);
             const response = await privateApi.patch(`/branch/${id}`, {
                 name: branch.name,
                 address: branch.address,
@@ -53,7 +57,9 @@ function EditBranchModal({ id, isVisible, ref, refresh }) {
             setBranch((prev) => ({ ...prev, [status]: !branch[status] }));
 
             refresh();
+            setIsProcessing(false);
         } catch (error) {
+            setIsProcessing(false);
             console.log("Error updating the branch status: ", error);
         }
     };
@@ -78,6 +84,11 @@ function EditBranchModal({ id, isVisible, ref, refresh }) {
 
     return (
         <Modal isVisible={isVisible} ref={ref} width={"min-w-lg"}>
+            <div>
+                <ProcessingMessage state={isProcessing}>
+                    Updating Branch...
+                </ProcessingMessage>
+            </div>
             <div className="flex flex-col gap-4">
                 <BranchInfo branch={branch} />
                 <div className="flex flex-row gap-4">

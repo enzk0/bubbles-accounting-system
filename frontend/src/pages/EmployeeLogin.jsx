@@ -8,14 +8,19 @@ import { AuthContext } from "../context/AuthContext";
 import TextField from "../components/TextField";
 import { privateApi, publicApi } from "../api/BASApi";
 import { useEffect } from "react";
+import ErrorMessage from "../components/ErrorMessage";
+import ProcessingMessage from "../components/ProcessingMessage";
 
 function EmployeeLogin() {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const navigate = useNavigate();
     const [token, setToken] = useAuth(AuthContext);
     const [errors, setErrors] = useState({
         incorrectCredentials: false,
         noCredentials: false,
         invalidUser: false,
+        notAllowed: false,
     });
 
     const [form, setForm] = useState({
@@ -38,6 +43,7 @@ function EmployeeLogin() {
             incorrectCredentials: false,
             invalidUser: false,
             noCredentials: false,
+            notAllowed: false,
         }));
 
         if (!form.username || !form.password) {
@@ -46,6 +52,7 @@ function EmployeeLogin() {
         }
 
         try {
+            setIsProcessing(true);
             const response = await publicApi.post("/auth/login/employee", {
                 username: form.username,
                 password: form.password,
@@ -53,14 +60,19 @@ function EmployeeLogin() {
 
             setToken(response.data.accessToken);
 
+            setIsProcessing(false);
             navigate("/employee");
         } catch (error) {
+            setIsProcessing(false);
             console.error("Error submitting form:", error);
             if (error.response?.status === 401) {
                 setErrors((prev) => ({ ...prev, incorrectCredentials: true }));
             }
             if (error.response?.status === 404) {
                 setErrors((prev) => ({ ...prev, invalidUser: true }));
+            }
+            if (error.response?.status === 403) {
+                setErrors((prev) => ({ ...prev, notAllowed: true }));
             }
         }
     };
@@ -99,21 +111,22 @@ function EmployeeLogin() {
                 className="flex flex-col gap-6 p-6 rounded-xl border-1 border-slate-300 bg-white"
             >
                 <p className="text-center text-lg font-bold">Employee Login</p>
-                <div
-                    className={`p-2 rounded text-center text-red-600 font-bold bg-red-200 ${errors.incorrectCredentials ? "" : "hidden"}`}
-                >
+                <ErrorMessage error={errors.incorrectCredentials}>
                     Incorrect Credentials!
-                </div>
-                <div
-                    className={`p-2 rounded text-center text-red-600 font-bold bg-red-200 ${errors.invalidUser ? "" : "hidden"}`}
-                >
+                </ErrorMessage>
+                <ErrorMessage error={errors.invalidUser}>
                     Not a User!
-                </div>
-                <div
-                    className={`p-2 rounded text-center text-red-600 font-bold bg-red-200 ${errors.noCredentials ? "" : "hidden"}`}
-                >
+                </ErrorMessage>
+                <ErrorMessage error={errors.noCredentials}>
                     No Credentials Entered!
-                </div>
+                </ErrorMessage>
+                <ErrorMessage error={errors.notAllowed}>
+                    Logging In with this User is not allowed!
+                </ErrorMessage>
+                <ProcessingMessage state={isProcessing}>
+                    Logging In
+                </ProcessingMessage>
+
                 <TextField
                     label={"Username"}
                     placeholder={"Enter username..."}

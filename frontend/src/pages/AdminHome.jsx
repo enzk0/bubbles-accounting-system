@@ -310,8 +310,6 @@ function AdminHome() {
                     branchSelection[branch.name] = branch.id;
                 });
 
-                console.log(branches);
-
                 setBranches({ All: 0, ...branchSelection });
             } catch (error) {
                 console.error("Error fetching job orders:", error);

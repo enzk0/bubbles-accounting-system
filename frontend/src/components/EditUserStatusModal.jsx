@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 import { privateApi } from "../api/BASApi";
+import ProcessingMessage from "./ProcessingMessage";
 
 function UserInfo({ user }) {
     return (
@@ -25,6 +26,8 @@ function UserInfo({ user }) {
 }
 
 function EditUserStatusModal({ id, isVisible, ref, refresh }) {
+    const [isProcessing, setIsProcessing] = useState(false);
+
     const [user, setUser] = useState({
         id: "",
         username: "",
@@ -42,6 +45,7 @@ function EditUserStatusModal({ id, isVisible, ref, refresh }) {
         e.preventDefault();
 
         try {
+            setIsProcessing(true);
             await privateApi.patch(`/user/${id}`, {
                 username: user.username,
                 firstName: user.firstName,
@@ -50,9 +54,10 @@ function EditUserStatusModal({ id, isVisible, ref, refresh }) {
             });
 
             setUser((prev) => ({ ...prev, isActive: !prev.isActive }));
-
+            setIsProcessing(false);
             refresh();
         } catch (error) {
+            setIsProcessing(false);
             console.error("Error updating user status: ", error);
         }
     };
@@ -74,6 +79,11 @@ function EditUserStatusModal({ id, isVisible, ref, refresh }) {
 
     return (
         <Modal isVisible={isVisible} ref={ref} width={"min-w-lg"}>
+            <div>
+                <ProcessingMessage state={isProcessing}>
+                    Updating User Status...
+                </ProcessingMessage>
+            </div>
             <div className="flex flex-col gap-4">
                 <UserInfo user={user} />
                 <div className="flex flex-row gap-4">

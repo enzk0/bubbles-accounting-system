@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
+import AdminRoute from "./components/AdminRoute";
+import EmployeeRoute from "./components/EmployeeRoute";
 import AdminProducts from "./pages/AdminProducts";
 import AdminBranches from "./pages/AdminBranches";
 import AdminEmployees from "./pages/AdminEmployees";
@@ -16,7 +18,6 @@ import EmployeeCompletedJobOrders from "./pages/EmployeeCompletedJobOrders";
 import EmployeeLayout from "./components/EmployeeLayout";
 import PageNotFound from "./pages/PageNotFound";
 import AuthProvider from "./context/AuthContext";
-import PrivateComponent from "./components/PrivateComponent";
 
 function App() {
     const [count, setCount] = useState(0);
@@ -33,9 +34,9 @@ function App() {
                         <Route
                             index
                             element={
-                                <PrivateComponent defaultRoute="/employee/login">
+                                <EmployeeRoute defaultRoute="/employee/login">
                                     <EmployeeHome />
-                                </PrivateComponent>
+                                </EmployeeRoute>
                             }
                         />
                         <Route path="login" element={<EmployeeLogin />} />
@@ -43,25 +44,25 @@ function App() {
                             <Route
                                 index
                                 element={
-                                    <PrivateComponent defaultRoute="/employee/login">
+                                    <EmployeeRoute defaultRoute="/employee/login">
                                         <EmployeeJobOrders />
-                                    </PrivateComponent>
+                                    </EmployeeRoute>
                                 }
                             />
                             <Route
                                 path="ongoing"
                                 element={
-                                    <PrivateComponent defaultRoute="/employee/login">
+                                    <EmployeeRoute defaultRoute="/employee/login">
                                         <EmployeeOngoingJobOrders />
-                                    </PrivateComponent>
+                                    </EmployeeRoute>
                                 }
                             />
                             <Route
                                 path="completed"
                                 element={
-                                    <PrivateComponent defaultRoute="/employee/login">
+                                    <EmployeeRoute defaultRoute="/employee/login">
                                         <EmployeeCompletedJobOrders />
-                                    </PrivateComponent>
+                                    </EmployeeRoute>
                                 }
                             />
                         </Route>
@@ -70,42 +71,42 @@ function App() {
                         <Route
                             index
                             element={
-                                <PrivateComponent defaultRoute="/admin/login">
+                                <AdminRoute defaultRoute="/admin/login">
                                     <AdminHome />
-                                </PrivateComponent>
+                                </AdminRoute>
                             }
                         />
                         <Route path="login" element={<AdminLogin />} />
                         <Route
                             path="job_orders"
                             element={
-                                <PrivateComponent defaultRoute="/admin/login">
+                                <AdminRoute defaultRoute="/admin/login">
                                     <AdminJobOrders />
-                                </PrivateComponent>
+                                </AdminRoute>
                             }
                         />
                         <Route
                             path="employees"
                             element={
-                                <PrivateComponent defaultRoute="/admin/login">
+                                <AdminRoute defaultRoute="/admin/login">
                                     <AdminEmployees />
-                                </PrivateComponent>
+                                </AdminRoute>
                             }
                         />
                         <Route
                             path="branches"
                             element={
-                                <PrivateComponent defaultRoute="/admin/login">
+                                <AdminRoute defaultRoute="/admin/login">
                                     <AdminBranches />
-                                </PrivateComponent>
+                                </AdminRoute>
                             }
                         />
                         <Route
                             path="products"
                             element={
-                                <PrivateComponent defaultRoute="/admin/login">
+                                <AdminRoute defaultRoute="/admin/login">
                                     <AdminProducts />
-                                </PrivateComponent>
+                                </AdminRoute>
                             }
                         />
                     </Route>

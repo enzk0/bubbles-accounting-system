@@ -1,6 +1,7 @@
 import axios from "axios";
 
-let baseURL = import.meta.env.VITE_API_URL;
+// let baseURL = import.meta.env.VITE_API_URL;
+let baseURL = "https://backend-azln.onrender.com";
 
 const publicApi = axios.create({
     baseURL: baseURL,
